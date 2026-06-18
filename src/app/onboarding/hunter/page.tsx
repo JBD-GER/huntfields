@@ -8,6 +8,7 @@ export const metadata = pageMetadata({
   description:
     "Complete hunter onboarding for US hunting land access, state attestations, license details, and electronic lease signing.",
   path: "/onboarding/hunter",
+  index: false,
 });
 
 export default async function HunterOnboardingPage() {

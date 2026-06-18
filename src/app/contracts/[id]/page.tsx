@@ -10,6 +10,7 @@ export const metadata = pageMetadata({
   description:
     "Review and electronically sign a Huntfields hunting lease agreement.",
   path: "/contracts",
+  index: false,
 });
 
 export default async function ContractPage({ params }: { params: Params }) {

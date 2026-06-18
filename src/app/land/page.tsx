@@ -16,7 +16,12 @@ import {
   searchListingsByRadius,
   searchListingsByRegion,
 } from "@/lib/data/listings";
-import { absoluteUrl, pageMetadata } from "@/lib/seo/site";
+import {
+  absoluteUrl,
+  breadcrumbStructuredData,
+  listingItemListStructuredData,
+  pageMetadata,
+} from "@/lib/seo/site";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getUsLaunchState } from "@/lib/us-market";
 
@@ -114,12 +119,24 @@ export default async function LandSearchPage({
     url: absoluteUrl("/land"),
     about: ["hunting leases", "hunting land for lease", "private land access"],
   };
+  const structuredData = [
+    jsonLd,
+    breadcrumbStructuredData([
+      { name: "Home", path: "/" },
+      { name: "Hunting leases", path: "/land" },
+    ]),
+    listingItemListStructuredData(
+      listings.data,
+      "/land",
+      "Available hunting leases",
+    ),
+  ];
 
   return (
     <div>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       <section className="relative overflow-hidden border-b border-[#234331]/10 bg-[#101b15] text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_12%,rgba(199,107,47,0.28),transparent_26%),radial-gradient(circle_at_78%_0%,rgba(47,111,143,0.25),transparent_30%)]" />

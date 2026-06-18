@@ -10,6 +10,7 @@ export const metadata = pageMetadata({
   description:
     "Manage Huntfields listing submissions, requests, bookings, favorites, and saved searches.",
   path: "/dashboard",
+  index: false,
 });
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;

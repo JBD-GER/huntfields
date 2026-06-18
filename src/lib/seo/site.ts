@@ -1,13 +1,28 @@
 import type { Metadata } from "next";
 import { env } from "@/lib/env";
-import type { ListingDetail, LegalRegion } from "@/lib/data/listings";
-import { formatPrice } from "@/lib/data/listings";
-import { formatAreaDisplay } from "@/lib/area-format";
+import type { ListingCard, ListingDetail, LegalRegion } from "@/lib/data/listings";
+import {
+  formatAreaForViewer,
+  formatPriceForViewer,
+  listingImageUrl,
+} from "@/lib/listing-display";
 
 export const site = {
   name: "Huntfields",
   description:
     "A privacy-first international marketplace for vetted hunting land access, leases, and landowner-approved bookings.",
+  url: env.appUrl,
+  defaultImage: "/opengraph-image",
+  keywords: [
+    "hunting leases",
+    "hunting land for lease",
+    "private hunting land",
+    "hunting lease marketplace",
+    "deer lease",
+    "ranch hunting lease",
+    "landowner hunting access",
+    "US hunting leases",
+  ],
 };
 
 export function absoluteUrl(path: string) {
@@ -19,19 +34,34 @@ export function pageMetadata({
   description,
   path,
   image,
+  index = true,
 }: {
   title: string;
   description: string;
   path: string;
   image?: string;
+  index?: boolean;
 }): Metadata {
   const url = absoluteUrl(path);
+  const imageUrl = image ? absoluteUrl(image) : absoluteUrl(site.defaultImage);
 
   return {
     title,
     description,
+    keywords: site.keywords,
     alternates: {
       canonical: url,
+    },
+    robots: {
+      index,
+      follow: index,
+      googleBot: {
+        index,
+        follow: index,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+      },
     },
     openGraph: {
       title,
@@ -39,13 +69,21 @@ export function pageMetadata({
       url,
       siteName: site.name,
       type: "website",
-      images: image ? [{ url: image }] : undefined,
+      locale: "en_US",
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: `${site.name} hunting lease marketplace`,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: image ? [image] : undefined,
+      images: [imageUrl],
     },
   };
 }
@@ -62,11 +100,14 @@ export function regionMetadata(region: LegalRegion, path: string): Metadata {
 }
 
 export function listingStructuredData(listing: ListingDetail) {
+  const imageUrl = listingImageUrl(listing.cover_image_path, listing.slug);
+
   return {
     "@context": "https://schema.org",
     "@type": "Product",
     name: listing.title,
     description: listing.summary,
+    image: imageUrl ? absoluteUrl(imageUrl) : absoluteUrl(site.defaultImage),
     category: listing.listing_type_label,
     areaServed: {
       "@type": "Place",
@@ -82,23 +123,19 @@ export function listingStructuredData(listing: ListingDetail) {
     offers: {
       "@type": "Offer",
       priceCurrency: listing.currency,
-      price:
-        listing.price_cents === null
-          ? undefined
-          : (listing.price_cents / 100).toFixed(0),
       availability: "https://schema.org/InStock",
       url: absoluteUrl(`/listings/${listing.slug}`),
     },
     additionalProperty: [
       {
         "@type": "PropertyValue",
-        name: "Area",
-        value: formatAreaDisplay(listing),
+        name: "Public area guide",
+        value: formatAreaForViewer(listing, false),
       },
       {
         "@type": "PropertyValue",
-        name: "Price",
-        value: formatPrice(listing),
+        name: "Public price guide",
+        value: formatPriceForViewer(listing, false),
       },
     ],
   };
@@ -118,5 +155,68 @@ export function regionStructuredData(region: LegalRegion, path: string) {
       name: site.name,
       url: absoluteUrl("/"),
     },
+  };
+}
+
+export function websiteStructuredData() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: site.name,
+    url: absoluteUrl("/"),
+    description: site.description,
+    inLanguage: "en-US",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${absoluteUrl("/land")}?state={search_term_string}&radius=statewide`,
+      "query-input": "required name=search_term_string",
+    },
+  };
+}
+
+export function organizationStructuredData() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: site.name,
+    url: absoluteUrl("/"),
+    logo: absoluteUrl("/opengraph-image"),
+    description: site.description,
+    sameAs: [],
+  };
+}
+
+export function breadcrumbStructuredData(
+  items: Array<{ name: string; path: string }>,
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: absoluteUrl(item.path),
+    })),
+  };
+}
+
+export function listingItemListStructuredData(
+  listings: ListingCard[],
+  path: string,
+  name: string,
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name,
+    url: absoluteUrl(path),
+    numberOfItems: listings.length,
+    itemListElement: listings.slice(0, 24).map((listing, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: absoluteUrl(`/listings/${listing.slug}`),
+      name: listing.title,
+    })),
   };
 }

@@ -8,7 +8,12 @@ import {
   getLegalRegions,
   getRegionBySlugs,
 } from "@/lib/data/listings";
-import { regionMetadata, regionStructuredData } from "@/lib/seo/site";
+import {
+  breadcrumbStructuredData,
+  listingItemListStructuredData,
+  regionMetadata,
+  regionStructuredData,
+} from "@/lib/seo/site";
 
 export const revalidate = 3600;
 
@@ -123,9 +128,19 @@ export default async function CountryLandingPage({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(
+            __html: JSON.stringify([
               regionStructuredData(region.data, `/land/${country}`),
-            ),
+              breadcrumbStructuredData([
+                { name: "Home", path: "/" },
+                { name: "Hunting leases", path: "/land" },
+                { name: region.data.country_name, path: `/land/${country}` },
+              ]),
+              listingItemListStructuredData(
+                listings.data,
+                `/land/${country}`,
+                `${region.data.country_name} hunting leases`,
+              ),
+            ]),
           }}
         />
       )}

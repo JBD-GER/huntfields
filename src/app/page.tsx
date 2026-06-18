@@ -16,7 +16,12 @@ import {
   getFeaturedListingsByRegion,
   getLegalRegions,
 } from "@/lib/data/listings";
-import { pageMetadata, regionStructuredData } from "@/lib/seo/site";
+import {
+  breadcrumbStructuredData,
+  listingItemListStructuredData,
+  pageMetadata,
+  regionStructuredData,
+} from "@/lib/seo/site";
 
 export const revalidate = 3600;
 
@@ -219,7 +224,15 @@ export default async function Home() {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(regionStructuredData(usRegion, "/")),
+            __html: JSON.stringify([
+              regionStructuredData(usRegion, "/"),
+              breadcrumbStructuredData([{ name: "Home", path: "/" }]),
+              listingItemListStructuredData(
+                featured.data,
+                "/",
+                "Featured hunting land for lease",
+              ),
+            ]),
           }}
         />
       )}

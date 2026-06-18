@@ -11,6 +11,7 @@ export const metadata = pageMetadata({
     "Create a free Huntfields account to message landowners, save hunting leases, request access, or list private hunting land.",
   path: "/auth/login",
   image: authImage,
+  index: false,
 });
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;

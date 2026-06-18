@@ -20,7 +20,11 @@ import {
   formatAreaForViewer,
   formatPriceForViewer,
 } from "@/lib/listing-display";
-import { listingStructuredData, pageMetadata } from "@/lib/seo/site";
+import {
+  breadcrumbStructuredData,
+  listingStructuredData,
+  pageMetadata,
+} from "@/lib/seo/site";
 import { getUsStateRule } from "@/lib/compliance/us-state-rules";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -305,7 +309,26 @@ export default async function ListingDetailPage({ params }: { params: Params }) 
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(listingStructuredData(listing.data)),
+          __html: JSON.stringify([
+            listingStructuredData(listing.data),
+            breadcrumbStructuredData([
+              { name: "Home", path: "/" },
+              { name: "Hunting leases", path: "/land" },
+              {
+                name:
+                  listing.data.admin_area_name ??
+                  listing.data.country_name ??
+                  "Region",
+                path: listing.data.admin_area_name
+                  ? `/land/${listing.data.region_slug}`
+                  : "/land",
+              },
+              {
+                name: listing.data.title,
+                path: `/listings/${listing.data.slug}`,
+              },
+            ]),
+          ]),
         }}
       />
     </div>

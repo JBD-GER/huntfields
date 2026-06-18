@@ -7,16 +7,17 @@ export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
-    "",
-    "/land",
-    "/list-your-land",
-    "/faq",
-    "/contact",
-  ].map((path) => ({
-    url: absoluteUrl(path || "/"),
+    { path: "/", changeFrequency: "daily", priority: 1 },
+    { path: "/land", changeFrequency: "daily", priority: 0.95 },
+    { path: "/list-your-land", changeFrequency: "weekly", priority: 0.9 },
+    { path: "/faq", changeFrequency: "monthly", priority: 0.65 },
+    { path: "/contact", changeFrequency: "monthly", priority: 0.45 },
+    { path: "/llms.txt", changeFrequency: "monthly", priority: 0.2 },
+  ].map((route) => ({
+    url: absoluteUrl(route.path),
     lastModified: new Date(),
-    changeFrequency: path === "" ? "daily" : "weekly",
-    priority: path === "" ? 1 : 0.8,
+    changeFrequency: route.changeFrequency as MetadataRoute.Sitemap[number]["changeFrequency"],
+    priority: route.priority,
   }));
 
   const regions = await getLegalRegions();
