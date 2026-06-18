@@ -10,6 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "",
     "/land",
     "/list-your-land",
+    "/faq",
     "/contact",
   ].map((path) => ({
     url: absoluteUrl(path || "/"),

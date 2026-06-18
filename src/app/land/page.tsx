@@ -207,7 +207,7 @@ export default async function LandSearchPage({
           ))}
         </section>
 
-        <div className="grid gap-5 lg:grid-cols-[330px_1fr]">
+        <div className="grid gap-5 lg:grid-cols-[300px_1fr]">
           <aside className="lg:sticky lg:top-24 lg:self-start">
             <div className="rounded-lg border border-[#234331]/10 bg-[#183326] p-4 text-white shadow-[0_18px_50px_rgba(25,35,29,0.12)]">
               <ShieldCheck className="size-5 text-[#d99a61]" aria-hidden="true" />
@@ -232,27 +232,6 @@ export default async function LandSearchPage({
           </aside>
 
           <section className="grid gap-6">
-            <div className="overflow-hidden rounded-lg border border-[#234331]/10 bg-[#fffdf7] shadow-[0_20px_60px_rgba(25,35,29,0.1)]">
-              <div className="flex flex-col gap-1 border-b border-[#234331]/10 p-4 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                  <p className="text-xs font-black uppercase tracking-[0.16em] text-[#c76b2f]">
-                    Map view
-                  </p>
-                  <h2 className="mt-1 text-xl font-black text-stone-950">
-                    Hunting leases in {state.label}
-                  </h2>
-                </div>
-                <p className="text-xs font-semibold text-stone-500">
-                  Filter by state first, then tighten by radius.
-                </p>
-              </div>
-              <LazyListingMap
-                listings={listings.data}
-                viewerCanSeeDetails={viewerCanSeeDetails}
-                className="min-h-[340px] border-0 sm:min-h-[500px]"
-              />
-            </div>
-
             <div>
               <div className="mb-4 flex items-end justify-between gap-4">
                 <div>
@@ -278,6 +257,27 @@ export default async function LandSearchPage({
                   lat: lat ? String(lat) : undefined,
                   lng: lng ? String(lng) : undefined,
                 }}
+              />
+            </div>
+
+            <div className="overflow-hidden rounded-lg border border-[#234331]/10 bg-[#fffdf7] shadow-[0_20px_60px_rgba(25,35,29,0.1)]">
+              <div className="flex flex-col gap-1 border-b border-[#234331]/10 p-4 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-[#c76b2f]">
+                    Map view
+                  </p>
+                  <h2 className="mt-1 text-xl font-black text-stone-950">
+                    General lease areas in {state.label}
+                  </h2>
+                </div>
+                <p className="text-xs font-semibold text-stone-500">
+                  Filter by state first, then tighten by radius.
+                </p>
+              </div>
+              <LazyListingMap
+                listings={listings.data}
+                viewerCanSeeDetails={viewerCanSeeDetails}
+                className="min-h-[320px] border-0 sm:min-h-[430px]"
               />
             </div>
           </section>

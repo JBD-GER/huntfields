@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { LogIn, MapPinned, Menu, PlusCircle, X } from "lucide-react";
+import { CircleHelp, LogIn, MapPinned, Menu, PlusCircle, X } from "lucide-react";
 
 const links = [
   {
@@ -16,6 +16,12 @@ const links = [
     label: "List your land",
     description: "Start as a landowner",
     icon: PlusCircle,
+  },
+  {
+    href: "/faq",
+    label: "FAQ",
+    description: "Answers for hunters and owners",
+    icon: CircleHelp,
   },
 ];
 

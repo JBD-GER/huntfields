@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LogIn, Map, MapPinned, PlusCircle } from "lucide-react";
+import { CircleHelp, LogIn, Map, MapPinned, PlusCircle } from "lucide-react";
 import { MobileNav } from "@/components/ui/mobile-nav";
 
 export function AppHeader() {
@@ -26,6 +26,13 @@ export function AppHeader() {
           >
             <PlusCircle size={16} aria-hidden="true" />
             List your land
+          </Link>
+          <Link
+            href="/faq"
+            className="inline-flex items-center gap-2 rounded-md px-3 py-2 transition hover:bg-[#183326] hover:text-white"
+          >
+            <CircleHelp size={16} aria-hidden="true" />
+            FAQ
           </Link>
         </nav>
         <div className="flex items-center gap-2">
@@ -59,6 +66,7 @@ export function AppFooter() {
           <div className="mt-3 grid gap-2 text-stone-400">
             <Link href="/land">Search land</Link>
             <Link href="/list-your-land">List your land</Link>
+            <Link href="/faq">FAQ</Link>
             <Link href="/dashboard">Requests and bookings</Link>
           </div>
         </div>
