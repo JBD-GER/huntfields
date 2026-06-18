@@ -15,6 +15,7 @@ export const env = {
   stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
   stripePublishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
   openaiApiKey: process.env.OPENAI_API_KEY,
+  openaiTextModel: process.env.OPENAI_TEXT_MODEL ?? "gpt-5-mini",
   openaiImageModel: process.env.OPENAI_IMAGE_MODEL ?? "gpt-image-2",
   openaiImageSize: process.env.OPENAI_IMAGE_SIZE ?? "1536x1024",
   openaiImageQuality: process.env.OPENAI_IMAGE_QUALITY ?? "high",

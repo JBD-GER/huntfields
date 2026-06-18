@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { Send } from "lucide-react";
+import { useRef, useState } from "react";
+import { Send, Sparkles } from "lucide-react";
 import { LazyPolygonEditor } from "@/components/maps/lazy-polygon-editor";
 import { SpeciesSelector } from "@/components/forms/species-selector";
 import type { ListingType } from "@/lib/data/listings";
 import type { UsStateHuntingRule } from "@/lib/compliance/us-state-rules";
 
 type SubmitState = "idle" | "loading" | "success" | "error";
+type DescriptionState = "idle" | "loading" | "error";
 
 export function ListingSubmissionForm({
   listingTypes,
@@ -16,8 +17,13 @@ export function ListingSubmissionForm({
   listingTypes: ListingType[];
   stateRules?: UsStateHuntingRule[];
 }) {
+  const formRef = useRef<HTMLFormElement | null>(null);
   const [state, setState] = useState<SubmitState>("idle");
   const [error, setError] = useState<string | null>(null);
+  const [description, setDescription] = useState("");
+  const [descriptionState, setDescriptionState] =
+    useState<DescriptionState>("idle");
+  const [descriptionError, setDescriptionError] = useState<string | null>(null);
   const [stateCode, setStateCode] = useState("TX");
   const activeRule =
     stateRules.find((rule) => rule.state_code === stateCode.toUpperCase()) ??
@@ -44,11 +50,48 @@ export function ListingSubmissionForm({
     }
 
     form.reset();
+    setDescription("");
+    setDescriptionState("idle");
     setState("success");
   }
 
+  async function generateDescription() {
+    const form = formRef.current;
+
+    if (!form) {
+      return;
+    }
+
+    setDescriptionState("loading");
+    setDescriptionError(null);
+
+    const formData = new FormData(form);
+    formData.set("description", description);
+
+    const response = await fetch("/api/listings/description", {
+      method: "POST",
+      body: formData,
+    });
+
+    const payload = (await response.json().catch(() => null)) as {
+      description?: string;
+      error?: string;
+    } | null;
+
+    if (!response.ok || !payload?.description) {
+      setDescriptionError(
+        payload?.error ?? "Unable to generate a description right now.",
+      );
+      setDescriptionState("error");
+      return;
+    }
+
+    setDescription(payload.description);
+    setDescriptionState("idle");
+  }
+
   return (
-    <form onSubmit={onSubmit} className="grid gap-6">
+    <form ref={formRef} onSubmit={onSubmit} className="grid gap-6">
       <div className="grid gap-4 lg:grid-cols-2">
         <label className="grid gap-2 text-sm font-semibold text-stone-800">
           Listing title
@@ -56,6 +99,7 @@ export function ListingSubmissionForm({
             name="title"
             required
             minLength={8}
+            maxLength={140}
             className="min-h-11 rounded-md border border-stone-300 px-3 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
           />
         </label>
@@ -88,9 +132,28 @@ export function ListingSubmissionForm({
         Description
         <textarea
           name="description"
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
           rows={5}
+          maxLength={1800}
           className="rounded-md border border-stone-300 px-3 py-2 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
         />
+        <button
+          type="button"
+          onClick={generateDescription}
+          disabled={descriptionState === "loading"}
+          className="mt-1 inline-flex min-h-10 w-fit items-center justify-center gap-2 rounded-md border border-[#234331]/16 bg-[#eef3ec] px-3 text-xs font-black text-[#183326] transition hover:border-[#234331]/32 hover:bg-[#e5eee2] disabled:opacity-60"
+        >
+          <Sparkles size={15} aria-hidden="true" />
+          {descriptionState === "loading"
+            ? "Generating description"
+            : "Generate description"}
+        </button>
+        {descriptionState === "error" && (
+          <span className="text-xs font-semibold leading-5 text-red-700">
+            {descriptionError}
+          </span>
+        )}
       </label>
       <div className="grid gap-4 md:grid-cols-3">
         <label className="grid gap-2 text-sm font-semibold text-stone-800">
@@ -108,6 +171,7 @@ export function ListingSubmissionForm({
           <input
             name="country_name"
             required
+            maxLength={120}
             placeholder="United States"
             className="min-h-11 rounded-md border border-stone-300 px-3 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
           />
@@ -117,6 +181,7 @@ export function ListingSubmissionForm({
           <input
             name="admin_area_code"
             value={stateCode}
+            maxLength={2}
             onChange={(event) => setStateCode(event.target.value.toUpperCase())}
             placeholder="TX"
             className="min-h-11 rounded-md border border-stone-300 px-3 uppercase font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
@@ -128,6 +193,7 @@ export function ListingSubmissionForm({
           State / region name
           <input
             name="admin_area_name"
+            maxLength={120}
             placeholder="Texas"
             className="min-h-11 rounded-md border border-stone-300 px-3 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
           />
@@ -136,6 +202,7 @@ export function ListingSubmissionForm({
           Nearest town
           <input
             name="nearest_town"
+            maxLength={120}
             placeholder="Fredericksburg"
             className="min-h-11 rounded-md border border-stone-300 px-3 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
           />
@@ -144,6 +211,7 @@ export function ListingSubmissionForm({
           Private address
           <input
             name="address_private"
+            maxLength={300}
             placeholder="Only shown after approval"
             className="min-h-11 rounded-md border border-stone-300 px-3 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
           />
@@ -155,6 +223,7 @@ export function ListingSubmissionForm({
           <input
             name="price"
             inputMode="decimal"
+            maxLength={12}
             placeholder="250"
             className="min-h-11 rounded-md border border-stone-300 px-3 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
           />
@@ -189,6 +258,7 @@ export function ListingSubmissionForm({
             Amenities
             <input
               name="amenities"
+              maxLength={260}
               placeholder="water, cabin, trails"
               className="min-h-11 rounded-md border border-stone-300 px-3 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
             />
@@ -197,6 +267,7 @@ export function ListingSubmissionForm({
             Rules
             <input
               name="rules"
+              maxLength={360}
               placeholder="no guests, blaze orange required"
               className="min-h-11 rounded-md border border-stone-300 px-3 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
             />
@@ -254,6 +325,7 @@ export function ListingSubmissionForm({
             Lease license number
             <input
               name="hunting_lease_license_number"
+              maxLength={80}
               placeholder="Required when applicable"
               className="min-h-11 rounded-md border border-stone-300 px-3 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
             />
@@ -264,6 +336,7 @@ export function ListingSubmissionForm({
             Allowed methods
             <input
               name="allowed_methods"
+              maxLength={220}
               placeholder="rifle, archery, muzzleloader"
               className="min-h-11 rounded-md border border-stone-300 px-3 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
             />
@@ -272,6 +345,7 @@ export function ListingSubmissionForm({
             Prohibited methods
             <input
               name="prohibited_methods"
+              maxLength={260}
               placeholder="baiting, night hunting"
               className="min-h-11 rounded-md border border-stone-300 px-3 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
             />
@@ -280,6 +354,7 @@ export function ListingSubmissionForm({
             Insurance notes
             <input
               name="insurance_summary"
+              maxLength={220}
               placeholder="Liability policy, waiver, etc."
               className="min-h-11 rounded-md border border-stone-300 px-3 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
             />
@@ -290,6 +365,7 @@ export function ListingSubmissionForm({
             Guest policy
             <input
               name="guest_policy"
+              maxLength={140}
               placeholder="No guests unless approved"
               className="min-h-11 rounded-md border border-stone-300 px-3 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
             />
@@ -298,6 +374,7 @@ export function ListingSubmissionForm({
             Vehicle policy
             <input
               name="vehicle_policy"
+              maxLength={140}
               placeholder="Use marked ranch roads only"
               className="min-h-11 rounded-md border border-stone-300 px-3 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
             />
@@ -306,6 +383,7 @@ export function ListingSubmissionForm({
             Alcohol policy
             <input
               name="alcohol_policy"
+              maxLength={140}
               placeholder="No alcohol while hunting"
               className="min-h-11 rounded-md border border-stone-300 px-3 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
             />
@@ -316,6 +394,7 @@ export function ListingSubmissionForm({
             Emergency contact name
             <input
               name="emergency_contact_name"
+              maxLength={120}
               className="min-h-11 rounded-md border border-stone-300 px-3 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
             />
           </label>
@@ -323,6 +402,7 @@ export function ListingSubmissionForm({
             Emergency contact phone
             <input
               name="emergency_contact_phone"
+              maxLength={80}
               className="min-h-11 rounded-md border border-stone-300 px-3 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
             />
           </label>
@@ -344,6 +424,7 @@ export function ListingSubmissionForm({
           <input
             name="reported_area_acres"
             inputMode="decimal"
+            maxLength={12}
             placeholder="Optional, e.g. 640"
             className="min-h-11 rounded-md border border-stone-300 px-3 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
           />

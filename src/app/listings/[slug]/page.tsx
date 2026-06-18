@@ -31,6 +31,89 @@ type Params = Promise<{ slug: string }>;
 const fallbackImage =
   "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80";
 
+function ListingDetailListCard({
+  title,
+  items,
+}: {
+  title: string;
+  items: string[];
+}) {
+  const isWildlife = title === "Wildlife";
+  const isRules = title === "Rules";
+  const maxItems = isRules ? 6 : 8;
+  const listItems = items
+    .map((item) => item.replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .slice(0, maxItems);
+  const hiddenCount = Math.max(items.length - listItems.length, 0);
+  const shouldWrap = listItems.length > 4;
+  const gridClass = shouldWrap ? "sm:grid-cols-2" : "";
+
+  return (
+    <div className="rounded-lg border border-[#234331]/10 bg-[#fffdf7] p-5 shadow-[0_14px_40px_rgba(25,35,29,0.07)]">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="font-black text-stone-950">{title}</h3>
+        {listItems.length > 0 && (
+          <span className="rounded-md bg-[#eef3ec] px-2 py-1 text-[11px] font-black text-[#234331]">
+            {listItems.length}
+          </span>
+        )}
+      </div>
+
+      {listItems.length === 0 ? (
+        <p className="mt-4 rounded-md bg-[#f6f2e9] px-3 py-2 text-sm font-semibold text-stone-600">
+          Provided after request
+        </p>
+      ) : isRules ? (
+        <ol className={`mt-4 grid max-h-60 gap-2 overflow-hidden text-sm text-stone-700 ${gridClass}`}>
+          {listItems.map((item, index) => (
+            <li
+              key={`${item}-${index}`}
+              className="grid min-w-0 grid-cols-[1.7rem_1fr] gap-2 rounded-md border border-[#234331]/8 bg-[#f8f4eb] px-2.5 py-2"
+            >
+              <span className="grid size-6 place-items-center rounded-md bg-[#183326] text-[11px] font-black text-white">
+                {index + 1}
+              </span>
+              <span className="line-clamp-2 min-w-0 leading-5 [overflow-wrap:anywhere]">
+                {item}
+              </span>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <ul className={`mt-4 grid max-h-60 gap-2 overflow-hidden text-sm text-stone-700 ${gridClass}`}>
+          {listItems.map((item) => (
+            <li
+              key={item}
+              className="flex min-w-0 items-center gap-2 rounded-md border border-[#234331]/8 bg-[#f8f4eb] px-2.5 py-2"
+            >
+              {isWildlife ? (
+                <SpeciesIcon
+                  name={item}
+                  className="size-4 shrink-0 text-[#234331]"
+                />
+              ) : (
+                <span className="shrink-0 text-sm font-black text-[#c76b2f]">
+                  -
+                </span>
+              )}
+              <span className="line-clamp-2 min-w-0 leading-5 [overflow-wrap:anywhere]">
+                {item}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {hiddenCount > 0 && (
+        <p className="mt-3 text-xs font-bold text-stone-500">
+          +{hiddenCount} more after request
+        </p>
+      )}
+    </div>
+  );
+}
+
 export async function generateMetadata({ params }: { params: Params }) {
   const { slug } = await params;
   const listing = await getListingDetailBySlug(slug);
@@ -155,58 +238,15 @@ export default async function ListingDetailPage({ params }: { params: Params }) 
           </section>
 
           <section className="grid gap-5 md:grid-cols-3">
-            {[
-              ["Wildlife", listing.data.wildlife],
-              ["Amenities", listing.data.amenities],
-              ["Rules", listing.data.rules],
-            ].map(([title, items]) => {
-              const listItems = items as string[];
-              const isWildlife = String(title) === "Wildlife";
-              const shouldWrapWildlife = isWildlife && listItems.length > 4;
-
-              return (
-                <div
-                  key={String(title)}
-                  className="rounded-lg border border-[#234331]/10 bg-[#fffdf7] p-5 shadow-[0_14px_40px_rgba(25,35,29,0.07)]"
-                >
-                  <h3 className="font-black text-stone-950">{String(title)}</h3>
-                  <ul
-                    className={[
-                      "mt-3 text-sm text-stone-700",
-                      shouldWrapWildlife
-                        ? "grid grid-cols-2 gap-2"
-                        : "grid gap-2",
-                    ].join(" ")}
-                  >
-                    {listItems.length > 0 ? (
-                      listItems.map((item) => (
-                        <li
-                          key={item}
-                          className={[
-                            "flex min-w-0 items-center gap-2",
-                            shouldWrapWildlife
-                              ? "rounded-md border border-[#234331]/10 bg-[#f6f2e9] px-2.5 py-2"
-                              : "",
-                          ].join(" ")}
-                        >
-                          {isWildlife && (
-                            <SpeciesIcon
-                              name={item}
-                              className="size-4 shrink-0 text-[#234331]"
-                            />
-                          )}
-                          <span className="min-w-0 break-words leading-5">
-                            {item}
-                          </span>
-                        </li>
-                      ))
-                    ) : (
-                      <li>Provided after request</li>
-                    )}
-                  </ul>
-                </div>
-              );
-            })}
+            <ListingDetailListCard
+              title="Wildlife"
+              items={listing.data.wildlife}
+            />
+            <ListingDetailListCard
+              title="Amenities"
+              items={listing.data.amenities}
+            />
+            <ListingDetailListCard title="Rules" items={listing.data.rules} />
           </section>
 
           <section className="overflow-hidden rounded-lg border border-[#234331]/10 bg-[#fffdf7] shadow-[0_20px_60px_rgba(25,35,29,0.1)]">

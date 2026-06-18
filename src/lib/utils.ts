@@ -20,6 +20,28 @@ export function commaList(value: string) {
     .filter(Boolean);
 }
 
+export function compactCommaList(
+  value: string,
+  {
+    maxItems = 8,
+    maxItemLength = 56,
+  }: {
+    maxItems?: number;
+    maxItemLength?: number;
+  } = {},
+) {
+  return commaList(value)
+    .slice(0, maxItems)
+    .map((item) =>
+      item
+        .replace(/\s+/g, " ")
+        .replace(/[.;:]+$/g, "")
+        .slice(0, maxItemLength)
+        .trim(),
+    )
+    .filter(Boolean);
+}
+
 export function priceToCents(value: string) {
   if (!value) {
     return null;

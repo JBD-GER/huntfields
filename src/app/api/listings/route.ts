@@ -8,12 +8,17 @@ import {
   createSupabaseServerClient,
   createSupabaseServiceClient,
 } from "@/lib/supabase/server";
-import { commaList, formValue, priceToCents, slugify } from "@/lib/utils";
+import {
+  compactCommaList,
+  formValue,
+  priceToCents,
+  slugify,
+} from "@/lib/utils";
 
 const listingSchema = z.object({
   title: z.string().min(8).max(140),
   summary: z.string().min(20).max(180),
-  description: z.string().max(5000).optional(),
+  description: z.string().max(1800).optional(),
   listing_type_slug: z.string().min(1),
   country_code: z.string().length(2),
   country_name: z.string().min(2).max(120),
@@ -146,12 +151,28 @@ export async function POST(request: Request) {
   const reportedAreaHectares = reportedAreaAcres
     ? Number((reportedAreaAcres * 0.40468564224).toFixed(2))
     : null;
-  const wildlife = commaList(formValue(formData, "wildlife"));
-  const amenities = commaList(formValue(formData, "amenities"));
-  const rules = commaList(formValue(formData, "rules"));
-  const allowedMethods = commaList(formValue(formData, "allowed_methods"));
-  const prohibitedMethods = commaList(
+  const wildlife = compactCommaList(formValue(formData, "wildlife"), {
+    maxItems: 8,
+    maxItemLength: 42,
+  });
+  const amenities = compactCommaList(formValue(formData, "amenities"), {
+    maxItems: 8,
+    maxItemLength: 52,
+  });
+  const rules = compactCommaList(formValue(formData, "rules"), {
+    maxItems: 6,
+    maxItemLength: 68,
+  });
+  const allowedMethods = compactCommaList(formValue(formData, "allowed_methods"), {
+    maxItems: 6,
+    maxItemLength: 42,
+  });
+  const prohibitedMethods = compactCommaList(
     formValue(formData, "prohibited_methods"),
+    {
+      maxItems: 6,
+      maxItemLength: 52,
+    },
   );
 
   const { data: listingType, error: typeError } = await db

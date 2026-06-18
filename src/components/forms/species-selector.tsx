@@ -29,8 +29,10 @@ function normalize(value: string) {
 
 export function SpeciesSelector({
   name = "wildlife",
+  maxSelected = 8,
 }: {
   name?: string;
+  maxSelected?: number;
 }) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
@@ -84,7 +86,7 @@ export function SpeciesSelector({
         return current;
       }
 
-      return [...current, label];
+      return [...current, label].slice(0, maxSelected);
     });
     setQuery("");
   }
@@ -104,6 +106,7 @@ export function SpeciesSelector({
             Huntable species
             <input
               value={query}
+              maxLength={42}
               onChange={(event) => setQuery(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === "Enter") {
@@ -118,7 +121,7 @@ export function SpeciesSelector({
           <button
             type="button"
             onClick={() => addSpecies(query)}
-            disabled={!query.trim()}
+            disabled={!query.trim() || selected.length >= maxSelected}
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-[#234331] px-4 text-sm font-bold text-white transition hover:bg-[#162d22] disabled:opacity-50"
           >
             <Plus size={16} aria-hidden="true" />
@@ -151,7 +154,7 @@ export function SpeciesSelector({
               className="inline-flex items-center gap-2 rounded-md bg-[#eef3ec] px-3 py-2 text-sm font-bold text-[#234331]"
             >
               <SpeciesIcon name={species} className="size-4" />
-              {species}
+              <span className="max-w-40 truncate">{species}</span>
               <button
                 type="button"
                 aria-label={`Remove ${species}`}
@@ -171,6 +174,7 @@ export function SpeciesSelector({
             key={species.slug}
             type="button"
             onClick={() => addSpecies(species.label)}
+            disabled={selected.length >= maxSelected}
             className="flex min-h-12 items-center gap-3 rounded-md border border-stone-200 bg-white px-3 py-2 text-left text-sm font-semibold text-stone-800 transition hover:border-[#234331] hover:text-[#234331]"
           >
             <SpeciesIcon category={species.category} className="size-5 shrink-0" />
