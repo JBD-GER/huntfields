@@ -76,7 +76,20 @@ export const metadata: Metadata = {
     email: false,
   },
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      {
+        url: "/Favicon.png",
+        type: "image/png",
+        sizes: "512x512",
+      },
+    ],
+    apple: [
+      {
+        url: "/apple-touch-icon.png",
+        type: "image/png",
+        sizes: "180x180",
+      },
+    ],
   },
 };
 

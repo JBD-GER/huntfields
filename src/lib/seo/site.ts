@@ -180,7 +180,7 @@ export function organizationStructuredData() {
     "@type": "Organization",
     name: site.name,
     url: absoluteUrl("/"),
-    logo: absoluteUrl("/opengraph-image"),
+    logo: absoluteUrl("/logo_black.png"),
     description: site.description,
     sameAs: [],
   };

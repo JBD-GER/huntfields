@@ -1,18 +1,14 @@
 import Link from "next/link";
-import { CircleHelp, LogIn, Map, MapPinned, PlusCircle } from "lucide-react";
+import { CircleHelp, LogIn, MapPinned, PlusCircle } from "lucide-react";
 import { MobileNav } from "@/components/ui/mobile-nav";
 import { CookieSettingsButton } from "@/components/privacy/cookie-consent";
+import { HeaderBrand } from "@/components/ui/header-brand";
 
 export function AppHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-[#234331]/10 bg-[#f6f2e9]/86 shadow-[0_10px_32px_rgba(25,35,29,0.08)] backdrop-blur-xl">
       <div className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between px-3 sm:h-16 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2 text-base font-black tracking-normal text-stone-950 sm:text-lg">
-          <span className="grid size-9 place-items-center rounded-md bg-[#183326] text-white shadow-[0_12px_26px_rgba(24,51,38,0.24)]">
-            <Map size={18} aria-hidden="true" />
-          </span>
-          <span>Huntfields</span>
-        </Link>
+        <HeaderBrand />
         <nav className="hidden items-center gap-1 rounded-md border border-[#234331]/10 bg-white/58 p-1 text-sm font-black text-stone-700 shadow-sm md:flex">
           <Link
             href="/land"
