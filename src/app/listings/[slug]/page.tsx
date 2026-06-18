@@ -13,11 +13,13 @@ import { StateRulePanel } from "@/components/compliance/state-rule-panel";
 import { LazyListingMap } from "@/components/maps/lazy-listing-map";
 import { SpeciesIcon } from "@/components/species/species-icon";
 import {
-  formatPrice,
   getListingDetailBySlug,
   listingImageUrl,
 } from "@/lib/data/listings";
-import { formatAreaDisplay } from "@/lib/area-format";
+import {
+  formatAreaForViewer,
+  formatPriceForViewer,
+} from "@/lib/listing-display";
 import { listingStructuredData, pageMetadata } from "@/lib/seo/site";
 import { getUsStateRule } from "@/lib/compliance/us-state-rules";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -80,6 +82,7 @@ export default async function ListingDetailPage({ params }: { params: Params }) 
   } = supabase
     ? await supabase.auth.getUser()
     : { data: { user: null } };
+  const viewerCanSeeDetails = Boolean(user);
 
   return (
     <div>
@@ -120,9 +123,14 @@ export default async function ListingDetailPage({ params }: { params: Params }) 
           <div className="-mt-12 grid gap-2 sm:-mt-16 sm:grid-cols-2 lg:grid-cols-4">
             {[
               [MapPin, [listing.data.nearest_town, listing.data.admin_area_name, listing.data.country_name].filter(Boolean).join(", ")],
-              [Ruler, formatAreaDisplay(listing.data)],
-              [CalendarDays, formatPrice(listing.data)],
-              [LockKeyhole, "Exact boundary after approval"],
+              [Ruler, formatAreaForViewer(listing.data, viewerCanSeeDetails)],
+              [CalendarDays, formatPriceForViewer(listing.data, viewerCanSeeDetails)],
+              [
+                LockKeyhole,
+                viewerCanSeeDetails
+                  ? "Drawn preview visible"
+                  : "Detailed preview after signup",
+              ],
             ].map(([Icon, text]) => {
               const IconComponent = Icon as typeof MapPin;
               return (
@@ -211,7 +219,11 @@ export default async function ListingDetailPage({ params }: { params: Params }) 
                 Exact gates, routes, and parcel coordinates unlock only after approval.
               </p>
             </div>
-            <LazyListingMap listings={[listing.data]} className="min-h-[360px] border-0 sm:min-h-[460px]" />
+            <LazyListingMap
+              listings={[listing.data]}
+              viewerCanSeeDetails={viewerCanSeeDetails}
+              className="min-h-[360px] border-0 sm:min-h-[460px]"
+            />
           </section>
           {stateRule && <StateRulePanel rule={stateRule} />}
         </article>
@@ -224,16 +236,16 @@ export default async function ListingDetailPage({ params }: { params: Params }) 
               </span>
               <div>
                 <h2 className="text-xl font-black tracking-normal text-stone-950">
-                  {user ? "Message the landowner" : "Create a free account"}
+                  {user ? "Message the landowner" : "Contact the landowner"}
                 </h2>
                 <p className="mt-2 text-sm leading-6 text-stone-600">
-                  Start a secure conversation. Exact coordinates and polygon
-                  boundaries remain private until approval or booking.
+                  Start with a short access request. Exact coordinates and
+                  polygon boundaries remain private until approval or booking.
                 </p>
               </div>
             </div>
             <div className="my-5 h-px bg-[#234331]/10" />
-            <p className="mb-4 rounded-md border border-[#d9c6aa] bg-[#fff8ec] px-3 py-2 text-xs font-bold leading-5 text-[#7a4a24]">
+            <p className="mb-5 rounded-md border border-[#d9c6aa] bg-[#fff8ec] px-3 py-2 text-xs font-bold leading-5 text-[#7a4a24]">
               No payment is collected before landowner approval and signed terms.
             </p>
             <div>

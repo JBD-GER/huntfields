@@ -2,13 +2,22 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, MapPin, Ruler, Trees } from "lucide-react";
 import type { ListingCard as ListingCardType } from "@/lib/data/listings";
-import { formatPrice, listingImageUrl } from "@/lib/listing-display";
-import { formatAreaDisplay } from "@/lib/area-format";
+import {
+  formatAreaForViewer,
+  formatPriceForViewer,
+  listingImageUrl,
+} from "@/lib/listing-display";
 
 const fallbackImage =
   "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=75";
 
-export function ListingCard({ listing }: { listing: ListingCardType }) {
+export function ListingCard({
+  listing,
+  viewerCanSeeDetails = false,
+}: {
+  listing: ListingCardType;
+  viewerCanSeeDetails?: boolean;
+}) {
   const image =
     listingImageUrl(listing.cover_image_path, listing.slug) ?? fallbackImage;
 
@@ -30,7 +39,7 @@ export function ListingCard({ listing }: { listing: ListingCardType }) {
           </div>
           <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-3 text-white">
             <div className="text-sm font-black drop-shadow">
-              {formatPrice(listing)}
+              {formatPriceForViewer(listing, viewerCanSeeDetails)}
             </div>
             <span className="grid size-9 shrink-0 place-items-center rounded-md border border-white/24 bg-white/16 backdrop-blur transition group-hover:bg-white/26">
               <ArrowUpRight size={17} aria-hidden="true" />
@@ -57,11 +66,13 @@ export function ListingCard({ listing }: { listing: ListingCardType }) {
             </span>
             <span className="flex items-center gap-2">
               <Ruler className="size-4 shrink-0 text-[#2f6f8f]" aria-hidden="true" />
-              {formatAreaDisplay(listing)}
+              {formatAreaForViewer(listing, viewerCanSeeDetails)}
             </span>
             <span className="flex items-center gap-2">
               <Trees className="size-4 shrink-0 text-[#234331]" aria-hidden="true" />
-              Approximate public boundary
+              {viewerCanSeeDetails
+                ? "Approximate drawn preview"
+                : "General area preview"}
             </span>
           </div>
         </div>

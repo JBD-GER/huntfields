@@ -17,6 +17,7 @@ import {
   searchListingsByRegion,
 } from "@/lib/data/listings";
 import { absoluteUrl, pageMetadata } from "@/lib/seo/site";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getUsLaunchState } from "@/lib/us-market";
 
 export const revalidate = 900;
@@ -69,6 +70,13 @@ export default async function LandSearchPage({
   const searchLat = lat ?? state.lat;
   const searchLng = lng ?? state.lng;
   const listingTypes = listingType ? [listingType] : undefined;
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = supabase
+    ? await supabase.auth.getUser()
+    : { data: { user: null } };
+  const viewerCanSeeDetails = Boolean(user);
 
   const listings =
     radius === "statewide"
@@ -240,6 +248,7 @@ export default async function LandSearchPage({
               </div>
               <LazyListingMap
                 listings={listings.data}
+                viewerCanSeeDetails={viewerCanSeeDetails}
                 className="min-h-[340px] border-0 sm:min-h-[500px]"
               />
             </div>
@@ -259,6 +268,7 @@ export default async function LandSearchPage({
                 initialListings={listings.data}
                 initialError={listings.error}
                 pageSize={pageSize}
+                viewerCanSeeDetails={viewerCanSeeDetails}
                 searchQuery={{
                   country,
                   state: state.code,

@@ -27,11 +27,13 @@ export function ListingResults({
   initialError,
   searchQuery,
   pageSize = 24,
+  viewerCanSeeDetails = false,
 }: {
   initialListings: ListingCard[];
   initialError?: string | null;
   searchQuery: SearchQuery;
   pageSize?: number;
+  viewerCanSeeDetails?: boolean;
 }) {
   const [listings, setListings] = useState(initialListings);
   const [error, setError] = useState(initialError ?? null);
@@ -72,7 +74,11 @@ export function ListingResults({
 
   return (
     <div className="grid gap-5">
-      <ListingGrid listings={listings} error={error} />
+      <ListingGrid
+        listings={listings}
+        error={error}
+        viewerCanSeeDetails={viewerCanSeeDetails}
+      />
       {hasMore ? (
         <div className="flex justify-center">
           <button

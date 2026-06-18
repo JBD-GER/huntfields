@@ -20,27 +20,27 @@ export function RequestAccessForm({
 
   if (!isAuthenticated) {
     return (
-      <div className="relative overflow-hidden rounded-md border border-[#234331]/10 bg-[#f8f4eb] p-5">
+      <div className="relative min-h-[310px] overflow-hidden rounded-md border border-[#234331]/10 bg-[#f8f4eb] p-5 sm:min-h-[330px]">
         <div className="pointer-events-none select-none blur-[3px]">
           <div className="h-4 w-32 rounded bg-stone-300" />
           <div className="mt-4 h-28 rounded-md border border-stone-300 bg-white" />
           <div className="mt-4 h-11 rounded-md bg-[#234331]" />
         </div>
-        <div className="absolute inset-0 grid place-items-center bg-[#fffdf7]/78 p-5 backdrop-blur-md">
-          <div className="max-w-xs text-center">
-            <div className="mx-auto grid size-11 place-items-center rounded-md bg-[#183326] text-white shadow-[0_18px_38px_rgba(24,51,38,0.22)]">
+        <div className="absolute inset-0 grid place-items-center bg-[#fffdf7]/82 p-5 backdrop-blur-md sm:p-6">
+          <div className="w-full max-w-sm text-center">
+            <div className="mx-auto grid size-12 place-items-center rounded-md bg-[#183326] text-white shadow-[0_18px_38px_rgba(24,51,38,0.22)]">
               <LockKeyhole size={18} aria-hidden="true" />
             </div>
-            <h3 className="mt-3 text-lg font-black text-stone-950">
+            <h3 className="mt-5 text-xl font-black text-stone-950">
               Create a free account
             </h3>
-            <p className="mt-2 text-sm leading-6 text-stone-600">
+            <p className="mx-auto mt-3 max-w-xs text-sm leading-6 text-stone-600">
               Start a secure conversation with the landowner and keep exact
               location details protected until approval.
             </p>
             <Link
               href={`/auth/login?next=${encodeURIComponent(nextPath)}`}
-              className="mt-4 inline-flex min-h-11 items-center justify-center rounded-md bg-[#183326] px-5 text-sm font-black text-white shadow-[0_18px_36px_rgba(24,51,38,0.2)] transition hover:bg-[#10271d]"
+              className="mt-7 inline-flex min-h-12 w-full items-center justify-center rounded-md bg-[#183326] px-6 text-sm font-black text-white shadow-[0_18px_36px_rgba(24,51,38,0.2)] transition hover:bg-[#10271d] sm:w-auto sm:min-w-60"
             >
               Create free account
             </Link>

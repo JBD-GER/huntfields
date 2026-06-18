@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import { getMapStyle, fallbackRasterStyle } from "@/lib/maps/style";
-import { formatAreaDisplay } from "@/lib/area-format";
+import { formatAreaForViewer } from "@/lib/listing-display";
 import type {
   ListingCard,
   PublicBoundaryGeojson,
@@ -116,11 +116,15 @@ function circleFallbackFeature(listing: MapListing): Feature<Polygon> {
 
 function buildPublicAreas(
   listings: MapListing[],
+  viewerCanSeeDetails: boolean,
 ): FeatureCollection<Polygon | MultiPolygon> {
   return {
     type: "FeatureCollection",
     features: listings.map((listing) => {
-      if (isPublicBoundary(listing.public_boundary_geojson)) {
+      if (
+        viewerCanSeeDetails &&
+        isPublicBoundary(listing.public_boundary_geojson)
+      ) {
         return {
           type: "Feature",
           properties: {
@@ -204,9 +208,11 @@ function extendBoundsWithGeometry(
 export function ListingMap({
   listings,
   className = "",
+  viewerCanSeeDetails = false,
 }: {
   listings: MapListing[];
   className?: string;
+  viewerCanSeeDetails?: boolean;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
@@ -256,7 +262,7 @@ export function ListingMap({
     markersRef.current = [];
 
     const bounds = new maplibregl.LngLatBounds();
-    const publicAreas = buildPublicAreas(listings);
+    const publicAreas = buildPublicAreas(listings, viewerCanSeeDetails);
 
     const syncApproximateAreas = () =>
       renderApproximateAreas(map, publicAreas);
@@ -274,7 +280,10 @@ export function ListingMap({
         .setLngLat([listing.public_lng, listing.public_lat])
         .setPopup(
           new maplibregl.Popup({ offset: 18 }).setHTML(
-            `<strong>${listing.title}</strong><br>${formatAreaDisplay(listing)}<br><a href="/listings/${listing.slug}">Open listing</a>`,
+            `<strong>${listing.title}</strong><br>${formatAreaForViewer(
+              listing,
+              viewerCanSeeDetails,
+            )}<br><a href="/listings/${listing.slug}">Open listing</a>`,
           ),
         )
         .addTo(map);
@@ -299,7 +308,7 @@ export function ListingMap({
       map.off("load", syncApproximateAreas);
       map.off("styledata", syncApproximateAreas);
     };
-  }, [listings]);
+  }, [listings, viewerCanSeeDetails]);
 
   return (
     <div
