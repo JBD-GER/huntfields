@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import { AppFooter, AppHeader } from "@/components/ui/app-shell";
+import { CookieConsentBanner } from "@/components/privacy/cookie-consent";
 import {
   absoluteUrl,
   organizationStructuredData,
@@ -89,9 +91,35 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-[#fbfaf6] text-stone-950">
+        <Script id="huntfields-consent-default" strategy="beforeInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('consent', 'default', {
+              ad_storage: 'denied',
+              ad_user_data: 'denied',
+              ad_personalization: 'denied',
+              analytics_storage: 'denied',
+              wait_for_update: 500
+            });
+            try {
+              var stored = localStorage.getItem('huntfields_cookie_consent_v1');
+              if (stored) {
+                var consent = JSON.parse(stored);
+                gtag('consent', 'update', {
+                  ad_storage: consent.ad_storage || 'denied',
+                  ad_user_data: consent.ad_user_data || 'denied',
+                  ad_personalization: consent.ad_personalization || 'denied',
+                  analytics_storage: consent.analytics_storage || 'denied'
+                });
+              }
+            } catch (error) {}
+          `}
+        </Script>
         <AppHeader />
         <main className="min-h-dvh">{children}</main>
         <AppFooter />
+        <CookieConsentBanner />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CircleHelp, LogIn, Map, MapPinned, PlusCircle } from "lucide-react";
 import { MobileNav } from "@/components/ui/mobile-nav";
+import { CookieSettingsButton } from "@/components/privacy/cookie-consent";
 
 export function AppHeader() {
   return (
@@ -74,6 +75,10 @@ export function AppFooter() {
           <p className="font-bold text-white">Operations</p>
           <div className="mt-3 grid gap-2 text-stone-400">
             <Link href="/contact">Contact</Link>
+            <Link href="/privacy">Privacy Policy</Link>
+            <Link href="/terms">Terms of Service</Link>
+            <Link href="/cookies">Cookie Policy</Link>
+            <CookieSettingsButton />
             <Link href="/land/united-states">United States</Link>
             <Link href="/land/united-states/texas">Texas hunting leases</Link>
           </div>
