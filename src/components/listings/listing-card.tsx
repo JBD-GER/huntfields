@@ -73,7 +73,7 @@ export function ListingCard({
             </span>
           </div>
         </div>
-        <div className="flex min-h-[18.75rem] flex-1 flex-col p-4 sm:min-h-[19.5rem] sm:p-5">
+        <div className="flex flex-1 flex-col p-4 sm:p-5">
           <div className="shrink-0">
             <h3 className="truncate text-base font-black leading-6 tracking-normal text-stone-950 sm:text-lg">
               {listing.title}
@@ -82,7 +82,7 @@ export function ListingCard({
               {listing.summary}
             </p>
           </div>
-          <div className="mt-auto grid gap-2 border-t border-[#234331]/10 pt-3 text-sm font-semibold text-stone-700">
+          <div className="mt-4 grid gap-2 border-t border-[#234331]/10 pt-3 text-sm font-semibold text-stone-700">
             {checkpoints.map(({ icon: Icon, label, className }) => (
               <span
                 key={label}
