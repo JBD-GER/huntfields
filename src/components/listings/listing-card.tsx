@@ -11,6 +11,14 @@ import {
 const fallbackImage =
   "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=75";
 
+function cardLocation(listing: ListingCardType) {
+  return (
+    [listing.nearest_town, listing.admin_area_name, listing.country_name]
+      .filter(Boolean)
+      .join(", ") || "Private location after approval"
+  );
+}
+
 export function ListingCard({
   listing,
   viewerCanSeeDetails = false,
@@ -20,11 +28,30 @@ export function ListingCard({
 }) {
   const image =
     listingImageUrl(listing.cover_image_path, listing.slug) ?? fallbackImage;
+  const checkpoints = [
+    {
+      icon: MapPin,
+      label: cardLocation(listing),
+      className: "text-[#c76b2f]",
+    },
+    {
+      icon: Ruler,
+      label: formatAreaForViewer(listing, viewerCanSeeDetails),
+      className: "text-[#2f6f8f]",
+    },
+    {
+      icon: Trees,
+      label: viewerCanSeeDetails
+        ? "Approximate drawn preview"
+        : "General area preview",
+      className: "text-[#234331]",
+    },
+  ];
 
   return (
-    <article className="group overflow-hidden rounded-lg border border-[#234331]/10 bg-[#fffdf7] shadow-[0_18px_48px_rgba(25,35,29,0.08)] transition duration-300 hover:-translate-y-1 hover:border-[#234331]/24 hover:shadow-[0_26px_70px_rgba(25,35,29,0.14)]">
-      <Link href={`/listings/${listing.slug}`} className="block">
-        <div className="relative aspect-[1.22] overflow-hidden bg-stone-200">
+    <article className="group h-full overflow-hidden rounded-lg border border-[#234331]/10 bg-[#fffdf7] shadow-[0_18px_48px_rgba(25,35,29,0.08)] transition duration-300 hover:-translate-y-1 hover:border-[#234331]/24 hover:shadow-[0_26px_70px_rgba(25,35,29,0.14)]">
+      <Link href={`/listings/${listing.slug}`} className="flex h-full flex-col">
+        <div className="relative h-[17.5rem] shrink-0 overflow-hidden bg-stone-200 sm:h-[18.5rem] lg:h-[19rem]">
           <Image
             src={image}
             alt=""
@@ -38,7 +65,7 @@ export function ListingCard({
             {listing.listing_type_label}
           </div>
           <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-3 text-white">
-            <div className="text-sm font-black drop-shadow">
+            <div className="max-w-[calc(100%-3.25rem)] truncate text-sm font-black drop-shadow sm:text-base">
               {formatPriceForViewer(listing, viewerCanSeeDetails)}
             </div>
             <span className="grid size-9 shrink-0 place-items-center rounded-md border border-white/24 bg-white/16 backdrop-blur transition group-hover:bg-white/26">
@@ -46,34 +73,28 @@ export function ListingCard({
             </span>
           </div>
         </div>
-        <div className="space-y-4 p-4 sm:p-5">
-          <div>
-            <h3 className="line-clamp-2 text-base font-black leading-6 tracking-normal text-stone-950">
+        <div className="flex min-h-[18.75rem] flex-1 flex-col p-4 sm:min-h-[19.5rem] sm:p-5">
+          <div className="shrink-0">
+            <h3 className="truncate text-base font-black leading-6 tracking-normal text-stone-950 sm:text-lg">
               {listing.title}
             </h3>
-            <p className="mt-2 line-clamp-2 text-sm leading-6 text-stone-600">
+            <p className="mt-2 line-clamp-2 min-h-12 text-sm leading-6 text-stone-600">
               {listing.summary}
             </p>
           </div>
-          <div className="grid gap-2 border-t border-[#234331]/10 pt-3 text-sm font-semibold text-stone-700">
-            <span className="flex min-w-0 items-center gap-2">
-              <MapPin className="size-4 shrink-0 text-[#c76b2f]" aria-hidden="true" />
-              <span className="truncate">
-              {[listing.nearest_town, listing.admin_area_name, listing.country_name]
-                .filter(Boolean)
-                .join(", ")}
+          <div className="mt-auto grid gap-2 border-t border-[#234331]/10 pt-3 text-sm font-semibold text-stone-700">
+            {checkpoints.map(({ icon: Icon, label, className }) => (
+              <span
+                key={label}
+                className="flex h-7 min-w-0 items-center gap-2"
+              >
+                <Icon
+                  className={`size-4 shrink-0 ${className}`}
+                  aria-hidden="true"
+                />
+                <span className="truncate">{label}</span>
               </span>
-            </span>
-            <span className="flex items-center gap-2">
-              <Ruler className="size-4 shrink-0 text-[#2f6f8f]" aria-hidden="true" />
-              {formatAreaForViewer(listing, viewerCanSeeDetails)}
-            </span>
-            <span className="flex items-center gap-2">
-              <Trees className="size-4 shrink-0 text-[#234331]" aria-hidden="true" />
-              {viewerCanSeeDetails
-                ? "Approximate drawn preview"
-                : "General area preview"}
-            </span>
+            ))}
           </div>
         </div>
       </Link>
