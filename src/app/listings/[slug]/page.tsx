@@ -46,58 +46,60 @@ function ListingDetailListCard({
     .filter(Boolean)
     .slice(0, maxItems);
   const hiddenCount = Math.max(items.length - listItems.length, 0);
-  const shouldWrap = listItems.length > 4;
-  const gridClass = shouldWrap ? "sm:grid-cols-2" : "";
+  const gridClass = listItems.length > 1 ? "sm:grid-cols-2" : "";
 
   return (
-    <div className="rounded-lg border border-[#234331]/10 bg-[#fffdf7] p-5 shadow-[0_14px_40px_rgba(25,35,29,0.07)]">
-      <div className="flex items-center justify-between gap-3">
-        <h3 className="font-black text-stone-950">{title}</h3>
-        {listItems.length > 0 && (
-          <span className="rounded-md bg-[#eef3ec] px-2 py-1 text-[11px] font-black text-[#234331]">
-            {listItems.length}
-          </span>
-        )}
+    <div className="grid gap-4 rounded-lg border border-[#234331]/10 bg-[#fffdf7] p-4 shadow-[0_14px_40px_rgba(25,35,29,0.07)] sm:p-5 lg:grid-cols-[190px_1fr] lg:items-start">
+      <div className="flex items-center justify-between gap-3 lg:block">
+        <div>
+          <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#c76b2f]">
+            Property details
+          </p>
+          <h3 className="mt-1 text-2xl font-black text-stone-950">{title}</h3>
+        </div>
+        <span className="rounded-md bg-[#eef3ec] px-2.5 py-1.5 text-xs font-black text-[#234331] lg:mt-4 lg:inline-flex">
+          {listItems.length || 0}
+        </span>
       </div>
 
       {listItems.length === 0 ? (
-        <p className="mt-4 rounded-md bg-[#f6f2e9] px-3 py-2 text-sm font-semibold text-stone-600">
+        <p className="rounded-md bg-[#f6f2e9] px-3 py-2 text-sm font-semibold text-stone-600">
           Provided after request
         </p>
       ) : isRules ? (
-        <ol className={`mt-4 grid max-h-60 gap-2 overflow-hidden text-sm text-stone-700 ${gridClass}`}>
+        <ol className={`grid gap-2.5 text-sm text-stone-700 ${gridClass}`}>
           {listItems.map((item, index) => (
             <li
               key={`${item}-${index}`}
-              className="grid min-w-0 grid-cols-[1.7rem_1fr] gap-2 rounded-md border border-[#234331]/8 bg-[#f8f4eb] px-2.5 py-2"
+              className="grid min-h-[4.25rem] min-w-0 grid-cols-[2rem_1fr] gap-3 rounded-md border border-[#234331]/8 bg-[#f8f4eb] px-3 py-3"
             >
-              <span className="grid size-6 place-items-center rounded-md bg-[#183326] text-[11px] font-black text-white">
+              <span className="grid size-8 place-items-center rounded-md bg-[#183326] text-sm font-black text-white">
                 {index + 1}
               </span>
-              <span className="line-clamp-2 min-w-0 leading-5 [overflow-wrap:anywhere]">
+              <span className="line-clamp-2 min-w-0 self-center text-base leading-6 [overflow-wrap:anywhere]">
                 {item}
               </span>
             </li>
           ))}
         </ol>
       ) : (
-        <ul className={`mt-4 grid max-h-60 gap-2 overflow-hidden text-sm text-stone-700 ${gridClass}`}>
+        <ul className={`grid gap-2.5 text-sm text-stone-700 ${gridClass}`}>
           {listItems.map((item) => (
             <li
               key={item}
-              className="flex min-w-0 items-center gap-2 rounded-md border border-[#234331]/8 bg-[#f8f4eb] px-2.5 py-2"
+              className="flex min-h-[4.25rem] min-w-0 items-center gap-3 rounded-md border border-[#234331]/8 bg-[#f8f4eb] px-3 py-3"
             >
               {isWildlife ? (
                 <SpeciesIcon
                   name={item}
-                  className="size-4 shrink-0 text-[#234331]"
+                  className="size-5 shrink-0 text-[#234331]"
                 />
               ) : (
-                <span className="shrink-0 text-sm font-black text-[#c76b2f]">
+                <span className="shrink-0 text-lg font-black text-[#c76b2f]">
                   -
                 </span>
               )}
-              <span className="line-clamp-2 min-w-0 leading-5 [overflow-wrap:anywhere]">
+              <span className="line-clamp-2 min-w-0 text-base leading-6 [overflow-wrap:anywhere]">
                 {item}
               </span>
             </li>
@@ -106,7 +108,7 @@ function ListingDetailListCard({
       )}
 
       {hiddenCount > 0 && (
-        <p className="mt-3 text-xs font-bold text-stone-500">
+        <p className="text-xs font-bold text-stone-500 lg:col-start-2">
           +{hiddenCount} more after request
         </p>
       )}
@@ -228,27 +230,6 @@ export default async function ListingDetailPage({ params }: { params: Params }) 
             })}
           </div>
 
-          <section className="rounded-lg border border-[#234331]/10 bg-[#fffdf7] p-5 shadow-[0_16px_46px_rgba(25,35,29,0.08)] sm:p-6">
-            <h2 className="text-2xl font-black tracking-normal text-stone-950">
-              Land access details
-            </h2>
-            <p className="mt-4 text-base leading-8 text-stone-700">
-              {listing.data.description ?? listing.data.summary}
-            </p>
-          </section>
-
-          <section className="grid gap-5 md:grid-cols-3">
-            <ListingDetailListCard
-              title="Wildlife"
-              items={listing.data.wildlife}
-            />
-            <ListingDetailListCard
-              title="Amenities"
-              items={listing.data.amenities}
-            />
-            <ListingDetailListCard title="Rules" items={listing.data.rules} />
-          </section>
-
           <section className="overflow-hidden rounded-lg border border-[#234331]/10 bg-[#fffdf7] shadow-[0_20px_60px_rgba(25,35,29,0.1)]">
             <div className="flex flex-col gap-2 border-b border-[#234331]/10 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
               <div className="flex items-center gap-2 text-sm font-black text-stone-900">
@@ -265,6 +246,28 @@ export default async function ListingDetailPage({ params }: { params: Params }) 
               className="min-h-[360px] border-0 sm:min-h-[460px]"
             />
           </section>
+
+          <section className="grid gap-4">
+            <ListingDetailListCard
+              title="Wildlife"
+              items={listing.data.wildlife}
+            />
+            <ListingDetailListCard
+              title="Amenities"
+              items={listing.data.amenities}
+            />
+            <ListingDetailListCard title="Rules" items={listing.data.rules} />
+          </section>
+
+          <section className="rounded-lg border border-[#234331]/10 bg-[#fffdf7] p-5 shadow-[0_16px_46px_rgba(25,35,29,0.08)] sm:p-6">
+            <h2 className="text-2xl font-black tracking-normal text-stone-950">
+              Land access details
+            </h2>
+            <p className="mt-4 text-base leading-8 text-stone-700">
+              {listing.data.description ?? listing.data.summary}
+            </p>
+          </section>
+
           {stateRule && <StateRulePanel rule={stateRule} />}
         </article>
 
