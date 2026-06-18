@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Huntfields
 
-## Getting Started
+Production-oriented MVP for an international hunting land access marketplace.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Next.js App Router on Vercel
+- Supabase Auth, Postgres, Storage, and PostGIS
+- MapLibre GL with Terra Draw polygon editing
+- Resend transactional email
+- Stripe-ready payment provider abstraction with manual/noop fallback for MVP
+- US-first compliance workflows for hunter onboarding, listing rules, booking approval, and electronic lease signing
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Copy `.env.example` to `.env.local`.
+2. Create a Supabase project and set the Supabase URL, anon key, and service role key.
+3. Run the SQL files in `supabase/migrations` in order.
+4. Configure Supabase Auth SMTP to use Resend if you want signup confirmation and magic-link emails through Resend.
+5. Run `npm run dev`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Supabase
 
-## Learn More
+The migrations enable PostGIS and create:
 
-To learn more about Next.js, take a look at the following resources:
+- `profiles`, `legal_region_configs`, `listing_types`
+- `listings` with exact `geometry(MultiPolygon, 4326)`, private `geography(Point, 4326)`, approximate public point, area fields, search vector, and GIST indexes
+- `listing_requests`, `bookings`, `messages`, `favorites`, `saved_searches`, `admin_reviews`
+- `us_state_hunting_rules`, `hunter_compliance_profiles`, `listing_compliance_profiles`, `booking_contracts`, `contract_signatures`, `booking_workflow_events`
+- Storage buckets for listing images, avatars, and message attachments
+- RLS policies and column grants so public users cannot directly select exact polygon coordinates
+- RPCs for radius search, bounds search, featured region listings, area calculation, approximate public location, public listing details, and exact polygon access after approval or confirmed booking
+- RPCs for reading state hunting rules and refreshing contract status after electronic signatures
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Map Privacy Model
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Landowners draw exact polygons in the listing submission flow. Supabase stores the exact geometry for search, area calculation, and private access. Public pages and map search return only the rounded approximate public point. The `get_listing_exact_polygon` RPC returns exact coordinates only to admins, landowners, approved hunters, or confirmed bookings.
 
-## Deploy on Vercel
+## AI Listing Covers
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+When `OPENAI_API_KEY` and `SUPABASE_SERVICE_ROLE_KEY` are configured, new listing submissions generate a unique regional cover image server-side. The prompt uses the listing title, state, region, nearest town, wildlife, habitat notes, and amenities, then uploads the image to the Supabase `listing-images` bucket. Without OpenAI or storage credentials, listings still work and fall back to the generated placeholder cover route.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Email Events
+
+Resend helpers are wired for:
+
+- Signup confirmation template for custom flows
+- New listing submitted
+- Listing approved or rejected
+- Hunter request sent to landowner
+- Landowner response sent to hunter
+- Booking/request status updates
+- Lease agreement ready for signature
+- Lease agreement fully signed
+- Contact form notifications
+
+Supabase Auth confirmation and magic-link delivery should be routed through Resend SMTP in the Supabase dashboard.
+
+## Payments
+
+The app uses `getPaymentProvider()` to select Stripe when `STRIPE_SECRET_KEY` is present, otherwise it uses the manual MVP provider. The Stripe provider is built around Checkout Sessions and can support Connect destination charges with a connected account ID later.
+
+## US Compliance and Contracts
+
+The first market is the United States. The seeded launch states are Texas, Colorado, Montana, and Georgia. The compliance layer is intentionally data-driven through `us_state_hunting_rules`, so more states can be added without changing the app flow.
+
+Current workflow:
+
+- Hunters complete `/onboarding/hunter` before messaging landowners.
+- Landowners complete state-aware listing checks during `/list-your-land`.
+- Requests can be approved or declined in `/dashboard`.
+- Approval creates a booking and generates a hunting lease agreement draft.
+- Both hunter and landowner sign at `/contracts/[id]`.
+- Once both signatures are stored, the contract status becomes `signed` and the booking becomes `confirmed`.
+
+The generated lease is an operational template, not legal advice. State rules change, and production launch should include counsel review per target state.

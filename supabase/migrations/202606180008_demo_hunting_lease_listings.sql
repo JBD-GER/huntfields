@@ -1,0 +1,3 @@
+-- Superseded by 202606180009_replace_demo_listings_with_public_area_examples.sql.
+-- Kept intentionally as a no-op so the original demo listings are not inserted
+-- in fresh development databases.

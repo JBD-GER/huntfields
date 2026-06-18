@@ -1,0 +1,122 @@
+import { env } from "@/lib/env";
+
+function layout(title: string, body: string) {
+  return `<!doctype html>
+<html lang="en">
+  <body style="margin:0;background:#f6f3ed;color:#19231d;font-family:Arial,sans-serif;">
+    <div style="max-width:640px;margin:0 auto;padding:32px 20px;">
+      <div style="background:#ffffff;border:1px solid #ddd6c8;border-radius:12px;padding:28px;">
+        <p style="margin:0 0 18px;color:#47604e;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">Huntfields</p>
+        <h1 style="margin:0 0 18px;font-size:24px;line-height:1.2;color:#19231d;">${title}</h1>
+        <div style="font-size:16px;line-height:1.6;color:#344239;">${body}</div>
+      </div>
+      <p style="margin:18px 0 0;color:#6f756f;font-size:12px;">This email was sent by Huntfields transactional notifications.</p>
+    </div>
+  </body>
+</html>`;
+}
+
+function button(label: string, href: string) {
+  return `<p style="margin:24px 0 0;"><a href="${href}" style="display:inline-block;background:#234331;color:#ffffff;text-decoration:none;border-radius:8px;padding:12px 16px;font-weight:700;">${label}</a></p>`;
+}
+
+export const emailTemplates = {
+  signupConfirmation(email: string, confirmationUrl: string) {
+    return {
+      subject: "Confirm your Huntfields account",
+      text: `Confirm ${email} for Huntfields: ${confirmationUrl}`,
+      html: layout(
+        "Confirm your Huntfields account",
+        `<p>Confirm ${email} to start messaging landowners and managing land listings.</p>${button("Confirm account", confirmationUrl)}`,
+      ),
+    };
+  },
+  listingSubmitted(title: string, listingUrl: string) {
+    return {
+      subject: `New listing submitted: ${title}`,
+      text: `A new listing was submitted for review: ${title}\n${listingUrl}`,
+      html: layout(
+        "New listing submitted",
+        `<p><strong>${title}</strong> is waiting for admin review.</p>${button("Review listing", listingUrl)}`,
+      ),
+    };
+  },
+  listingDecision(title: string, approved: boolean, listingUrl: string, note?: string) {
+    return {
+      subject: approved
+        ? `Your Huntfields listing was approved`
+        : `Your Huntfields listing needs changes`,
+      text: `${title}: ${approved ? "approved" : "not approved"}\n${note ?? ""}\n${listingUrl}`,
+      html: layout(
+        approved ? "Listing approved" : "Listing needs changes",
+        `<p><strong>${title}</strong> ${approved ? "is now live on Huntfields." : "was not approved yet."}</p>${note ? `<p>${note}</p>` : ""}${button("Open listing", listingUrl)}`,
+      ),
+    };
+  },
+  hunterRequest(title: string, requesterName: string, requestUrl: string) {
+    return {
+      subject: `New access request for ${title}`,
+      text: `${requesterName} requested access to ${title}.\n${requestUrl}`,
+      html: layout(
+        "New hunter request",
+        `<p><strong>${requesterName}</strong> requested access to <strong>${title}</strong>.</p>${button("Respond to request", requestUrl)}`,
+      ),
+    };
+  },
+  landownerResponse(title: string, approved: boolean, requestUrl: string) {
+    return {
+      subject: approved
+        ? `Your request for ${title} was approved`
+        : `Update on your request for ${title}`,
+      text: `Your request for ${title} was ${approved ? "approved" : "updated"}.\n${requestUrl}`,
+      html: layout(
+        approved ? "Request approved" : "Request updated",
+        `<p>Your request for <strong>${title}</strong> was ${approved ? "approved" : "updated by the landowner"}.</p>${button("View request", requestUrl)}`,
+      ),
+    };
+  },
+  bookingStatus(title: string, status: string, bookingUrl: string) {
+    return {
+      subject: `Booking ${status}: ${title}`,
+      text: `Booking status for ${title}: ${status}\n${bookingUrl}`,
+      html: layout(
+        "Booking status update",
+        `<p>Your booking for <strong>${title}</strong> is now <strong>${status}</strong>.</p>${button("View booking", bookingUrl)}`,
+      ),
+    };
+  },
+  leaseContractReady(title: string, contractUrl: string) {
+    return {
+      subject: `Lease agreement ready: ${title}`,
+      text: `The hunting lease agreement for ${title} is ready for electronic signature.\n${contractUrl}`,
+      html: layout(
+        "Lease agreement ready",
+        `<p>The hunting lease agreement for <strong>${title}</strong> is ready for electronic signature.</p>${button("Review and sign", contractUrl)}`,
+      ),
+    };
+  },
+  leaseContractSigned(title: string, contractUrl: string) {
+    return {
+      subject: `Lease agreement signed: ${title}`,
+      text: `The hunting lease agreement for ${title} has been fully signed.\n${contractUrl}`,
+      html: layout(
+        "Lease agreement signed",
+        `<p>The hunting lease agreement for <strong>${title}</strong> has been fully signed. The booking is now confirmed.</p>${button("Open agreement", contractUrl)}`,
+      ),
+    };
+  },
+  contactForm(name: string, email: string, topic: string, message: string) {
+    return {
+      subject: `Huntfields contact: ${topic}`,
+      text: `${name} <${email}> wrote:\n\n${message}`,
+      html: layout(
+        "New contact form message",
+        `<p><strong>${name}</strong> &lt;${email}&gt; wrote about <strong>${topic}</strong>.</p><p>${message.replaceAll("\n", "<br>")}</p>`,
+      ),
+    };
+  },
+};
+
+export function appUrl(path: string) {
+  return new URL(path, env.appUrl).toString();
+}

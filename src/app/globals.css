@@ -1,8 +1,9 @@
 @import "tailwindcss";
+@import "maplibre-gl/dist/maplibre-gl.css";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f6f2e9;
+  --foreground: #19231d;
 }
 
 @theme inline {
@@ -12,15 +13,73 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  background:
+    linear-gradient(180deg, rgb(246 242 233 / 96%), rgb(239 234 222 / 100%)),
+    repeating-linear-gradient(
+      90deg,
+      rgb(25 35 29 / 0.018) 0,
+      rgb(25 35 29 / 0.018) 1px,
+      transparent 1px,
+      transparent 7px
+    );
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+::selection {
+  background: #c76b2f;
+  color: #fff;
+}
+
+.maplibregl-popup-content {
+  border-radius: 8px;
+  border: 1px solid rgb(35 67 49 / 14%);
+  box-shadow: 0 20px 52px rgb(25 35 29 / 22%);
+  color: #19231d;
+  font: 14px/1.45 var(--font-geist-sans), Arial, sans-serif;
+}
+
+.maplibregl-popup-content a {
+  color: #234331;
+  font-weight: 700;
+}
+
+.maplibregl-ctrl-group {
+  border-radius: 8px !important;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgb(25 35 29 / 16%) !important;
+}
+
+:focus-visible {
+  outline: 3px solid rgb(199 107 47 / 40%);
+  outline-offset: 3px;
+}
+
+.lease-contract-content h1 {
+  margin: 0 0 1rem;
+  font-size: 1.875rem;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.lease-contract-content h2 {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 900;
+}
+
+.lease-contract-content p,
+.lease-contract-content li {
+  color: #44403c;
+  font-size: 0.95rem;
+  line-height: 1.75;
+}
+
+.lease-contract-content ul,
+.lease-contract-content ol {
+  margin: 0.75rem 0 0;
+  padding-left: 1.25rem;
 }
