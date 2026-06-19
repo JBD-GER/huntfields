@@ -77,21 +77,29 @@ export default async function LoginPage({
 
         <section className="rounded-lg border border-white/14 bg-[#fffdf7]/96 p-4 shadow-[0_30px_90px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-6 lg:ml-auto lg:w-full lg:max-w-md">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-[#c76b2f]">
-            Sign in / Sign up
+            Secure account
           </p>
           <h2 className="mt-3 text-3xl font-black tracking-normal text-stone-950">
-            Continue for free.
+            Login or create an account.
           </h2>
           <p className="mt-2 text-sm leading-6 text-stone-600">
-            Enter your email and we will send a secure link. No password, no
-            payment, no subscription required.
+            Default is login. Switch to create an account only if you are new.
+            Google, SAML 2.0, and classic email/password are supported.
           </p>
           <div className="mt-5 rounded-md border border-[#234331]/10 bg-[#f6f2e9] p-3 text-sm font-semibold leading-6 text-stone-700">
             Hunters can message owners and request access. Landowners can
             create an owner profile and submit land for review.
           </div>
           <div className="mt-6">
-            <LoginForm nextPath={next} />
+            <LoginForm
+              authError={
+                typeof params.auth_error === "string"
+                  ? params.auth_error
+                  : null
+              }
+              initialMode={params.mode === "register" ? "register" : "login"}
+              nextPath={next}
+            />
           </div>
         </section>
       </div>

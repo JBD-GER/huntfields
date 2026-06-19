@@ -1,3 +1,4 @@
+import type { EmailOtpType } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -32,25 +33,36 @@ function redirectToLogin(origin: string, message: string) {
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
-  const error = requestUrl.searchParams.get("error_description");
+  const tokenHash = requestUrl.searchParams.get("token_hash");
+  const type = requestUrl.searchParams.get("type") as EmailOtpType | null;
   const next = safeRedirectPath(requestUrl.searchParams.get("next"), requestUrl.origin);
+  const supabase = await createSupabaseServerClient();
 
-  if (error) {
-    return redirectToLogin(requestUrl.origin, error);
+  if (!supabase) {
+    return redirectToLogin(requestUrl.origin, "Supabase Auth is not configured.");
   }
 
-  if (code) {
-    const supabase = await createSupabaseServerClient();
-    const { error: exchangeError } =
-      (await supabase?.auth.exchangeCodeForSession(code)) ?? {};
+  if (tokenHash && type) {
+    const { error } = await supabase.auth.verifyOtp({
+      token_hash: tokenHash,
+      type,
+    });
 
-    if (exchangeError) {
-      return redirectToLogin(
-        requestUrl.origin,
-        "Your sign-in link expired or could not be verified. Please try again.",
-      );
+    if (!error) {
+      return NextResponse.redirect(new URL(next, requestUrl.origin));
     }
   }
 
-  return NextResponse.redirect(new URL(next, requestUrl.origin));
+  if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (!error) {
+      return NextResponse.redirect(new URL(next, requestUrl.origin));
+    }
+  }
+
+  return redirectToLogin(
+    requestUrl.origin,
+    "Your sign-in link expired or could not be verified. Please try again.",
+  );
 }

@@ -56,6 +56,73 @@ Resend helpers are wired for:
 
 Supabase Auth confirmation and magic-link delivery should be routed through Resend SMTP in the Supabase dashboard.
 
+## Auth Provider Setup
+
+The app supports four sign-in paths on `/auth/login`:
+
+- Email and password through Supabase Auth
+- Google OAuth through the Supabase Google provider
+- SAML 2.0 through Supabase Enterprise SSO
+- Passkey sign-in for users who add a passkey after logging in
+
+For Supabase Auth URLs, set:
+
+- Site URL: `https://www.huntfields.com`
+- Redirect URLs:
+  - `https://www.huntfields.com/auth/callback`
+  - `https://www.huntfields.com/auth/confirm`
+  - `http://localhost:3000/auth/callback`
+  - `http://localhost:3000/auth/confirm`
+
+The default Supabase confirmation links work through `/auth/callback`. For the
+most reliable server-side email confirmation and invite flow, update Supabase
+Auth email templates to point at `/auth/confirm` with `token_hash`:
+
+```html
+<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type={{ .Type }}&redirect_to={{ .RedirectTo }}">
+  Confirm your Huntfields account
+</a>
+```
+
+For Google, create a Google Cloud OAuth client with application type `Web application`.
+
+- Authorized JavaScript origins:
+  - `https://www.huntfields.com`
+  - `http://localhost:3000`
+- Authorized redirect URI:
+  - copy the exact `Callback URL (for OAuth)` shown in Supabase Dashboard -> Auth -> Providers -> Google. It looks like `https://<project-ref>.supabase.co/auth/v1/callback`.
+
+Then paste the Google Web Client ID and Client Secret into the Supabase Google provider settings and save.
+
+For SAML 2.0, enable SAML in Supabase Dashboard -> Auth -> Providers -> SAML 2.0, then add each identity provider with the Supabase CLI. Prefer metadata URLs when the IdP supports them:
+
+```bash
+supabase sso add --type saml --project-ref <project-ref> \
+  --metadata-url 'https://company.com/idp/saml/metadata' \
+  --domains company.com
+```
+
+If the IdP only provides a metadata XML file:
+
+```bash
+supabase sso add --type saml --project-ref <project-ref> \
+  --metadata-file /path/to/saml/metadata.xml \
+  --domains company.com
+```
+
+Users then enter `company.com` in the SAML field on `/auth/login`.
+
+For Passkeys, enable Supabase Dashboard -> Auth -> Providers -> Passkeys.
+
+- Relying Party Display Name: `Huntfields`
+- Local development Relying Party ID: `localhost`
+- Local development Origin: `http://localhost:3000`
+- Production Relying Party ID: `huntfields.com`
+- Production Origin: `https://www.huntfields.com`
+
+The app shows passkey sign-in on `/auth/login` and lets signed-in users add a
+passkey from `/dashboard`.
+
 ## Payments
 
 The app uses `getPaymentProvider()` to select Stripe when `STRIPE_SECRET_KEY` is present, otherwise it uses the manual MVP provider. The Stripe provider is built around Checkout Sessions and can support Connect destination charges with a connected account ID later.
