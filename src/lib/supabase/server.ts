@@ -6,6 +6,7 @@ import {
   hasSupabaseBrowserEnv,
   hasSupabaseServiceEnv,
 } from "@/lib/env";
+import { supabaseAuthCookieOptions } from "@/lib/supabase/auth-cookies";
 
 export async function createSupabaseServerClient() {
   if (!hasSupabaseBrowserEnv()) {
@@ -15,6 +16,7 @@ export async function createSupabaseServerClient() {
   const cookieStore = await cookies();
 
   return createServerClient(env.supabaseUrl!, env.supabaseAnonKey!, {
+    cookieOptions: supabaseAuthCookieOptions,
     cookies: {
       getAll() {
         return cookieStore.getAll();

@@ -2,6 +2,7 @@
 
 import { createBrowserClient } from "@supabase/ssr";
 import { env, hasSupabaseBrowserEnv } from "@/lib/env";
+import { supabaseAuthCookieOptions } from "@/lib/supabase/auth-cookies";
 
 export function createSupabaseBrowserClient() {
   if (!hasSupabaseBrowserEnv()) {
@@ -11,6 +12,7 @@ export function createSupabaseBrowserClient() {
   }
 
   return createBrowserClient(env.supabaseUrl!, env.supabaseAnonKey!, {
+    cookieOptions: supabaseAuthCookieOptions,
     auth: {
       experimental: {
         passkey: true,

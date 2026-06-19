@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { clearLegacySupabaseAuthCookies } from "@/lib/auth/supabase-cookie-cleanup";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function safeRedirectPath(value: string | null, origin: string) {
@@ -50,6 +51,8 @@ export async function GET(request: Request) {
         "Your sign-in link expired or could not be verified. Please try again.",
       );
     }
+
+    await clearLegacySupabaseAuthCookies();
   }
 
   return NextResponse.redirect(new URL(next, requestUrl.origin));
