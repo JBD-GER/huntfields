@@ -14,7 +14,17 @@ export type LeaseContractInput = {
   endsOn: string;
   partySize: number;
   amountCents: number | null;
+  additionalFeeCents?: number | null;
+  hunterPlatformFeeCents?: number | null;
+  landownerPlatformFeeCents?: number | null;
+  landownerPayoutCents?: number | null;
+  hunterTotalCents?: number | null;
   currency: string;
+  renewalType?: string | null;
+  paymentSchedule?: string | null;
+  contractSource?: string | null;
+  uploadedContractPath?: string | null;
+  termsNotes?: string | null;
   hunterName: string;
   hunterEmail: string | null;
   landownerName: string;
@@ -43,6 +53,17 @@ function money(amountCents: number | null, currency: string) {
     currency,
     maximumFractionDigits: 0,
   }).format(amountCents / 100);
+}
+
+function renewalLabel(value: string | null | undefined) {
+  switch (value) {
+    case "annual_optional":
+      return "Annual renewal may be offered by the landowner and must be accepted in writing.";
+    case "annual_auto":
+      return "Annual renewal is intended, subject to written renewal terms, payment, and legal availability.";
+    default:
+      return "No automatic renewal.";
+  }
 }
 
 function list(items: string[], fallback: string) {
@@ -77,7 +98,14 @@ export function generateHuntingLeaseContract(input: LeaseContractInput) {
     `Region: ${[input.nearestTown, input.countyOrRegion, stateLabel].filter(Boolean).join(", ")}`,
     `Access dates: ${input.startsOn} through ${input.endsOn}`,
     `Approved party size: ${input.partySize}`,
-    `Fee: ${money(input.amountCents, input.currency)}`,
+    `Lease price: ${money(input.amountCents, input.currency)}`,
+    `Additional owner-approved charges: ${money(input.additionalFeeCents ?? 0, input.currency)}`,
+    `Hunter platform fee: ${money(input.hunterPlatformFeeCents ?? 0, input.currency)}`,
+    `Landowner platform fee: ${money(input.landownerPlatformFeeCents ?? 0, input.currency)}`,
+    `Hunter total due after signature: ${money(input.hunterTotalCents ?? input.amountCents, input.currency)}`,
+    `Estimated landowner payout before external taxes/withholding: ${money(input.landownerPayoutCents ?? input.amountCents, input.currency)}`,
+    `Renewal: ${renewalLabel(input.renewalType)}`,
+    `Contract source: ${input.contractSource === "uploaded_pdf" ? "Landowner uploaded PDF plus Huntfields signature wrapper" : "Huntfields generated agreement"}`,
     `Hunter: ${input.hunterName}${input.hunterEmail ? ` <${input.hunterEmail}>` : ""}`,
     `Landowner: ${input.landownerName}${input.landownerEmail ? ` <${input.landownerEmail}>` : ""}`,
     "",
@@ -88,6 +116,7 @@ export function generateHuntingLeaseContract(input: LeaseContractInput) {
     `Vehicle policy: ${input.vehiclePolicy ?? "Use only approved roads, gates, and parking areas"}`,
     `Alcohol policy: ${input.alcoholPolicy ?? "No alcohol or impairment while hunting or handling firearms/archery equipment"}`,
     `Emergency contact: ${[input.emergencyContactName, input.emergencyContactPhone].filter(Boolean).join(" - ") || "Provided after approval"}`,
+    input.termsNotes ? `Additional notes: ${input.termsNotes}` : "",
     "",
     "Compliance checklist:",
     ...(input.rule?.booking_checklist ?? ["Verify state hunting requirements", "Sign agreement electronically"]),
@@ -116,7 +145,20 @@ export function generateHuntingLeaseContract(input: LeaseContractInput) {
       <p><strong>Region:</strong> ${escapeHtml([input.nearestTown, input.countyOrRegion, stateLabel].filter(Boolean).join(", "))}</p>
       <p><strong>Access dates:</strong> ${escapeHtml(input.startsOn)} through ${escapeHtml(input.endsOn)}</p>
       <p><strong>Approved party size:</strong> ${input.partySize}</p>
-      <p><strong>Fee:</strong> ${escapeHtml(money(input.amountCents, input.currency))}</p>
+      <h2>Final Price and Platform Fees</h2>
+      <p><strong>Lease price:</strong> ${escapeHtml(money(input.amountCents, input.currency))}</p>
+      <p><strong>Additional owner-approved charges:</strong> ${escapeHtml(money(input.additionalFeeCents ?? 0, input.currency))}</p>
+      <p><strong>Hunter platform fee:</strong> ${escapeHtml(money(input.hunterPlatformFeeCents ?? 0, input.currency))}</p>
+      <p><strong>Landowner platform fee:</strong> ${escapeHtml(money(input.landownerPlatformFeeCents ?? 0, input.currency))}</p>
+      <p><strong>Total due from hunter after both parties sign:</strong> ${escapeHtml(money(input.hunterTotalCents ?? input.amountCents, input.currency))}</p>
+      <p><strong>Estimated landowner payout:</strong> ${escapeHtml(money(input.landownerPayoutCents ?? input.amountCents, input.currency))}</p>
+      <p><strong>Renewal:</strong> ${escapeHtml(renewalLabel(input.renewalType))}</p>
+      <p><strong>Payment timing:</strong> Hunter payment is due immediately after the agreement is fully signed. Access is not active until payment is completed or manually confirmed by Huntfields.</p>
+      ${
+        input.contractSource === "uploaded_pdf"
+          ? `<p><strong>Uploaded owner contract:</strong> The landowner supplied a PDF contract. This page records the platform signature wrapper and payment terms. File path: ${escapeHtml(input.uploadedContractPath ?? "stored privately")}</p>`
+          : ""
+      }
       <h2>Parties</h2>
       <p><strong>Hunter:</strong> ${escapeHtml(input.hunterName)}${input.hunterEmail ? ` &lt;${escapeHtml(input.hunterEmail)}&gt;` : ""}</p>
       <p><strong>Landowner:</strong> ${escapeHtml(input.landownerName)}${input.landownerEmail ? ` &lt;${escapeHtml(input.landownerEmail)}&gt;` : ""}</p>
@@ -128,6 +170,7 @@ export function generateHuntingLeaseContract(input: LeaseContractInput) {
       <p><strong>Vehicle policy:</strong> ${escapeHtml(input.vehiclePolicy ?? "Use only approved roads, gates, and parking areas")}</p>
       <p><strong>Alcohol policy:</strong> ${escapeHtml(input.alcoholPolicy ?? "No alcohol or impairment while hunting or handling firearms/archery equipment")}</p>
       <p><strong>Emergency contact:</strong> ${escapeHtml([input.emergencyContactName, input.emergencyContactPhone].filter(Boolean).join(" - ") || "Provided after approval")}</p>
+      ${input.termsNotes ? `<p><strong>Additional notes:</strong> ${escapeHtml(input.termsNotes)}</p>` : ""}
       <h2>Compliance Checklist</h2>
       <ul>${checklistHtml}</ul>
       <h2>Terms</h2>

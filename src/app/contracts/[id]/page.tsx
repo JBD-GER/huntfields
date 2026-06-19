@@ -1,9 +1,11 @@
 import { redirect } from "next/navigation";
-import { CheckCircle2, FileSignature, LockKeyhole } from "lucide-react";
+import { CheckCircle2, CreditCard, FileSignature, LockKeyhole } from "lucide-react";
+import { formatMoney } from "@/lib/payments/fees";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { pageMetadata } from "@/lib/seo/site";
 
 type Params = Promise<{ id: string }>;
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 export const metadata = pageMetadata({
   title: "Hunting lease agreement",
@@ -13,8 +15,15 @@ export const metadata = pageMetadata({
   index: false,
 });
 
-export default async function ContractPage({ params }: { params: Params }) {
+export default async function ContractPage({
+  params,
+  searchParams,
+}: {
+  params: Params;
+  searchParams: SearchParams;
+}) {
   const { id } = await params;
+  const query = await searchParams;
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
@@ -42,7 +51,7 @@ export default async function ContractPage({ params }: { params: Params }) {
     supabase
       .from("booking_contracts")
       .select(
-        "id, booking_id, listing_id, hunter_id, landowner_id, status, title, contract_html, contract_hash, electronic_records_disclosure, generated_at, signed_at",
+        "id, booking_id, listing_id, hunter_id, landowner_id, status, title, contract_html, contract_hash, electronic_records_disclosure, generated_at, signed_at, lease_amount_cents, additional_fee_cents, hunter_platform_fee_cents, landowner_platform_fee_cents, landowner_payout_cents, hunter_total_cents, renewal_type, payment_due_at, bookings(status, payment_status, workflow_stage, checkout_url, currency)",
       )
       .eq("id", id)
       .maybeSingle(),
@@ -75,6 +84,13 @@ export default async function ContractPage({ params }: { params: Params }) {
     (signature) => signature.signer_id === user.id,
   );
   const fullySigned = contract.status === "signed";
+  const booking = Array.isArray(contract.bookings)
+    ? contract.bookings[0]
+    : contract.bookings;
+  const currency = booking?.currency ?? "USD";
+  const paymentState = Array.isArray(query.payment_state)
+    ? query.payment_state[0]
+    : query.payment_state;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
@@ -94,6 +110,24 @@ export default async function ContractPage({ params }: { params: Params }) {
       </div>
 
       <section className="rounded-md border border-stone-200 bg-white p-5 shadow-sm">
+        <div className="mb-6 grid gap-3 rounded-md border border-[#234331]/10 bg-[#fbfaf6] p-4 sm:grid-cols-2 lg:grid-cols-3">
+          <FinancialStat
+            label="Hunter total due"
+            value={formatMoney(contract.hunter_total_cents, currency)}
+          />
+          <FinancialStat
+            label="Landowner payout"
+            value={formatMoney(contract.landowner_payout_cents, currency)}
+          />
+          <FinancialStat
+            label="Platform fees"
+            value={formatMoney(
+              (contract.hunter_platform_fee_cents ?? 0) +
+                (contract.landowner_platform_fee_cents ?? 0),
+              currency,
+            )}
+          />
+        </div>
         <div className="lease-contract-content prose max-w-none prose-stone">
           <div dangerouslySetInnerHTML={{ __html: contract.contract_html }} />
         </div>
@@ -142,9 +176,35 @@ export default async function ContractPage({ params }: { params: Params }) {
           </p>
         )}
         {fullySigned && (
-          <p className="text-sm font-semibold text-[#234331]">
-            Fully signed. The related booking is confirmed.
-          </p>
+          <div className="grid gap-3 rounded-md border border-[#d9c6aa] bg-[#fff9ef] p-4 text-sm leading-6 text-stone-700">
+            <p className="font-bold text-stone-950">
+              Fully signed. Payment is now due from the hunter.
+            </p>
+            <p>
+              The agreement is signed, but access becomes active only after
+              Stripe payment is completed or Huntfields manually confirms
+              payment.
+            </p>
+            {paymentState === "connect_required" ? (
+              <p className="font-semibold text-[#8a4a20]">
+                Stripe Connect is not fully enabled for this landowner yet.
+                Payment is marked as manual pending.
+              </p>
+            ) : null}
+            {booking?.payment_status ? (
+              <p className="font-semibold">
+                Payment status: {booking.payment_status.replaceAll("_", " ")}
+              </p>
+            ) : null}
+          </div>
+        )}
+        {fullySigned && signerRole === "hunter" && booking?.payment_status !== "paid" && (
+          <form action={`/api/bookings/${contract.booking_id}/checkout`} method="post">
+            <button className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-[#234331] px-5 font-bold text-white transition hover:bg-[#162d22]">
+              <CreditCard size={17} aria-hidden="true" />
+              Pay now
+            </button>
+          </form>
         )}
         {signerRole && !alreadySigned && !fullySigned && (
           <form action={`/api/contracts/${id}/sign`} method="post" className="grid gap-4">
@@ -176,6 +236,17 @@ export default async function ContractPage({ params }: { params: Params }) {
           </form>
         )}
       </section>
+    </div>
+  );
+}
+
+function FinancialStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-xs font-black uppercase tracking-[0.14em] text-[#c76b2f]">
+        {label}
+      </p>
+      <p className="mt-1 text-xl font-black text-stone-950">{value}</p>
     </div>
   );
 }

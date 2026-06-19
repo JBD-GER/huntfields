@@ -3,6 +3,7 @@ import {
   createSupabaseServerClient,
   createSupabaseServiceClient,
 } from "@/lib/supabase/server";
+import { clearSupabaseAuthCookies } from "@/lib/auth/supabase-cookie-cleanup";
 
 function redirectWithError(request: Request, message: string) {
   const url = new URL("/dashboard", request.url);
@@ -57,6 +58,7 @@ export async function POST(request: Request) {
   }
 
   await supabase.auth.signOut({ scope: "local" });
+  await clearSupabaseAuthCookies();
 
   return NextResponse.redirect(
     new URL("/auth/login?account_deleted=1", request.url),

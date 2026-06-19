@@ -92,6 +92,8 @@ export default async function LoginPage({
               authMessage={
                 params.account_deleted === "1"
                   ? "Your account has been deleted."
+                  : params.cookies_cleared === "1"
+                    ? "Old local auth cookies were cleared. Please sign in again."
                   : null
               }
               initialMode={params.mode === "register" ? "register" : "login"}

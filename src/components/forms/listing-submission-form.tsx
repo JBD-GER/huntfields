@@ -6,6 +6,7 @@ import { LazyPolygonEditor } from "@/components/maps/lazy-polygon-editor";
 import { SpeciesSelector } from "@/components/forms/species-selector";
 import type { ListingType } from "@/lib/data/listings";
 import type { UsStateHuntingRule } from "@/lib/compliance/us-state-rules";
+import { calculateMarketplaceFees, formatBps, formatMoney, INITIAL_HUNTER_FEE_BPS, INITIAL_OWNER_FEE_BPS } from "@/lib/payments/fees";
 
 type SubmitState = "idle" | "loading" | "success" | "error";
 type DescriptionState = "idle" | "loading" | "error";
@@ -25,9 +26,16 @@ export function ListingSubmissionForm({
     useState<DescriptionState>("idle");
   const [descriptionError, setDescriptionError] = useState<string | null>(null);
   const [stateCode, setStateCode] = useState("TX");
+  const [pricePreviewCents, setPricePreviewCents] = useState<number | null>(
+    null,
+  );
   const activeRule =
     stateRules.find((rule) => rule.state_code === stateCode.toUpperCase()) ??
     stateRules[0];
+  const feePreview =
+    pricePreviewCents !== null
+      ? calculateMarketplaceFees({ leaseAmountCents: pricePreviewCents })
+      : null;
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -225,8 +233,25 @@ export function ListingSubmissionForm({
             inputMode="decimal"
             maxLength={12}
             placeholder="250"
+            onChange={(event) => {
+              const parsed = Number(event.target.value.replace(",", "."));
+              setPricePreviewCents(
+                Number.isFinite(parsed) && parsed >= 0
+                  ? Math.round(parsed * 100)
+                  : null,
+              );
+            }}
             className="min-h-11 rounded-md border border-stone-300 px-3 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
           />
+          {feePreview ? (
+            <span className="rounded-md border border-[#d9c6aa] bg-[#fff9ef] p-2 text-xs font-normal leading-5 text-stone-600">
+              Huntfields owner fee is {formatBps(INITIAL_OWNER_FEE_BPS)}.
+              Hunter fee is shown later when terms are serious (
+              {formatBps(INITIAL_HUNTER_FEE_BPS)}). At this price your
+              estimated payout is {formatMoney(feePreview.landownerPayoutCents)}
+              .
+            </span>
+          ) : null}
         </label>
         <label className="grid gap-2 text-sm font-semibold text-stone-800">
           Currency

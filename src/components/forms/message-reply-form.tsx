@@ -48,6 +48,20 @@ export function MessageReplyForm({ requestId }: { requestId: string }) {
           className="rounded-md border border-stone-300 px-3 py-2 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
         />
       </label>
+      <label className="grid gap-2 text-sm font-semibold text-stone-800">
+        Attach photos or documents
+        <input
+          name="attachments"
+          type="file"
+          multiple
+          accept="image/jpeg,image/png,image/webp,application/pdf"
+          className="rounded-md border border-dashed border-stone-300 bg-[#fbfaf6] px-3 py-2 text-sm font-normal file:mr-3 file:rounded-md file:border-0 file:bg-[#234331] file:px-3 file:py-2 file:text-xs file:font-bold file:text-white"
+        />
+        <span className="text-xs font-normal leading-5 text-stone-500">
+          Up to 5 files. PDF, JPG, PNG, or WebP. Useful for insurance,
+          ownership proof, trail photos, and contract notes.
+        </span>
+      </label>
       {state === "error" && (
         <p className="text-sm font-semibold text-red-700">{error}</p>
       )}

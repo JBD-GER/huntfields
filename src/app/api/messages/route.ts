@@ -10,6 +10,21 @@ const schema = z.object({
   body: z.string().min(1).max(4000),
 });
 
+function safeFileName(value: string) {
+  return value
+    .replace(/[^a-zA-Z0-9._-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 120);
+}
+
+function attachmentKind(contentType: string) {
+  if (contentType.startsWith("image/")) {
+    return "photo";
+  }
+
+  return "document";
+}
+
 export async function POST(request: Request) {
   const supabase = await createSupabaseServerClient();
   const service = createSupabaseServiceClient();
@@ -74,16 +89,75 @@ export async function POST(request: Request) {
   }
 
   const recipientId = isHunter ? listing.owner_id : accessRequest.hunter_id;
-  const { error } = await db.from("messages").insert({
-    request_id: accessRequest.id,
-    listing_id: accessRequest.listing_id,
-    sender_id: user.id,
-    recipient_id: recipientId,
-    body: parsed.data.body,
-  });
+  const { data: createdMessage, error } = await db
+    .from("messages")
+    .insert({
+      request_id: accessRequest.id,
+      listing_id: accessRequest.listing_id,
+      sender_id: user.id,
+      recipient_id: recipientId,
+      body: parsed.data.body,
+    })
+    .select("id")
+    .single();
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error || !createdMessage) {
+    return NextResponse.json(
+      { error: error?.message ?? "Message could not be sent." },
+      { status: 500 },
+    );
+  }
+
+  const attachmentFiles = formData
+    .getAll("attachments")
+    .filter((value): value is File => value instanceof File && value.size > 0)
+    .slice(0, 5);
+
+  if (attachmentFiles.length > 0 && service) {
+    for (const file of attachmentFiles) {
+      if (file.size > 15 * 1024 * 1024) {
+        continue;
+      }
+
+      const contentType = file.type || "application/octet-stream";
+
+      if (
+        ![
+          "image/jpeg",
+          "image/png",
+          "image/webp",
+          "application/pdf",
+        ].includes(contentType)
+      ) {
+        continue;
+      }
+
+      const fileName = safeFileName(file.name || "attachment");
+      const storagePath = `${user.id}/${createdMessage.id}/${crypto.randomUUID()}-${fileName}`;
+      const upload = await service.storage
+        .from("message-attachments")
+        .upload(storagePath, file, {
+          contentType,
+          upsert: false,
+        });
+
+      if (upload.error) {
+        continue;
+      }
+
+      await service.from("message_attachments").insert({
+        message_id: createdMessage.id,
+        request_id: accessRequest.id,
+        listing_id: accessRequest.listing_id,
+        uploader_id: user.id,
+        storage_bucket: "message-attachments",
+        storage_path: storagePath,
+        file_name: fileName,
+        content_type: contentType,
+        file_size: file.size,
+        attachment_kind: attachmentKind(contentType),
+      });
+    }
   }
 
   return NextResponse.json({ ok: true });

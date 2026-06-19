@@ -33,6 +33,19 @@ export async function POST(request: Request) {
     );
   }
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role, onboarding_completed")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (profile?.role !== "hunter" || !profile.onboarding_completed) {
+    return NextResponse.json(
+      { error: "Complete hunter account setup before requesting access." },
+      { status: 403 },
+    );
+  }
+
   const formData = await request.formData();
   const parsed = requestSchema.safeParse({
     listing_id: formData.get("listing_id"),

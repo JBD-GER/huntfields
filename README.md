@@ -27,6 +27,7 @@ The migrations enable PostGIS and create:
 - `listings` with exact `geometry(MultiPolygon, 4326)`, private `geography(Point, 4326)`, approximate public point, area fields, search vector, and GIST indexes
 - `listing_requests`, `bookings`, `messages`, `favorites`, `saved_searches`, `admin_reviews`
 - `us_state_hunting_rules`, `hunter_compliance_profiles`, `listing_compliance_profiles`, `booking_contracts`, `contract_signatures`, `booking_workflow_events`
+- `lease_terms_proposals`, `platform_fee_configs`, `payment_accounts`, `booking_payment_intents`, `message_attachments`
 - Storage buckets for listing images, avatars, and message attachments
 - RLS policies and column grants so public users cannot directly select exact polygon coordinates
 - RPCs for radius search, bounds search, featured region listings, area calculation, approximate public location, public listing details, and exact polygon access after approval or confirmed booking
@@ -104,14 +105,26 @@ For Passkeys, enable Supabase Dashboard -> Auth -> Providers -> Passkeys.
 The app shows passkey sign-in on `/auth/login` and lets signed-in users add a
 passkey from `/dashboard`.
 
+If local Google OAuth redirects to `/dashboard` and the browser shows HTTP 431,
+clear stale localhost Supabase cookies. The app includes
+`/api/auth/clear-cookies`, but if the header is already too large for the
+request to reach Next.js, clear `localhost` cookies manually in the browser and
+sign in again.
+
 Authenticated users can delete their own Supabase Auth user from `/dashboard`.
 That action requires `SUPABASE_SERVICE_ROLE_KEY` on the server because it uses
 the Supabase Admin API. If an account owns active marketplace records, archive
 or transfer those records before deleting the Auth user.
 
-## Payments
+## Payments and Marketplace Fees
 
-The app uses `getPaymentProvider()` to select Stripe when `STRIPE_SECRET_KEY` is present, otherwise it uses the manual MVP provider. The Stripe provider is built around Checkout Sessions and can support Connect destination charges with a connected account ID later.
+The app uses `getPaymentProvider()` to select Stripe when `STRIPE_SECRET_KEY` is present, otherwise it uses the manual MVP provider. Stripe is modeled as Checkout Sessions with Connect destination charges:
+
+- Initial lease: 10% landowner platform fee and 5% hunter platform fee
+- Annual renewal: 5% landowner platform fee and 2.5% hunter platform fee
+- Hunter total, landowner payout, and application fee are stored before signature
+- Without Stripe keys or a connected landowner account, checkout becomes `manual_pending`
+- Stripe webhook endpoint: `/api/stripe/webhook`
 
 ## US Compliance and Contracts
 
@@ -119,11 +132,15 @@ The first market is the United States. The seeded launch states are Texas, Color
 
 Current workflow:
 
+- New users complete `/onboarding`, choose hunter or landowner, and can add a passkey after first login.
 - Hunters complete `/onboarding/hunter` before messaging landowners.
 - Landowners complete state-aware listing checks during `/list-your-land`.
-- Requests can be approved or declined in `/dashboard`.
-- Approval creates a booking and generates a hunting lease agreement draft.
+- Requests open a chat in `/dashboard`; parties can exchange messages, PDFs, and photos.
+- Landowners decline requests or propose final terms in `/dashboard`.
+- Final terms capture price, extras, dates, party size, renewal type, contract source, and fee disclosure.
+- Final terms create a booking and generate a hunting lease agreement draft.
 - Both hunter and landowner sign at `/contracts/[id]`.
-- Once both signatures are stored, the contract status becomes `signed` and the booking becomes `confirmed`.
+- Once both signatures are stored, the contract status becomes `signed`, booking payment becomes `payment_due`, and the hunter can start checkout.
+- Once Stripe confirms payment, the booking becomes `confirmed` / `active`.
 
 The generated lease is an operational template, not legal advice. State rules change, and production launch should include counsel review per target state.

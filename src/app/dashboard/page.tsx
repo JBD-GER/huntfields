@@ -1,8 +1,17 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { CalendarCheck, Heart, Inbox, LogOut, MapPinned, Trash2 } from "lucide-react";
+import {
+  CalendarCheck,
+  FileSignature,
+  Heart,
+  Inbox,
+  LogOut,
+  MapPinned,
+  Trash2,
+} from "lucide-react";
 import { MessageReplyForm } from "@/components/forms/message-reply-form";
 import { PasskeyRegistrationCard } from "@/components/forms/passkey-registration-card";
+import { formatBps, formatMoney, INITIAL_HUNTER_FEE_BPS, INITIAL_OWNER_FEE_BPS, RENEWAL_HUNTER_FEE_BPS, RENEWAL_OWNER_FEE_BPS } from "@/lib/payments/fees";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { pageMetadata } from "@/lib/seo/site";
 
@@ -52,11 +61,21 @@ export default async function DashboardPage({
     redirect("/auth/login");
   }
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("onboarding_completed")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (!profile?.onboarding_completed) {
+    redirect("/onboarding");
+  }
+
   const [requests, bookings, favorites, savedSearches, listings] =
     await Promise.all([
       supabase
         .from("listing_requests")
-        .select("id, status, created_at, hunter_id, listings(title, slug, owner_id)")
+        .select("id, status, workflow_stage, created_at, hunter_id, requested_start, requested_end, party_size, listings(title, slug, owner_id, price_cents, currency)")
         .order("created_at", { ascending: false })
         .limit(6),
       supabase
@@ -76,14 +95,14 @@ export default async function DashboardPage({
   const activeRequest = activeRequestId
     ? await supabase
         .from("listing_requests")
-        .select("id, status, hunter_id, message, listings(title, slug, owner_id)")
+        .select("id, status, workflow_stage, hunter_id, message, requested_start, requested_end, party_size, listings(title, slug, owner_id, price_cents, currency)")
         .eq("id", activeRequestId)
         .maybeSingle()
     : { data: null, error: null };
   const activeMessages = activeRequestId
     ? await supabase
         .from("messages")
-        .select("id, sender_id, recipient_id, body, created_at")
+        .select("id, sender_id, recipient_id, body, created_at, message_attachments(id, file_name, attachment_kind)")
         .eq("request_id", activeRequestId)
         .order("created_at", { ascending: true })
     : { data: [], error: null };
@@ -204,16 +223,15 @@ export default async function DashboardPage({
                   meta={request.status}
                 >
                   {listing?.owner_id === user.id && request.status === "pending" && (
-                    <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                      <form
-                        action={`/api/requests/${request.id}/decision`}
-                        method="post"
-                      >
-                        <input type="hidden" name="decision" value="approved" />
-                        <button className="min-h-9 w-full rounded-md bg-[#234331] px-3 text-xs font-bold text-white">
-                          Approve + contract
-                        </button>
-                      </form>
+                    <div className="mt-3 grid gap-3">
+                      <TermsProposalForm
+                        requestId={request.id}
+                        requestedStart={request.requested_start}
+                        requestedEnd={request.requested_end}
+                        partySize={request.party_size}
+                        listingPriceCents={listing.price_cents}
+                        currency={listing.currency ?? "USD"}
+                      />
                       <form
                         action={`/api/requests/${request.id}/decision`}
                         method="post"
@@ -268,6 +286,24 @@ export default async function DashboardPage({
                           }`}
                         >
                           <p>{message.body}</p>
+                          {message.message_attachments?.length ? (
+                            <div className="mt-3 grid gap-2">
+                              {message.message_attachments.map((attachment) => (
+                                <Link
+                                  key={attachment.id}
+                                  href={`/api/messages/attachments/${attachment.id}`}
+                                  className={`rounded-md border px-3 py-2 text-xs font-bold ${
+                                    own
+                                      ? "border-white/20 bg-white/10 text-white"
+                                      : "border-stone-200 bg-white text-[#234331]"
+                                  }`}
+                                >
+                                  {attachment.attachment_kind}:{" "}
+                                  {attachment.file_name}
+                                </Link>
+                              ))}
+                            </div>
+                          ) : null}
                           <p
                             className={`mt-2 text-xs ${
                               own ? "text-white/70" : "text-stone-500"
@@ -330,6 +366,180 @@ function DashboardRow({
       </Link>
       {children}
     </div>
+  );
+}
+
+function TermsProposalForm({
+  requestId,
+  requestedStart,
+  requestedEnd,
+  partySize,
+  listingPriceCents,
+  currency,
+}: {
+  requestId: string;
+  requestedStart?: string | null;
+  requestedEnd?: string | null;
+  partySize?: number | null;
+  listingPriceCents?: number | null;
+  currency: string;
+}) {
+  const defaultPrice = listingPriceCents
+    ? String(Math.round(listingPriceCents / 100))
+    : "";
+
+  return (
+    <form
+      action={`/api/requests/${requestId}/terms`}
+      method="post"
+      className="grid gap-3 rounded-md border border-[#d9c6aa] bg-[#fff9ef] p-3"
+    >
+      <div className="flex items-start gap-2">
+        <FileSignature className="mt-0.5 size-4 text-[#c76b2f]" aria-hidden="true" />
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.12em] text-[#c76b2f]">
+            Final terms before signature
+          </p>
+          <p className="mt-1 text-xs leading-5 text-stone-600">
+            Owner fee {formatBps(INITIAL_OWNER_FEE_BPS)}, hunter fee{" "}
+            {formatBps(INITIAL_HUNTER_FEE_BPS)}. Annual renewals use owner{" "}
+            {formatBps(RENEWAL_OWNER_FEE_BPS)} and hunter{" "}
+            {formatBps(RENEWAL_HUNTER_FEE_BPS)}.
+          </p>
+        </div>
+      </div>
+
+      <div className="grid gap-2 sm:grid-cols-3">
+        <label className="grid gap-1 text-xs font-bold text-stone-700">
+          Final price
+          <input
+            name="lease_amount"
+            inputMode="decimal"
+            required
+            defaultValue={defaultPrice}
+            placeholder="5000"
+            className="min-h-9 rounded-md border border-stone-300 bg-white px-2 text-sm font-normal outline-none focus:border-[#234331]"
+          />
+        </label>
+        <label className="grid gap-1 text-xs font-bold text-stone-700">
+          Extras
+          <input
+            name="additional_fee"
+            inputMode="decimal"
+            placeholder="0"
+            className="min-h-9 rounded-md border border-stone-300 bg-white px-2 text-sm font-normal outline-none focus:border-[#234331]"
+          />
+        </label>
+        <label className="grid gap-1 text-xs font-bold text-stone-700">
+          Party
+          <input
+            name="party_size"
+            inputMode="numeric"
+            required
+            defaultValue={partySize ?? 1}
+            className="min-h-9 rounded-md border border-stone-300 bg-white px-2 text-sm font-normal outline-none focus:border-[#234331]"
+          />
+        </label>
+      </div>
+
+      <div className="grid gap-2 sm:grid-cols-2">
+        <label className="grid gap-1 text-xs font-bold text-stone-700">
+          Starts
+          <input
+            name="starts_on"
+            type="date"
+            required
+            defaultValue={requestedStart ?? ""}
+            className="min-h-9 rounded-md border border-stone-300 bg-white px-2 text-sm font-normal outline-none focus:border-[#234331]"
+          />
+        </label>
+        <label className="grid gap-1 text-xs font-bold text-stone-700">
+          Ends
+          <input
+            name="ends_on"
+            type="date"
+            required
+            defaultValue={requestedEnd ?? ""}
+            className="min-h-9 rounded-md border border-stone-300 bg-white px-2 text-sm font-normal outline-none focus:border-[#234331]"
+          />
+        </label>
+      </div>
+
+      <div className="grid gap-2 sm:grid-cols-2">
+        <label className="grid gap-1 text-xs font-bold text-stone-700">
+          Renewal
+          <select
+            name="renewal_type"
+            defaultValue="none"
+            className="min-h-9 rounded-md border border-stone-300 bg-white px-2 text-sm font-normal outline-none focus:border-[#234331]"
+          >
+            <option value="none">No automatic renewal</option>
+            <option value="annual_optional">Annual optional renewal</option>
+            <option value="annual_auto">Annual intended renewal</option>
+          </select>
+        </label>
+        <label className="grid gap-1 text-xs font-bold text-stone-700">
+          Notice days
+          <input
+            name="renewal_notice_days"
+            inputMode="numeric"
+            defaultValue={30}
+            className="min-h-9 rounded-md border border-stone-300 bg-white px-2 text-sm font-normal outline-none focus:border-[#234331]"
+          />
+        </label>
+      </div>
+
+      <div className="grid gap-2 sm:grid-cols-2">
+        <label className="grid gap-1 text-xs font-bold text-stone-700">
+          Contract source
+          <select
+            name="contract_source"
+            defaultValue="generated"
+            className="min-h-9 rounded-md border border-stone-300 bg-white px-2 text-sm font-normal outline-none focus:border-[#234331]"
+          >
+            <option value="generated">Generate agreement</option>
+            <option value="uploaded_pdf">Use uploaded PDF path</option>
+          </select>
+        </label>
+        <label className="grid gap-1 text-xs font-bold text-stone-700">
+          PDF path
+          <input
+            name="uploaded_contract_path"
+            placeholder="Optional private storage path"
+            className="min-h-9 rounded-md border border-stone-300 bg-white px-2 text-sm font-normal outline-none focus:border-[#234331]"
+          />
+        </label>
+      </div>
+
+      <label className="grid gap-1 text-xs font-bold text-stone-700">
+        Notes
+        <textarea
+          name="terms_notes"
+          rows={2}
+          placeholder="Special access, payment, renewal, or property notes"
+          className="rounded-md border border-stone-300 bg-white px-2 py-2 text-sm font-normal outline-none focus:border-[#234331]"
+        />
+      </label>
+
+      <p className="rounded-md border border-[#234331]/10 bg-white/70 p-2 text-xs font-semibold leading-5 text-stone-600">
+        Example from current listing price: hunter sees about{" "}
+        {formatMoney(
+          listingPriceCents ? Math.round(listingPriceCents * 1.05) : 0,
+          currency,
+        )}{" "}
+        total; owner payout before taxes/withholding is about{" "}
+        {formatMoney(
+          listingPriceCents ? Math.round(listingPriceCents * 0.9) : 0,
+          currency,
+        )}
+        . Exact totals are recalculated from the final price above.
+      </p>
+
+      <button className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-[#234331] px-3 text-xs font-black text-white">
+        <FileSignature size={15} aria-hidden="true" />
+        Generate contract for signature
+      </button>
+    </form>
   );
 }
 

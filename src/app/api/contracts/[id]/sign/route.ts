@@ -52,7 +52,7 @@ export async function POST(request: Request, { params }: { params: Params }) {
 
   const { data: contract, error } = await service
     .from("booking_contracts")
-    .select("id, listing_id, hunter_id, landowner_id, status, title")
+    .select("id, booking_id, request_id, listing_id, hunter_id, landowner_id, status, title")
     .eq("id", id)
     .single();
 
@@ -108,6 +108,8 @@ export async function POST(request: Request, { params }: { params: Params }) {
   });
 
   await service.from("booking_workflow_events").insert({
+    booking_id: contract.booking_id,
+    request_id: contract.request_id,
     actor_id: user.id,
     event_type: "contract_signed",
     payload: { contract_id: contract.id, signer_role: expectedRole, status },
