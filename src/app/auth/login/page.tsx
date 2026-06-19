@@ -23,7 +23,9 @@ export default async function LoginPage({
 }) {
   const params = await searchParams;
   const next =
-    typeof params.next === "string" && params.next.startsWith("/")
+    typeof params.next === "string" &&
+    params.next.startsWith("/") &&
+    !params.next.startsWith("//")
       ? params.next
       : "/dashboard";
 
@@ -92,6 +94,8 @@ export default async function LoginPage({
               authMessage={
                 params.account_deleted === "1"
                   ? "Your account has been deleted."
+                  : params.password_reset === "1"
+                    ? "Password updated. Please log in with your new password."
                   : params.cookies_cleared === "1"
                     ? "Old local auth cookies were cleared. Please sign in again."
                   : null

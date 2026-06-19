@@ -7,7 +7,7 @@ function safeRedirectPath(value: string | null, origin: string) {
     return "/dashboard";
   }
 
-  if (value.startsWith("/")) {
+  if (value.startsWith("/") && !value.startsWith("//")) {
     return value;
   }
 
@@ -35,7 +35,11 @@ export async function GET(request: Request) {
   const code = requestUrl.searchParams.get("code");
   const tokenHash = requestUrl.searchParams.get("token_hash");
   const type = requestUrl.searchParams.get("type") as EmailOtpType | null;
-  const next = safeRedirectPath(requestUrl.searchParams.get("next"), requestUrl.origin);
+  const next = safeRedirectPath(
+    requestUrl.searchParams.get("next") ??
+      requestUrl.searchParams.get("redirect_to"),
+    requestUrl.origin,
+  );
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {

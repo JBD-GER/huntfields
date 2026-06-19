@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import {
   Fingerprint,
@@ -240,7 +241,17 @@ export function LoginForm({
           </span>
         </label>
         <label className="grid gap-2 text-sm font-bold text-stone-800">
-          Password
+          <span className="flex items-center justify-between gap-3">
+            Password
+            {mode === "login" ? (
+              <Link
+                href="/auth/forgot-password"
+                className="text-xs font-black text-[#234331] hover:underline"
+              >
+                Forgot password?
+              </Link>
+            ) : null}
+          </span>
           <span className="relative">
             <LockKeyhole
               className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-stone-400"

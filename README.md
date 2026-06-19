@@ -64,6 +64,7 @@ The app supports three consumer sign-in paths on `/auth/login`:
 - Email and password through Supabase Auth
 - Google OAuth through the Supabase Google provider
 - Passkey sign-in for users who add a passkey after logging in
+- Password recovery through `/auth/forgot-password` and `/auth/reset-password`
 
 For Supabase Auth URLs, set:
 
@@ -71,8 +72,17 @@ For Supabase Auth URLs, set:
 - Redirect URLs:
   - `https://www.huntfields.com/auth/callback`
   - `https://www.huntfields.com/auth/confirm`
+  - `https://www.huntfields.com/auth/reset-password`
   - `http://localhost:3000/auth/callback`
   - `http://localhost:3000/auth/confirm`
+  - `http://localhost:3000/auth/reset-password`
+
+If the live Google flow ever redirects to `localhost`, the Supabase project is
+falling back to a local Site URL. In Supabase Dashboard -> Auth -> URL
+Configuration, set Site URL to `https://www.huntfields.com`, add the production
+redirect URLs above, and add the same values to the allowed redirect URLs. In
+Vercel, set `NEXT_PUBLIC_APP_URL=https://www.huntfields.com` for Production and
+redeploy.
 
 The default Supabase confirmation links work through `/auth/callback`. For the
 most reliable server-side email confirmation and invite flow, update Supabase
@@ -83,6 +93,20 @@ Auth email templates to point at `/auth/confirm` with `token_hash`:
   Confirm your Huntfields account
 </a>
 ```
+
+Password recovery links should point to the app callback with the reset page as
+the next step:
+
+```html
+<a href="{{ .ConfirmationURL }}">
+  Reset your Huntfields password
+</a>
+```
+
+When using a custom template, make sure the recovery redirect target is
+`https://www.huntfields.com/auth/callback?next=/auth/reset-password` in
+production and `http://localhost:3000/auth/callback?next=/auth/reset-password`
+locally.
 
 For Google, create a Google Cloud OAuth client with application type `Web application`.
 

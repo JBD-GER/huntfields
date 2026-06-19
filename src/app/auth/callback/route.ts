@@ -7,7 +7,7 @@ function safeRedirectPath(value: string | null, origin: string) {
     return "/dashboard";
   }
 
-  if (value.startsWith("/")) {
+  if (value.startsWith("/") && !value.startsWith("//")) {
     return value;
   }
 
@@ -34,7 +34,11 @@ export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
   const error = requestUrl.searchParams.get("error_description");
-  const next = safeRedirectPath(requestUrl.searchParams.get("next"), requestUrl.origin);
+  const next = safeRedirectPath(
+    requestUrl.searchParams.get("next") ??
+      requestUrl.searchParams.get("redirect_to"),
+    requestUrl.origin,
+  );
 
   if (error) {
     return redirectToLogin(requestUrl.origin, error);
