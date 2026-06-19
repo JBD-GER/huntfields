@@ -87,13 +87,18 @@ export default async function LoginPage({
           </p>
           <div className="mt-5 rounded-md border border-[#234331]/10 bg-[#f6f2e9] p-3 text-sm font-semibold leading-6 text-stone-700">
             Default is login. Switch to create an account only if you are new.
-            Google, SAML 2.0, and classic email/password are supported.
+            Google, passkeys, and classic email/password are supported.
           </div>
           <div className="mt-6">
             <LoginForm
               authError={
                 typeof params.auth_error === "string"
                   ? params.auth_error
+                  : null
+              }
+              authMessage={
+                params.account_deleted === "1"
+                  ? "Your account has been deleted."
                   : null
               }
               initialMode={params.mode === "register" ? "register" : "login"}

@@ -58,11 +58,10 @@ Supabase Auth confirmation and magic-link delivery should be routed through Rese
 
 ## Auth Provider Setup
 
-The app supports four sign-in paths on `/auth/login`:
+The app supports three consumer sign-in paths on `/auth/login`:
 
 - Email and password through Supabase Auth
 - Google OAuth through the Supabase Google provider
-- SAML 2.0 through Supabase Enterprise SSO
 - Passkey sign-in for users who add a passkey after logging in
 
 For Supabase Auth URLs, set:
@@ -94,24 +93,6 @@ For Google, create a Google Cloud OAuth client with application type `Web applic
 
 Then paste the Google Web Client ID and Client Secret into the Supabase Google provider settings and save.
 
-For SAML 2.0, enable SAML in Supabase Dashboard -> Auth -> Providers -> SAML 2.0, then add each identity provider with the Supabase CLI. Prefer metadata URLs when the IdP supports them:
-
-```bash
-supabase sso add --type saml --project-ref <project-ref> \
-  --metadata-url 'https://company.com/idp/saml/metadata' \
-  --domains company.com
-```
-
-If the IdP only provides a metadata XML file:
-
-```bash
-supabase sso add --type saml --project-ref <project-ref> \
-  --metadata-file /path/to/saml/metadata.xml \
-  --domains company.com
-```
-
-Users then enter `company.com` in the SAML field on `/auth/login`.
-
 For Passkeys, enable Supabase Dashboard -> Auth -> Providers -> Passkeys.
 
 - Relying Party Display Name: `Huntfields`
@@ -122,6 +103,11 @@ For Passkeys, enable Supabase Dashboard -> Auth -> Providers -> Passkeys.
 
 The app shows passkey sign-in on `/auth/login` and lets signed-in users add a
 passkey from `/dashboard`.
+
+Authenticated users can delete their own Supabase Auth user from `/dashboard`.
+That action requires `SUPABASE_SERVICE_ROLE_KEY` on the server because it uses
+the Supabase Admin API. If an account owns active marketplace records, archive
+or transfer those records before deleting the Auth user.
 
 ## Payments
 

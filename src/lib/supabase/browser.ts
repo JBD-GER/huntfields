@@ -10,5 +10,11 @@ export function createSupabaseBrowserClient() {
     );
   }
 
-  return createBrowserClient(env.supabaseUrl!, env.supabaseAnonKey!);
+  return createBrowserClient(env.supabaseUrl!, env.supabaseAnonKey!, {
+    auth: {
+      experimental: {
+        passkey: true,
+      },
+    },
+  });
 }

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { CalendarCheck, Heart, Inbox, LogOut, MapPinned } from "lucide-react";
+import { CalendarCheck, Heart, Inbox, LogOut, MapPinned, Trash2 } from "lucide-react";
 import { MessageReplyForm } from "@/components/forms/message-reply-form";
+import { PasskeyRegistrationCard } from "@/components/forms/passkey-registration-card";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { pageMetadata } from "@/lib/seo/site";
 
@@ -26,6 +27,7 @@ export default async function DashboardPage({
 }) {
   const params = await searchParams;
   const activeRequestId = stringParam(params.request);
+  const accountError = stringParam(params.account_error);
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
@@ -111,6 +113,49 @@ export default async function DashboardPage({
           </button>
         </form>
       </div>
+
+      {accountError ? (
+        <div className="mt-5 rounded-lg border border-red-200 bg-red-50 p-4 text-sm font-semibold leading-6 text-red-700">
+          {accountError}
+        </div>
+      ) : null}
+
+      <PasskeyRegistrationCard email={user.email} />
+
+      <section className="mt-6 rounded-lg border border-red-200/70 bg-[#fffdf7] p-5 shadow-[0_16px_46px_rgba(25,35,29,0.08)] sm:p-6">
+        <div className="grid gap-5 lg:grid-cols-[1fr_360px] lg:items-end">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-red-600">
+              Account controls
+            </p>
+            <h2 className="mt-2 text-2xl font-black text-stone-950">
+              Delete authenticated user
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-600">
+              Permanently deletes your Supabase Auth user through the server-side
+              Admin API. Accounts that own active marketplace records may need
+              those records archived or transferred first.
+            </p>
+          </div>
+          <form action="/api/auth/delete-account" method="post" className="grid gap-3">
+            <label className="grid gap-2 text-sm font-bold text-stone-800">
+              Type DELETE to confirm
+              <input
+                name="confirm"
+                type="text"
+                autoComplete="off"
+                pattern="DELETE"
+                required
+                className="min-h-11 rounded-md border border-red-200 bg-white px-3 font-normal outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+              />
+            </label>
+            <button className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-red-700 px-4 text-sm font-black text-white transition hover:bg-red-800">
+              <Trash2 size={16} aria-hidden="true" />
+              Delete account
+            </button>
+          </form>
+        </div>
+      </section>
 
       <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map(([label, value, Icon]) => {
