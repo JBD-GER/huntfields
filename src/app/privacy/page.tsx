@@ -131,7 +131,8 @@ export default function PrivacyPage() {
         <Mail className="size-5 text-[#d99a61]" aria-hidden="true" />
         <h2 className="mt-3 text-2xl font-black">Contact</h2>
         <p className="mt-2 text-sm leading-7 text-white/72">
-          For privacy requests, contact{" "}
+          Huntfields is operated by Flaaq Holding GmbH, Großer Kamp 5a, 31633
+          Leese, Germany. For privacy requests, contact{" "}
           <a href="mailto:ops@huntfields.com" className="font-black text-white">
             ops@huntfields.com
           </a>

@@ -129,6 +129,8 @@ export default function TermsPage() {
       <section className="mt-6 rounded-lg border border-[#234331]/10 bg-[#183326] p-5 text-white shadow-[0_18px_50px_rgba(25,35,29,0.12)] sm:p-6">
         <h2 className="text-2xl font-black">Questions about these terms?</h2>
         <p className="mt-2 text-sm leading-7 text-white/72">
+          Huntfields is operated by Flaaq Holding GmbH, Großer Kamp 5a, 31633
+          Leese, Germany.{" "}
           Contact{" "}
           <a href="mailto:ops@huntfields.com" className="font-black text-white">
             ops@huntfields.com

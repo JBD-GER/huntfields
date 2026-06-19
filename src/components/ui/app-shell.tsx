@@ -3,6 +3,7 @@ import { CircleHelp, LogIn, MapPinned, PlusCircle } from "lucide-react";
 import { MobileNav } from "@/components/ui/mobile-nav";
 import { CookieSettingsButton } from "@/components/privacy/cookie-consent";
 import { HeaderBrand } from "@/components/ui/header-brand";
+import { BrandLogo } from "@/components/ui/brand-assets";
 
 export function AppHeader() {
   return (
@@ -52,10 +53,14 @@ export function AppFooter() {
     <footer className="border-t border-[#234331]/10 bg-[#171f1a] text-stone-200">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 text-sm sm:px-6 md:grid-cols-[1.3fr_1fr_1fr] lg:px-8">
         <div>
-          <p className="text-base font-black text-white">Huntfields</p>
+          <BrandLogo variant="white" className="w-36" />
           <p className="mt-3 max-w-md leading-6 text-stone-400">
             Privacy-first hunting access marketplace infrastructure for
             landowners, hunters, outfitters, and regional lease discovery.
+          </p>
+          <p className="mt-5 max-w-sm text-xs leading-5 text-stone-500">
+            Operated by Flaaq Holding GmbH, Großer Kamp 5a, 31633 Leese,
+            Germany.
           </p>
         </div>
         <div>

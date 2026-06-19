@@ -12,7 +12,6 @@ import {
 import { LeaseFilterForm } from "@/components/forms/lease-filter-form";
 import { ListingGrid } from "@/components/listings/listing-grid";
 import { LazyListingMap } from "@/components/maps/lazy-listing-map";
-import { BrandLogo } from "@/components/ui/brand-assets";
 import {
   getFeaturedListingsByRegion,
   getLegalRegions,
@@ -64,11 +63,6 @@ export default async function Home() {
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#f6f2e9]" />
         <div className="relative mx-auto flex min-h-[calc(100svh-3.5rem)] max-w-7xl flex-col justify-end px-3 pb-8 pt-20 sm:px-6 sm:pb-12 lg:px-8 lg:pt-24">
           <div className="max-w-4xl text-white">
-            <BrandLogo
-              variant="white"
-              priority
-              className="mb-5 w-40 drop-shadow-[0_18px_34px_rgba(0,0,0,0.35)] sm:w-56"
-            />
             <p className="inline-flex items-center gap-2 rounded-md border border-white/18 bg-white/12 px-3 py-2 text-xs font-black uppercase tracking-[0.12em] backdrop-blur">
               <ShieldCheck size={16} aria-hidden="true" />
               US-first hunting lease marketplace

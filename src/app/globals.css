@@ -58,6 +58,27 @@ body {
   outline-offset: 3px;
 }
 
+@keyframes huntfields-route-loading {
+  0% {
+    transform: translateX(-120%);
+  }
+
+  100% {
+    transform: translateX(320%);
+  }
+}
+
+.huntfields-route-loading-bar {
+  animation: huntfields-route-loading 1.05s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .huntfields-route-loading-bar {
+    animation: none;
+    transform: translateX(0);
+  }
+}
+
 .lease-contract-content h1 {
   margin: 0 0 1rem;
   font-size: 1.875rem;
