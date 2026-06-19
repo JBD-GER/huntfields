@@ -82,10 +82,6 @@ export default async function LoginPage({
           <h2 className="mt-3 text-3xl font-black tracking-normal text-stone-950">
             Login or create an account.
           </h2>
-          <p className="mt-2 text-sm leading-6 text-stone-600">
-            Default is login. Switch to create an account only if you are new.
-            Google, passkeys, and classic email/password are supported.
-          </p>
           <div className="mt-6">
             <LoginForm
               authError={
@@ -101,10 +97,6 @@ export default async function LoginPage({
               initialMode={params.mode === "register" ? "register" : "login"}
               nextPath={next}
             />
-          </div>
-          <div className="mt-5 rounded-md border border-[#234331]/10 bg-[#f6f2e9] p-3 text-sm font-semibold leading-6 text-stone-700">
-            Hunters can message owners and request access. Landowners can
-            create an owner profile and submit land for review.
           </div>
         </section>
       </div>

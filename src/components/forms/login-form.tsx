@@ -283,11 +283,6 @@ export function LoginForm({
         </p>
       ) : null}
 
-      <p className="text-xs font-semibold leading-5 text-stone-500">
-        Default is login. Create account is only for new users. Registration is
-        free and may require email confirmation depending on your Supabase Auth
-        settings. Passkeys can be added after your first login.
-      </p>
     </div>
   );
 }
