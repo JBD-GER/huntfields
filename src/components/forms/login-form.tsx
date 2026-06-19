@@ -31,6 +31,27 @@ function friendlyError(caught: unknown, fallback: string) {
   return fallback;
 }
 
+function passkeySignInError(caught: unknown) {
+  const raw =
+    caught instanceof Error
+      ? `${caught.name} ${caught.message}`.toLowerCase()
+      : "";
+
+  if (
+    raw.includes("notallowed") ||
+    raw.includes("not allowed") ||
+    raw.includes("timed out") ||
+    raw.includes("passkey")
+  ) {
+    return "No passkey was selected for Huntfields. First log in with Google or email, add a passkey from your dashboard, then use passkey sign-in next time.";
+  }
+
+  return friendlyError(
+    caught,
+    "Unable to sign in with passkey. Check that passkeys are enabled for this domain.",
+  );
+}
+
 export function LoginForm({
   authError = null,
   authMessage = null,
@@ -138,12 +159,7 @@ export function LoginForm({
       window.location.assign(nextPath);
     } catch (caught) {
       setState("error");
-      setMessage(
-        friendlyError(
-          caught,
-          "Unable to sign in with passkey. Use Google or email if this account has no passkey yet.",
-        ),
-      );
+      setMessage(passkeySignInError(caught));
     }
   }
 
@@ -182,15 +198,22 @@ export function LoginForm({
         Continue with Google
       </button>
 
-      <button
-        type="button"
-        onClick={handlePasskeyAuth}
-        disabled={loading}
-        className="inline-flex min-h-11 items-center justify-center gap-3 rounded-md border border-[#234331]/14 bg-[#fbfaf6] px-4 text-sm font-black text-[#183326] shadow-sm transition hover:border-[#234331]/32 hover:bg-white disabled:opacity-60"
-      >
-        <Fingerprint size={18} aria-hidden="true" />
-        Continue with passkey
-      </button>
+      {mode === "login" ? (
+        <div className="grid gap-2">
+          <button
+            type="button"
+            onClick={handlePasskeyAuth}
+            disabled={loading}
+            className="inline-flex min-h-11 items-center justify-center gap-3 rounded-md border border-[#234331]/14 bg-[#fbfaf6] px-4 text-sm font-black text-[#183326] shadow-sm transition hover:border-[#234331]/32 hover:bg-white disabled:opacity-60"
+          >
+            <Fingerprint size={18} aria-hidden="true" />
+            Continue with passkey
+          </button>
+          <p className="text-xs font-semibold leading-5 text-stone-500">
+            Use this only after adding a passkey from your dashboard.
+          </p>
+        </div>
+      ) : null}
 
       <div className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.14em] text-stone-400">
         <span className="h-px flex-1 bg-[#234331]/12" />

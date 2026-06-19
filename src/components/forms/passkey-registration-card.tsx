@@ -6,6 +6,25 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 type PasskeyState = "idle" | "loading" | "success" | "error";
 
+function passkeyRegistrationError(caught: unknown) {
+  const raw =
+    caught instanceof Error
+      ? `${caught.name} ${caught.message}`.toLowerCase()
+      : "";
+
+  if (
+    raw.includes("notallowed") ||
+    raw.includes("not allowed") ||
+    raw.includes("timed out")
+  ) {
+    return "Passkey was not added. Make sure this page matches the Passkey domain configured in Supabase, then try again.";
+  }
+
+  return caught instanceof Error
+    ? caught.message
+    : "Unable to add passkey. Make sure Passkeys are enabled in Supabase Auth.";
+}
+
 export function PasskeyRegistrationCard({ email }: { email?: string | null }) {
   const [state, setState] = useState<PasskeyState>("idle");
   const [message, setMessage] = useState<string | null>(null);
@@ -33,11 +52,7 @@ export function PasskeyRegistrationCard({ email }: { email?: string | null }) {
       setMessage("Passkey added. Next time you can sign in without a password.");
     } catch (caught) {
       setState("error");
-      setMessage(
-        caught instanceof Error
-          ? caught.message
-          : "Unable to add passkey. Make sure Passkeys are enabled in Supabase Auth.",
-      );
+      setMessage(passkeyRegistrationError(caught));
     }
   }
 
@@ -53,7 +68,8 @@ export function PasskeyRegistrationCard({ email }: { email?: string | null }) {
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-600">
             Use Face ID, Touch ID, Windows Hello, or a security key for this
-            account{email ? ` (${email})` : ""}. It stays optional.
+            account{email ? ` (${email})` : ""}. Add it once here, then use
+            passkey sign-in on your next visit.
           </p>
         </div>
         <button
