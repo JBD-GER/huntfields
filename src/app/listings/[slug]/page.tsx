@@ -309,9 +309,6 @@ export default async function ListingDetailPage({ params }: { params: Params }) 
               </div>
             </div>
             <div className="my-5 h-px bg-[#234331]/10" />
-            <p className="mb-5 rounded-md border border-[#d9c6aa] bg-[#fff8ec] px-3 py-2 text-xs font-bold leading-5 text-[#7a4a24]">
-              No payment is collected before landowner approval and signed terms.
-            </p>
             <div>
               <RequestAccessForm
                 listingId={listing.data.id}
