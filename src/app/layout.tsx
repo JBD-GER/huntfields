@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import { AppFooter, AppHeader } from "@/components/ui/app-shell";
@@ -34,6 +35,7 @@ export const metadata: Metadata = {
   creator: site.name,
   publisher: site.name,
   category: "marketplace",
+  manifest: "/manifest.webmanifest",
   alternates: {
     canonical: absoluteUrl("/"),
   },
@@ -76,7 +78,13 @@ export const metadata: Metadata = {
     email: false,
   },
   icons: {
+    shortcut: ["/favicon.ico"],
     icon: [
+      {
+        url: "/favicon.ico",
+        type: "image/x-icon",
+        sizes: "16x16 32x32",
+      },
       {
         url: "/Favicon.png",
         type: "image/png",
@@ -133,6 +141,7 @@ export default function RootLayout({
         <main className="min-h-dvh">{children}</main>
         <AppFooter />
         <CookieConsentBanner />
+        <Analytics />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

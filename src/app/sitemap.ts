@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getLegalRegions } from "@/lib/data/listings";
+import { guideCategories, guidePosts } from "@/lib/guides";
 import { absoluteUrl } from "@/lib/seo/site";
 import { createSupabasePublicClient } from "@/lib/supabase/server";
 
@@ -10,6 +11,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: "/", changeFrequency: "daily", priority: 1 },
     { path: "/land", changeFrequency: "daily", priority: 0.95 },
     { path: "/list-your-land", changeFrequency: "weekly", priority: 0.9 },
+    { path: "/guides", changeFrequency: "weekly", priority: 0.55 },
     { path: "/faq", changeFrequency: "monthly", priority: 0.65 },
     { path: "/privacy", changeFrequency: "monthly", priority: 0.5 },
     { path: "/terms", changeFrequency: "monthly", priority: 0.5 },
@@ -48,5 +50,36 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticRoutes, ...regionRoutes, ...listingRoutes];
+  const guideCategoryRoutes: MetadataRoute.Sitemap = guideCategories.map(
+    (category) => {
+      const categoryPosts = guidePosts.filter(
+        (post) => post.category === category.slug,
+      );
+      const latestUpdate =
+        categoryPosts
+          .map((post) => new Date(post.updatedAt).getTime())
+          .sort((a, b) => b - a)[0] ?? Date.now();
+
+      return {
+        url: absoluteUrl(`/guides/category/${category.slug}`),
+        lastModified: new Date(latestUpdate),
+        changeFrequency: "monthly",
+        priority: 0.5,
+      };
+    },
+  );
+  const guidePostRoutes: MetadataRoute.Sitemap = guidePosts.map((post) => ({
+    url: absoluteUrl(`/guides/${post.slug}`),
+    lastModified: new Date(post.updatedAt),
+    changeFrequency: "monthly",
+    priority: 0.58,
+  }));
+
+  return [
+    ...staticRoutes,
+    ...regionRoutes,
+    ...listingRoutes,
+    ...guideCategoryRoutes,
+    ...guidePostRoutes,
+  ];
 }
