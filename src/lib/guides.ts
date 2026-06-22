@@ -68,7 +68,7 @@ export const guideCategories: GuideCategory[] = [
   },
 ];
 
-export const guidePosts: GuidePost[] = [
+const guidePostDrafts: GuidePost[] = [
   {
     slug: "hunting-lease-landowner-guide",
     category: "landowner-basics",
@@ -780,6 +780,742 @@ export const guidePosts: GuidePost[] = [
     ctaHref: "/list-your-land",
   },
 ];
+
+type GuidePostExpansion = {
+  readingMinutes: number;
+  takeaways: string[];
+  sections: GuideSection[];
+  faq: GuideFaq[];
+};
+
+const guidePostExpansions: Record<string, GuidePostExpansion> = {
+  "hunting-lease-landowner-guide": {
+    readingMinutes: 18,
+    takeaways: [
+      "The best landowner listings separate public discovery from private access approval.",
+      "A modern hunting lease workflow should make the next step obvious without forcing owners into legal-heavy setup too early.",
+    ],
+    sections: [
+      {
+        heading: "Build the listing around owner control",
+        body: [
+          "Most landowners do not want a public booking calendar where strangers can instantly unlock private access. They want qualified interest, clear expectations, and the ability to decide who gets more information.",
+          "That means the listing should act as a controlled front door. It should tell hunters enough to understand the opportunity, then route serious people into a request where the owner can review fit before exact access details are shared.",
+          "This is also better for the hunter. A request-first process helps avoid assumptions about boundaries, dates, species, and rules before either side has confirmed that the lease makes sense.",
+        ],
+      },
+      {
+        heading: "Explain the property without overexposing it",
+        body: [
+          "A strong hunting lease page usually includes the nearest town, state or region, general habitat, estimated huntable acreage, target species, available methods, and a short owner summary. That is enough for discovery and SEO without publishing the full operating details of the land.",
+          "Exact house addresses, gate locations, private roads, family-use areas, equipment yards, livestock zones, and sensitive boundary drawings should stay inside the approved workflow. Those details become useful after the owner knows who is asking.",
+          "For SEO, this distinction matters. A page can rank for hunting leases, private hunting land, deer lease, or regional hunting access while still protecting the private information that should not be indexed.",
+        ],
+      },
+      {
+        heading: "Keep compliance practical",
+        body: [
+          "A landowner workflow should not ask every possible legal question up front. It should collect the basics once, then request additional proof only when the property, state, species, payment flow, or final agreement needs it.",
+          "For example, the account profile can hold the owner's identity and contact details. The listing can hold proof of authority or ownership when available. The final request can collect agreement-specific documents, dates, insurance notes, and signatures.",
+          "This keeps the onboarding calm while still protecting the serious parts of the transaction. People can browse, list, and chat, while contracts and final access remain gated behind the correct checks.",
+        ],
+      },
+      {
+        heading: "Make the first request easy to answer",
+        body: [
+          "A hunter request should not feel like a court filing. It should ask for the information that helps the owner decide whether to continue: desired dates, species, method, party size, experience, and a short note.",
+          "The owner can then ask follow-up questions in chat, request documents, adjust terms, or decline. This keeps the first conversion simple while still supporting a serious back office workflow.",
+          "The best owner experience is one where every request arrives already attached to the relevant listing, conversation, verification status, and next action.",
+        ],
+      },
+      {
+        heading: "Turn the dashboard into the main workplace",
+        body: [
+          "After login, landowners and hunters should not need to keep jumping back to the public marketing site. The dashboard should contain search, requests, listing management, contracts, documents, payments, and verification progress.",
+          "For landowners, that means a listing can be created, improved, verified, and managed from one place. For hunters, lease search and request tracking should live beside compliance documents, signatures, and payment status.",
+          "This is what makes the product feel like SaaS instead of a static directory. The public page attracts demand, but the dashboard is where the real leasing workflow happens.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "Can landowners create a listing before verification is complete?",
+        answer:
+          "Yes. A practical workflow can allow listing creation, editing, photos, rules, and early requests while showing that verification is pending. Final contracts and active access should wait until the required checks are complete.",
+      },
+      {
+        question: "What should stay private until a hunter is approved?",
+        answer:
+          "Exact addresses, gate details, private roads, sensitive boundaries, home locations, equipment areas, and any document that would expose owner risk should stay inside the approved workflow.",
+      },
+      {
+        question: "Should a landowner use one listing for an entire ranch?",
+        answer:
+          "Not always. If different areas have different rules, species, access points, or availability, separate listings or clearly drawn huntable zones may be easier to manage.",
+      },
+      {
+        question: "Is a hunting lease marketplace the same as outfitting?",
+        answer:
+          "No. A private hunting lease usually focuses on access to land. Guided services, lodging, harvest support, or outfitter services should be described separately if they are offered.",
+      },
+    ],
+  },
+  "how-to-price-hunting-leases": {
+    readingMinutes: 19,
+    takeaways: [
+      "Pricing should match the offer structure, not only the acreage number.",
+      "The owner should understand payout, platform fee, hunter fee, payment timing, and tax handling before final terms are signed.",
+    ],
+    sections: [
+      {
+        heading: "Price the actual access product",
+        body: [
+          "A hunting lease price only makes sense when the offer is clear. The same property can be priced very differently depending on whether access is per day, per weekend, per week, per season, annual, exclusive, or limited to one species.",
+          "Landowners should decide what the hunter receives: access window, party size, included species, vehicle access, guest permissions, stand rules, and whether scouting days are included.",
+          "Once the product is defined, the price becomes easier to explain and easier for serious hunters to compare.",
+        ],
+      },
+      {
+        heading: "Use comparable leases carefully",
+        body: [
+          "Comparable hunting leases can help, but they are rarely perfect. Two properties in the same county can have different wildlife patterns, road access, pressure, lodging, water, cover, and owner involvement.",
+          "Use comparable prices as a range, not as a formula. Then adjust based on the quality of access, season length, exclusivity, amenities, and how much admin work the owner expects.",
+          "This prevents the common mistake of pricing only by acres and ignoring the practical experience the hunter is actually buying.",
+        ],
+      },
+      {
+        heading: "Separate owner payout from hunter checkout",
+        body: [
+          "Marketplace pricing should be clear about what the owner is asking and what the hunter pays at checkout. If the platform charges an owner fee, hunter fee, tax, or processing fee, those pieces should not be hidden until the last moment.",
+          "For launch, a fixed USD setup is simple. If fees are disabled during a free beta, the interface should say that clearly so nobody expects a charge.",
+          "When paid flows are active, final terms should show the price, billing unit, platform fee logic, payment status, and the point at which the contract becomes active.",
+        ],
+      },
+      {
+        heading: "Choose a billing unit hunters understand",
+        body: [
+          "Per day is easy for short access, but it can create scheduling pressure. Per week works for travel hunters or multi-day trips. Per season or annual access is better for repeat use and stronger relationships.",
+          "Per hunter is useful when the owner wants to control party size. Per party is cleaner when the group is approved as a unit. Exclusive access should usually be priced higher because the owner is limiting other opportunities.",
+          "The listing should make this unit obvious. A price without a billing unit creates confusion and slows down serious requests.",
+        ],
+      },
+      {
+        heading: "Leave room for final negotiated terms",
+        body: [
+          "A public listing price does not need to cover every possible situation. The owner can publish a starting price or estimated price and then finalize the amount after reviewing dates, hunters, party size, and special terms.",
+          "This is especially useful for multi-species access, longer agreements, custom availability, or properties where pressure management matters.",
+          "The key is to avoid surprise. If the price is a starting point, the listing should say so before the hunter sends a request.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "Should landowners charge before or after signatures?",
+        answer:
+          "A strong marketplace flow usually has the hunter sign, then complete checkout, then sends the final agreement to the owner for counter-signature. The contract becomes active only after required signatures, payment, and verification are complete.",
+      },
+      {
+        question: "Can hunting leases be offered free during launch?",
+        answer:
+          "Yes. A free beta can reduce friction while the platform validates demand, but listings should still track price fields, billing units, and terms so paid transactions can be enabled later without redesigning the workflow.",
+      },
+      {
+        question: "Should taxes be included in the listing price?",
+        answer:
+          "The listing should make clear whether the shown price is the owner-facing amount before taxes and fees or the hunter checkout amount. Tax handling should be calculated during checkout based on the final payment setup.",
+      },
+      {
+        question: "What makes a hunting lease worth more?",
+        answer:
+          "Reliable habitat, low hunting pressure, clear access, exclusive rights, useful amenities, strong photos, nearby lodging, and a responsive owner can all increase value beyond acreage alone.",
+      },
+    ],
+  },
+  "hunting-lease-agreement-checklist": {
+    readingMinutes: 20,
+    takeaways: [
+      "Agreement data should be assembled gradually from onboarding, listing, request chat, and final terms.",
+      "The final lease should only become active after both parties, payment, documents, and verification are in the right state.",
+    ],
+    sections: [
+      {
+        heading: "Reuse data instead of asking twice",
+        body: [
+          "A professional agreement workflow should not ask for first name, last name, address, phone, or role again if the platform already collected that information during onboarding.",
+          "The same applies to listing details. Property address, state, acreage, species, rules, billing unit, and owner authority proof should flow into final terms instead of being manually retyped.",
+          "This reduces errors and makes the final contract feel like a natural continuation of the dashboard instead of a separate paperwork system.",
+        ],
+      },
+      {
+        heading: "Gate signatures with verification status",
+        body: [
+          "Hunters and landowners can browse, list, request, and chat before all verification is complete. But final signatures should require the correct verification state on both sides.",
+          "For hunters, that may include identity verification and the minimum hunting-related proof required for the lease. For owners, it may include identity verification and property authority review.",
+          "The interface should say exactly what is missing and provide a direct action button rather than hiding the problem in an error message.",
+        ],
+      },
+      {
+        heading: "Attach the right documents to the right stage",
+        body: [
+          "Not every document belongs in public listing creation. Owner authority proof can be uploaded during listing setup or verification. Hunter documents can be uploaded in profile settings or when a request becomes serious.",
+          "Final lease documents, maps, waivers, insurance notes, and special terms should live in the request or contract workspace where both parties understand the context.",
+          "This prevents random document upload areas from becoming confusing and keeps sensitive files tied to the transaction they support.",
+        ],
+      },
+      {
+        heading: "Use payment status as a contract condition",
+        body: [
+          "If paid transactions are enabled, payment should not be treated as a side note. The contract state should understand whether checkout was created, paid, failed, expired, refunded, or transferred.",
+          "A clean sequence is: owner proposes final terms, hunter signs, hunter pays, owner countersigns, and then the lease becomes active. If payment fails, the contract should not become active.",
+          "This sequence protects the owner and gives the hunter a clear path from agreement to access.",
+        ],
+      },
+      {
+        heading: "Make renewal and cancellation explicit",
+        body: [
+          "Even simple hunting leases should define what happens at the end of the access period. Does the lease automatically expire, renew by mutual agreement, or require a new request?",
+          "Cancellation terms should also be clear. Weather, unsafe access, owner conflicts, hunter cancellation, and property closures should not be handled only through informal messages.",
+          "The agreement does not need to be bloated, but it needs enough structure that both parties know what happens next.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "Can chat messages replace a hunting lease agreement?",
+        answer:
+          "No. Chat is useful for negotiation and clarification, but final access should be represented by structured terms, documents, signatures, payment status, and contract state.",
+      },
+      {
+        question: "What should happen if one side is not verified?",
+        answer:
+          "The request can remain open, but document finalization, digital signature, payment release, and active contract status should remain blocked until the required verification is complete.",
+      },
+      {
+        question: "Should the owner sign before the hunter pays?",
+        answer:
+          "For marketplace protection, the safer sequence is usually hunter signature, hunter payment, owner counter-signature, then active contract. The exact implementation depends on the final payment policy.",
+      },
+      {
+        question: "Should final terms include map attachments?",
+        answer:
+          "Yes, when boundaries, exclusions, roads, or access zones matter. The map notes should match the written lease terms so there is no conflict.",
+      },
+    ],
+  },
+  "prepare-land-for-hunting-lease-listing": {
+    readingMinutes: 17,
+    takeaways: [
+      "Listing preparation should feel like a guided checklist, not a legal questionnaire.",
+      "The listing should collect enough detail to generate trust while leaving final compliance for the serious request stage.",
+    ],
+    sections: [
+      {
+        heading: "Start with a simple property inventory",
+        body: [
+          "Before writing the listing, the owner should make a quick inventory of the land: available acreage, general habitat, water, roads, access limits, species, photos, existing stands, parking, and any restricted areas.",
+          "This does not need to be perfect on day one. The platform should let owners save drafts, return later, and improve the listing as they gather photos or documents.",
+          "The goal is momentum. A landowner should feel that listing the property is manageable, not like starting a permit application.",
+        ],
+      },
+      {
+        heading: "Use owner-friendly language",
+        body: [
+          "Field labels matter. 'Property address' is clearer than 'private address' because the owner needs to understand whether the field is about the land, the account, or a mailing address.",
+          "The interface should also explain when information is private. For example, the exact property address can be used for verification and final access while only a nearest town is visible publicly.",
+          "Small wording improvements reduce hesitation, especially for landowners who are new to online leasing.",
+        ],
+      },
+      {
+        heading: "Treat maps as a confidence tool",
+        body: [
+          "A map drawing tool should not feel mysterious. Owners need obvious controls for starting a shape, adding points, finishing a shape, editing points, deleting a shape, and saving changes.",
+          "If double-click finishes a polygon, the UI should still provide a clear finish button. Mobile and tablet users should never need to discover hidden gestures to complete an important action.",
+          "Multiple shapes are useful when the lease includes separated hunting areas or excludes a house, barn, pasture, or neighboring access route.",
+        ],
+      },
+      {
+        heading: "Ask for proof without making it scary",
+        body: [
+          "Property authority proof can be optional during draft creation but clearly marked as needed before final contracts. Good examples include a deed, tax record, management agreement, lease authorization, or other document showing authority to offer access.",
+          "The upload area should explain that the proof is for verification and not public marketing. That reassurance matters because many owners are cautious about documents.",
+          "A clean post-listing checklist can say: listing created, documents under review, identity verification pending, requests enabled, contracts locked until verified.",
+        ],
+      },
+      {
+        heading: "Optimize for mobile completion",
+        body: [
+          "Many owners will start or edit a listing on a phone. Forms need consistent field heights, full-width controls, large tap targets, and visible save actions.",
+          "Long sections should be divided into clear steps: location, offer, species, photos, rules, verification, and publish. The owner should always know what is complete and what is still needed.",
+          "A listing flow feels easy when the next action is obvious and the user never has to hunt for the save button.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "Can a landowner publish before every document is reviewed?",
+        answer:
+          "Yes, the listing can be visible with a pending verification status, but final contracts and digital signatures should remain locked until required owner and property checks are complete.",
+      },
+      {
+        question: "What is the minimum information needed for a useful listing?",
+        answer:
+          "A title, short summary, general location, acreage estimate, species, price or pricing note, billing unit, access rules, photos, and owner-controlled request flow are a strong minimum.",
+      },
+      {
+        question: "Should a listing ask for currency?",
+        answer:
+          "If launch is USD-only, the form should not ask owners to choose currency. It should show that USD is fixed and keep the interface simple.",
+      },
+      {
+        question: "Can owners add custom species, amenities, and rules?",
+        answer:
+          "Yes. Presets help speed up the form, but custom entries are important because real properties often have local details that do not fit a fixed list.",
+      },
+    ],
+  },
+  "screen-hunter-requests-before-approval": {
+    readingMinutes: 18,
+    takeaways: [
+      "Verification status should be visible to the owner without blocking early conversation.",
+      "A request should turn into a full-screen workspace once the owner or hunter opens it.",
+    ],
+    sections: [
+      {
+        heading: "Show verification status where decisions happen",
+        body: [
+          "A landowner should not need to open three pages to understand whether a hunter is verified. The request list should show a simple status badge next to the hunter: verified, pending, or not verified.",
+          "A verified hunter can use a clear green map or location indicator. A pending or unverified hunter can use a muted or gray indicator so the owner understands the status without reading a long explanation.",
+          "The status should be informational during early chat, then become a hard requirement before final documents, signatures, payment, or active contract creation.",
+        ],
+      },
+      {
+        heading: "Turn each request into a focused workspace",
+        body: [
+          "The request list should be simple: hunter, listing, status, date, last message, verification state, and next action. Clicking a request should open the full conversation instead of squeezing the chat beside a half-empty panel.",
+          "Inside the request workspace, both sides should see messages, attachments, terms, verification checklist, contract status, payment status, and action buttons relevant to their role.",
+          "This keeps the experience clean on desktop and especially on mobile, where side-by-side panels often become cramped.",
+        ],
+      },
+      {
+        heading: "Ask screening questions in plain English",
+        body: [
+          "Owners should ask practical questions: What dates are you looking for? What species? What methods? How many hunters? Any guests? Any dogs? Any vehicles beyond marked roads?",
+          "The goal is not to make hunters feel unwelcome. The goal is to quickly find out whether the request matches the listing rules and the owner's comfort level.",
+          "Answers can be used later to create final terms so the same information does not need to be typed again.",
+        ],
+      },
+      {
+        heading: "Watch for mismatch, not just risk",
+        body: [
+          "A bad fit is not always a bad hunter. A hunter may be looking for night hunting, guests, dogs, ATVs, or species that the property does not allow.",
+          "The request workflow should make it easy to decline respectfully, suggest different terms, or keep the conversation open while the hunter completes verification.",
+          "This approach helps landowners stay professional without turning every decision into a confrontation.",
+        ],
+      },
+      {
+        heading: "Move from chat to terms at the right time",
+        body: [
+          "Once the owner is comfortable, the conversation should convert into proposed final terms. That is where dates, price, billing unit, party size, rules, documents, payment, and signatures become structured.",
+          "The chat should not be the final system of record. It should be the negotiation layer that feeds the contract workflow.",
+          "This gives both sides a clear path from interest to agreement without losing important details in a long message thread.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "Should owners see if a hunter is not verified?",
+        answer:
+          "Yes. The owner should see a clear but non-alarming status such as not verified or verification pending. The hunter can still chat, but final contract actions stay locked until requirements are met.",
+      },
+      {
+        question: "Should every request automatically create a chat?",
+        answer:
+          "Yes. A request should create a linked conversation so both sides have one place for messages, attachments, terms, and next actions.",
+      },
+      {
+        question: "What should the request list show?",
+        answer:
+          "Show the hunter, listing, request status, verification badge, last activity, requested dates or species when available, and a clear action to open the conversation.",
+      },
+      {
+        question: "Can an owner approve a request before verification is complete?",
+        answer:
+          "The owner can express interest and continue chat, but final signatures, payment, and active contract status should wait until both sides complete the required verification.",
+      },
+    ],
+  },
+  "hunting-lease-photos-landowners": {
+    readingMinutes: 17,
+    takeaways: [
+      "Photo quality affects both SEO engagement and request quality.",
+      "A safe photo strategy shows the hunting opportunity while hiding exact access details until approval.",
+    ],
+    sections: [
+      {
+        heading: "Use a simple photo shot list",
+        body: [
+          "A good listing does not need professional photography. It needs useful photos. Landowners can start with one wide habitat photo, one access-road photo, one water or cover photo, one field or timber edge, one amenity photo, and one seasonal or trail context image.",
+          "Each photo should help the hunter understand the land. Random scenery is less valuable than a clear image of terrain, cover, travel corridors, parking, existing infrastructure, or road conditions.",
+          "On mobile, the first image matters most. It should instantly communicate the type of hunting opportunity without exposing a private gate or home.",
+        ],
+      },
+      {
+        heading: "Avoid accidental location leaks",
+        body: [
+          "Photos can reveal more than owners expect. Road signs, house numbers, gate labels, unique structures, vehicle plates, equipment logos, and background landmarks can make a private property easier to identify.",
+          "Before uploading, landowners should review each image like a stranger would. If a photo reveals something that should stay private, crop it, choose a different angle, or save it for approved requests only.",
+          "This is not about hiding the quality of the land. It is about keeping public discovery separate from private access approval.",
+        ],
+      },
+      {
+        heading: "Use captions to create trust",
+        body: [
+          "Captions help hunters interpret photos quickly. A caption like 'south timber edge after summer rain' is more useful than a generic label like 'photo 3'.",
+          "Captions can also explain privacy choices: exact gate directions shared after approval, access route provided in final terms, or additional map details available in the request workspace.",
+          "This makes the listing feel transparent while still respecting owner safety.",
+        ],
+      },
+      {
+        heading: "Balance wildlife proof with realistic language",
+        body: [
+          "Trail camera photos and harvest history can increase interest, but they should not imply guaranteed success. Wildlife movement changes with weather, pressure, food, season, and neighboring activity.",
+          "Use careful wording such as 'owner has observed deer and turkey activity' or 'trail camera history available in approved request flow' rather than promising outcomes.",
+          "This protects trust and reduces the chance that a hunter expects more than the lease can reasonably provide.",
+        ],
+      },
+      {
+        heading: "Prepare images for fast pages",
+        body: [
+          "SEO is affected by user experience. Heavy, slow images can hurt engagement, especially on mobile. Listings should use compressed images, sensible dimensions, and descriptive alt text.",
+          "Alt text should describe the image naturally: 'oak creek bottom on private hunting lease near Fredericksburg' is better than keyword stuffing.",
+          "Fast, useful, accessible images help both users and search engines understand the page.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "Do hunting lease photos need to be professional?",
+        answer:
+          "No. Clear, honest, well-lit photos that explain habitat, access, and amenities are usually more valuable than polished images that do not show practical details.",
+      },
+      {
+        question: "Should owners show exact blinds or stands?",
+        answer:
+          "They can show general infrastructure, but exact locations should be handled carefully. If revealing a stand location creates risk or pressure, share that detail only after approval.",
+      },
+      {
+        question: "Can photos improve hunting lease SEO?",
+        answer:
+          "Yes. Relevant images, captions, fast loading, and descriptive alt text can improve engagement and help search engines understand the listing context.",
+      },
+      {
+        question: "Should landowners remove metadata from images?",
+        answer:
+          "It is wise to avoid exposing location metadata in public images. The platform should process uploads safely, and owners should still avoid photos that visually reveal sensitive access details.",
+      },
+    ],
+  },
+  "protect-property-boundaries-hunting-lease": {
+    readingMinutes: 18,
+    takeaways: [
+      "Boundary clarity is both a safety feature and a conversion feature.",
+      "Map drawings should have an obvious finish action, edit mode, and save state across desktop, tablet, and mobile.",
+    ],
+    sections: [
+      {
+        heading: "Create a public boundary strategy",
+        body: [
+          "Public listing pages should not need a precise boundary map to attract qualified hunters. The public stage can communicate region, habitat, acreage, and species while keeping sensitive geometry private.",
+          "After approval, the owner can share the actual access shape, excluded areas, parking, roads, and entry instructions inside the request or contract workspace.",
+          "This strategy supports SEO and privacy at the same time. Search engines and hunters understand the opportunity, while exact property details remain protected.",
+        ],
+      },
+      {
+        heading: "Make map drawing obvious",
+        body: [
+          "If owners draw boundaries, the tool should support start drawing, add points, finish shape, edit points, save shape, and add another area. Important actions should be visible as buttons, not only hidden gestures.",
+          "Double-click to finish can remain as a shortcut, but it should not be the only way. Many tablet and mobile users will never discover it.",
+          "A clear map workflow reduces owner frustration and makes the final agreement more reliable.",
+        ],
+      },
+      {
+        heading: "Separate included and excluded zones",
+        body: [
+          "The lease area is not always one continuous shape. Owners may need to include a timber block, exclude a home site, include a field edge, exclude a cattle pasture, or mark a no-vehicle zone.",
+          "Multiple shapes help explain this without overloading the written description. Each shape can have a label like huntable area, parking only, no access, or approved road.",
+          "The final contract should match the map labels so hunters do not receive conflicting instructions.",
+        ],
+      },
+      {
+        heading: "Protect neighbors and shared access",
+        body: [
+          "Boundary mistakes can create neighbor conflict quickly. If there are shared roads, easements, fences, adjacent leases, livestock gates, or nearby homes, those details should be addressed before access starts.",
+          "The owner does not need to publish all of this publicly, but approved hunters should receive enough context to avoid crossing lines or using the wrong route.",
+          "A good lease workflow makes respectful access easier than accidental trespass.",
+        ],
+      },
+      {
+        heading: "Keep final access instructions current",
+        body: [
+          "Boundaries can change because of weather, crop cycles, livestock, fire risk, construction, or owner plans. The dashboard should make it easy to update map notes and keep the active contract aligned.",
+          "If access changes after signature, the owner should communicate that clearly and keep a record in the request or contract workspace.",
+          "This is especially important for seasonal or annual leases where property conditions may change over time.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "Can a hunting lease have multiple map areas?",
+        answer:
+          "Yes. Multiple shapes are useful for separated hunting zones, excluded homes, parking areas, roads, or no-access zones.",
+      },
+      {
+        question: "Should excluded areas be shown before signature?",
+        answer:
+          "Yes. The hunter should understand meaningful exclusions before final terms, payment, and signature. Exact private details can still remain inside the approved workflow.",
+      },
+      {
+        question: "What if the owner only knows approximate acreage?",
+        answer:
+          "Use owner-reported acreage and label it clearly. The final map and agreement should focus on the actual access area and restrictions.",
+      },
+      {
+        question: "Can boundaries be updated after a lease is active?",
+        answer:
+          "Only with clear communication and appropriate agreement handling. Material changes should be documented so both sides understand the updated access.",
+      },
+    ],
+  },
+  "hunting-lease-amenities-landowners": {
+    readingMinutes: 17,
+    takeaways: [
+      "Amenities should reduce uncertainty, not oversell the property.",
+      "The best amenity fields are repeatable chips or lists so owners can add multiple items cleanly.",
+    ],
+    sections: [
+      {
+        heading: "Use amenities to answer logistics questions",
+        body: [
+          "Amenities are not just extras. They answer the practical questions hunters ask before committing: where can I park, can I get in after rain, is there water, is there a blind, can I camp, and how far is lodging?",
+          "A clear amenity section reduces repetitive chat and helps hunters decide whether the lease fits their trip.",
+          "This is especially important for out-of-area hunters who cannot easily inspect the land before requesting access.",
+        ],
+      },
+      {
+        heading: "Let owners add multiple items cleanly",
+        body: [
+          "Amenities, allowed methods, prohibited methods, and rules should work as multi-entry fields. Owners need to add several items, remove them, and use presets without fighting the form.",
+          "A single text box is rarely enough. Chips, add buttons, and common presets make the workflow faster while still allowing custom values.",
+          "This keeps the listing structured for search and readable for users.",
+        ],
+      },
+      {
+        heading: "Clarify what is included and what is not",
+        body: [
+          "If there is lodging, say what kind. If camping is allowed, say whether water, electric, fire, trash, or restrooms are included. If roads are available, explain whether vehicles must stay on marked roads.",
+          "Missing amenities should not be hidden. 'No lodging' or 'walk-in only' is useful information and prevents poor-fit requests.",
+          "Honest limitations often increase trust because they show the owner is setting realistic expectations.",
+        ],
+      },
+      {
+        heading: "Distinguish owner support from property features",
+        body: [
+          "Some amenities are physical, like blinds, roads, water, gates, or parking. Others are service-like, such as check-in help, map review, harvest reporting, or local recommendations.",
+          "These should be described separately so hunters know what the property includes and what the owner will actively support.",
+          "This distinction matters for expectations and pricing.",
+        ],
+      },
+      {
+        heading: "Keep amenities connected to rules",
+        body: [
+          "Amenities and rules often overlap. A road is useful, but the rule might be 'marked roads only'. A campsite is useful, but the rule might be 'no open fires'. A blind is useful, but the rule might be 'do not move existing blinds'.",
+          "The listing should make these connections clear so amenities do not accidentally imply unlimited use.",
+          "This creates a better final lease because the attractive details and the restrictions support each other.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "What amenities matter most for hunters?",
+        answer:
+          "Parking, access roads, water, blinds, stands, camping, lodging proximity, cell service, cleaning areas, and clear check-in instructions are often the most useful.",
+      },
+      {
+        question: "Should owners list rules as amenities?",
+        answer:
+          "No. Amenities describe what is available. Rules describe how it may be used. Both should be visible, but they should not be mixed together.",
+      },
+      {
+        question: "Can amenities affect the price?",
+        answer:
+          "Yes. Useful amenities can support a higher price when they reduce planning friction or improve the hunting experience.",
+      },
+      {
+        question: "Should custom amenities be allowed?",
+        answer:
+          "Yes. Presets speed up entry, but custom amenities let owners describe real property details that a fixed list may miss.",
+      },
+    ],
+  },
+  "annual-hunting-lease-vs-short-term-access": {
+    readingMinutes: 18,
+    takeaways: [
+      "Lease length should match pressure management, owner workload, and trust level.",
+      "Short-term access can be a smart stepping stone before annual commitments.",
+    ],
+    sections: [
+      {
+        heading: "Start with the owner's goal",
+        body: [
+          "A landowner who wants predictable income and fewer conversations may prefer an annual lease. A landowner who wants more control, lower pressure, or seasonal flexibility may prefer short-term access.",
+          "Neither model is automatically better. The right structure depends on the property, the wildlife, the owner's schedule, and how much access the owner is comfortable granting.",
+          "The listing should make this structure visible early so hunters do not request something the owner does not want to offer.",
+        ],
+      },
+      {
+        heading: "Use short-term access to test fit",
+        body: [
+          "Short-term access can be a low-risk way to see whether a hunter respects rules, communicates clearly, follows check-in instructions, and treats the land well.",
+          "If the relationship works, the owner can offer a longer season or annual agreement later. If it does not, the owner has not committed the property for a full year.",
+          "This is especially helpful for new marketplace users who are still learning what type of request they want.",
+        ],
+      },
+      {
+        heading: "Understand exclusivity",
+        body: [
+          "Annual leases often imply stronger expectations around exclusivity. Hunters may assume they are the primary or only party with hunting access, even if the owner did not mean that.",
+          "The agreement should say whether access is exclusive, shared, species-specific, zone-specific, or date-limited.",
+          "Clear exclusivity language protects the owner and prevents conflict between multiple hunting groups.",
+        ],
+      },
+      {
+        heading: "Align payment cadence with access",
+        body: [
+          "A day lease may require full payment before access. A season or annual lease may need a deposit, milestone payments, or full upfront payment depending on the policy.",
+          "If the platform starts as free during beta, the same final terms should still record price, unit, and payment state so paid workflows can turn on later.",
+          "When paid access is active, the contract should not become active until the required checkout status is complete.",
+        ],
+      },
+      {
+        heading: "Plan the end of the lease",
+        body: [
+          "Short-term access naturally ends at a date. Annual access needs more structure: renewal date, renewal rights, owner review, notice period, and whether terms can change.",
+          "If the owner wants the option to review hunter behavior before renewal, that should be explicit.",
+          "A clean end-of-lease process makes future leasing easier and keeps the owner in control.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "Should first-time landowners offer annual leases?",
+        answer:
+          "They can, but many owners benefit from starting with shorter access or a limited season to learn the workflow and evaluate hunter fit.",
+      },
+      {
+        question: "Can a lease be annual but non-exclusive?",
+        answer:
+          "Yes, but it must be stated clearly. Annual access does not automatically mean exclusive access unless the final terms say so.",
+      },
+      {
+        question: "What billing units should a platform support?",
+        answer:
+          "Useful units include per day, per week, per season, per year, per hunter, and per party. Launch can be simple, but the data model should not trap owners later.",
+      },
+      {
+        question: "Can the owner change from short-term to annual later?",
+        answer:
+          "Yes. A successful request or season can lead to a new annual agreement with updated terms, verification checks, and payment handling.",
+      },
+    ],
+  },
+  "common-hunting-lease-listing-mistakes": {
+    readingMinutes: 18,
+    takeaways: [
+      "Most listing mistakes come from unclear expectations, not bad land.",
+      "A better listing flow prevents support issues by making price, rules, verification, and next steps obvious.",
+    ],
+    sections: [
+      {
+        heading: "Writing a headline that says too little",
+        body: [
+          "A headline like 'Great hunting land' does not help hunters or search engines. A better headline includes the core opportunity: private deer lease near a town, seasonal turkey access, waterfowl property, or large-acreage multi-species lease.",
+          "The headline should be specific without giving away sensitive access details.",
+          "Good SEO starts with useful human language. If a hunter immediately understands the offer, search engines usually understand it better too.",
+        ],
+      },
+      {
+        heading: "Making the location either too vague or too exact",
+        body: [
+          "Too vague makes the listing hard to evaluate. Too exact can expose the owner. The sweet spot is a public region, nearest town, state, and habitat context, with exact access available after approval.",
+          "This creates enough confidence for a request while protecting the owner from unnecessary public exposure.",
+          "Location strategy is one of the most important parts of a private hunting marketplace.",
+        ],
+      },
+      {
+        heading: "Forgetting the next action",
+        body: [
+          "A listing should never leave the hunter wondering what to do next. The call to action should be clear: send request, ask a question, start verification, or create final terms.",
+          "The same is true for owners after listing. They should see next steps: complete verification, upload authority proof, improve photos, review requests, or connect payout when paid transactions are enabled.",
+          "A marketplace feels professional when every page has one obvious next step.",
+        ],
+      },
+      {
+        heading: "Mixing public marketing with private compliance",
+        body: [
+          "Compliance documents, identity checks, property proof, and sensitive maps do not belong in public marketing content. They belong in controlled account, listing, request, or contract workflows.",
+          "When these areas are mixed together, users get confused and owners become hesitant.",
+          "A clean product separates public SEO content, owner listing content, request chat, verification, and final contract actions.",
+        ],
+      },
+      {
+        heading: "Ignoring mobile readability",
+        body: [
+          "Many hunters and landowners will read listings on a phone. Long fields, uneven controls, cramped grids, and hidden buttons make the product feel unfinished.",
+          "Listings should use clean spacing, full-width mobile fields, readable cards, predictable action buttons, and no overlapping text.",
+          "Mobile polish is not decoration. It directly affects trust and conversion.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "What makes a hunting lease listing look trustworthy?",
+        answer:
+          "Clear photos, realistic species information, owner-controlled location details, visible rules, pricing clarity, and an obvious request workflow all increase trust.",
+      },
+      {
+        question: "Should owners publish a listing if verification is pending?",
+        answer:
+          "Yes, if the platform labels the status clearly and keeps final contracts locked until the required verification is complete.",
+      },
+      {
+        question: "What is the fastest way to improve a weak listing?",
+        answer:
+          "Improve the headline, add useful photos, clarify billing unit, add rules, define species, and explain the request process.",
+      },
+      {
+        question: "Why do some listings get poor requests?",
+        answer:
+          "Poor requests often come from vague listings. If hunters do not understand dates, rules, price, species, or access type, they send broad questions instead of serious requests.",
+      },
+    ],
+  },
+};
+
+export const guidePosts: GuidePost[] = guidePostDrafts.map((post) => {
+  const expansion = guidePostExpansions[post.slug];
+
+  if (!expansion) {
+    return post;
+  }
+
+  return {
+    ...post,
+    readingMinutes: expansion.readingMinutes,
+    takeaways: [...post.takeaways, ...expansion.takeaways],
+    sections: [...post.sections, ...expansion.sections],
+    faq: [...post.faq, ...expansion.faq],
+  };
+});
 
 export function getGuideCategory(slug: string) {
   return guideCategories.find((category) => category.slug === slug) ?? null;

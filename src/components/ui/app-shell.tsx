@@ -92,6 +92,7 @@ export function AppFooter() {
           <div className="mt-3 grid gap-2 text-stone-400">
             <Link href="/land">Search land</Link>
             <Link href="/list-your-land">List your land</Link>
+            <Link href="/guides">Landowner Guides</Link>
             <Link href="/faq">FAQ</Link>
             <Link href="/dashboard">Requests and bookings</Link>
           </div>
@@ -100,7 +101,6 @@ export function AppFooter() {
           <p className="font-bold text-white">Operations</p>
           <div className="mt-3 grid gap-2 text-stone-400">
             <Link href="/contact">Contact</Link>
-            <Link href="/guides">Landowner Guides</Link>
             <Link href="/privacy">Privacy Policy</Link>
             <Link href="/terms">Terms of Service</Link>
             <Link href="/cookies">Cookie Policy</Link>
