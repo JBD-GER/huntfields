@@ -33,6 +33,7 @@ import { LeaseFilterForm } from "@/components/forms/lease-filter-form";
 import { ListingSubmissionForm } from "@/components/forms/listing-submission-form";
 import { MessageReplyForm } from "@/components/forms/message-reply-form";
 import { PasskeyRegistrationCard } from "@/components/forms/passkey-registration-card";
+import { ProblemReportCard } from "@/components/forms/problem-report-card";
 import { ListingResults } from "@/components/listings/listing-results";
 import { LazyListingMap } from "@/components/maps/lazy-listing-map";
 import { getUsStateRules } from "@/lib/compliance/us-state-rules";
@@ -1256,6 +1257,7 @@ function OverviewView({
 
       <div className="grid gap-5">
         <PrimaryActionCard role={role} />
+        <ProblemReportCard role={role} />
         <DashboardPanel
           title={role === "hunter" ? "Recent Requests" : "Recent Listings"}
           eyebrow="Workspace"

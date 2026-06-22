@@ -1,5 +1,17 @@
 import { env } from "@/lib/env";
 
+function escapeHtml(value: string) {
+  const replacements: Record<string, string> = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+
+  return value.replace(/[&<>"']/g, (char) => replacements[char]);
+}
+
 function layout(title: string, body: string) {
   return `<!doctype html>
 <html lang="en">
@@ -147,6 +159,24 @@ export const emailTemplates = {
       html: layout(
         "New contact form message",
         `<p><strong>${name}</strong> &lt;${email}&gt; wrote about <strong>${topic}</strong>.</p><p>${message.replaceAll("\n", "<br>")}</p>`,
+      ),
+    };
+  },
+  dashboardProblemReport(
+    name: string,
+    email: string,
+    role: "hunter" | "landowner",
+    message: string,
+    dashboardUrl: string,
+  ) {
+    const roleLabel = role === "landowner" ? "Landowner" : "Hunter";
+
+    return {
+      subject: `Huntfields dashboard problem: ${roleLabel}`,
+      text: `${name} <${email}> reported a dashboard problem from the ${roleLabel} workspace.\n\n${message}\n\nDashboard: ${dashboardUrl}`,
+      html: layout(
+        "New dashboard problem report",
+        `<p><strong>${escapeHtml(name)}</strong> &lt;${escapeHtml(email)}&gt; reported a problem from the <strong>${roleLabel}</strong> workspace.</p><p>${escapeHtml(message).replaceAll("\n", "<br>")}</p>${button("Open dashboard", dashboardUrl)}`,
       ),
     };
   },
