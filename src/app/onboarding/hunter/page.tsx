@@ -1,5 +1,4 @@
 import { HunterOnboardingForm } from "@/components/forms/hunter-onboarding-form";
-import { StateRulePanel } from "@/components/compliance/state-rule-panel";
 import { getUsStateRules } from "@/lib/compliance/us-state-rules";
 import { pageMetadata } from "@/lib/seo/site";
 
@@ -15,23 +14,22 @@ export default async function HunterOnboardingPage() {
   const stateRules = await getUsStateRules();
 
   return (
-    <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[0.75fr_1.25fr] lg:px-8">
-      <aside className="grid content-start gap-5">
-        <div>
-          <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#c76b2f]">
-            Hunter onboarding
+    <div className="mx-auto max-w-5xl px-3 py-6 sm:px-6 sm:py-10 lg:px-8">
+      <section className="rounded-lg border border-[#234331]/10 bg-[#fffdf7] p-4 shadow-[0_22px_70px_rgba(25,35,29,0.10)] sm:p-6">
+        <div className="mb-5 rounded-md border border-[#234331]/10 bg-white p-4">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-[#c76b2f]">
+            Hunter verification
           </p>
-          <h1 className="mt-3 text-4xl font-black tracking-normal text-stone-950">
-            Get request-ready before you message a landowner.
+          <h1 className="mt-2 text-2xl font-black tracking-normal text-stone-950 sm:text-3xl">
+            Get request-ready
           </h1>
-          <p className="mt-4 text-base leading-7 text-stone-600">
-            Start with the US market. Huntfields collects the core information
-            needed for state-aware access requests and electronic lease signing.
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-stone-600">
+            Huntfields reuses your account onboarding details. Add only the
+            hunter-specific minimum: birth date, primary hunting state,
+            license or education path, optional proof documents, and electronic
+            signing consent.
           </p>
         </div>
-        {stateRules[0] && <StateRulePanel rule={stateRules[0]} title="First market" />}
-      </aside>
-      <section className="rounded-md border border-stone-200 bg-white p-5 shadow-sm">
         <HunterOnboardingForm stateRules={stateRules} />
       </section>
     </div>

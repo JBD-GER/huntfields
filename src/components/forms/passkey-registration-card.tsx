@@ -59,14 +59,14 @@ export function PasskeyRegistrationCard({ email }: { email?: string | null }) {
   return (
     <section className="mt-6 rounded-lg border border-[#234331]/10 bg-[#fffdf7] p-5 shadow-[0_16px_46px_rgba(25,35,29,0.08)] sm:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
+        <div className="min-w-0">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-[#c76b2f]">
             Faster login
           </p>
           <h2 className="mt-2 text-2xl font-black text-stone-950">
             Add a passkey
           </h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-600">
+          <p className="mt-2 max-w-2xl break-words text-sm leading-6 text-stone-600">
             Use Face ID, Touch ID, Windows Hello, or a security key for this
             account{email ? ` (${email})` : ""}. Add it once here, then use
             passkey sign-in on your next visit.
@@ -76,7 +76,7 @@ export function PasskeyRegistrationCard({ email }: { email?: string | null }) {
           type="button"
           onClick={registerPasskey}
           disabled={state === "loading"}
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-[#183326] px-4 text-sm font-black text-white shadow-[0_16px_34px_rgba(24,51,38,0.18)] transition hover:bg-[#10271d] disabled:opacity-60"
+          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-[#183326] px-4 text-sm font-black text-white shadow-[0_16px_34px_rgba(24,51,38,0.18)] transition hover:bg-[#10271d] disabled:opacity-60 sm:w-auto"
         >
           <Fingerprint size={17} aria-hidden="true" />
           {state === "loading" ? "Opening passkey" : "Add passkey"}

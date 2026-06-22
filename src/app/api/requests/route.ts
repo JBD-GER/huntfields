@@ -123,7 +123,7 @@ export async function POST(request: Request) {
       const template = emailTemplates.hunterRequest(
         listing.title,
         profile?.full_name ?? user.email ?? "A hunter",
-        appUrl(`/dashboard?request=${created.id}`),
+        appUrl(`/dashboard?view=requests&request=${created.id}`),
       );
       await sendTransactionalEmail({
         to: ownerEmail,

@@ -101,7 +101,7 @@ export function SpeciesSelector({
     <section ref={rootRef} className="grid gap-3 md:col-span-3">
       <input name={name} type="hidden" value={selected.join(", ")} readOnly />
       <div className="grid gap-2">
-        <div className="flex items-end justify-between gap-3">
+        <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
           <label className="grid flex-1 gap-2 text-sm font-semibold text-stone-800">
             Huntable species
             <input
@@ -117,12 +117,15 @@ export function SpeciesSelector({
               placeholder="Type deer, turkey, elk, hog..."
               className="min-h-11 rounded-md border border-stone-300 px-3 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
             />
+            <span className="text-xs font-normal leading-5 text-stone-500">
+              Pick from the list or type a custom species and press Add.
+            </span>
           </label>
           <button
             type="button"
             onClick={() => addSpecies(query)}
             disabled={!query.trim() || selected.length >= maxSelected}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-[#234331] px-4 text-sm font-bold text-white transition hover:bg-[#162d22] disabled:opacity-50"
+            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-[#234331] px-4 text-sm font-bold text-white transition hover:bg-[#162d22] disabled:opacity-50 sm:w-auto"
           >
             <Plus size={16} aria-hidden="true" />
             Add
@@ -168,7 +171,7 @@ export function SpeciesSelector({
         </div>
       )}
 
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         {suggestions.map((species) => (
           <button
             key={species.slug}
@@ -177,7 +180,10 @@ export function SpeciesSelector({
             disabled={selected.length >= maxSelected}
             className="flex min-h-12 items-center gap-3 rounded-md border border-stone-200 bg-white px-3 py-2 text-left text-sm font-semibold text-stone-800 transition hover:border-[#234331] hover:text-[#234331]"
           >
-            <SpeciesIcon category={species.category} className="size-5 shrink-0" />
+            <SpeciesIcon
+              category={species.category}
+              className="size-5 shrink-0"
+            />
             <span className="min-w-0">
               <span className="block truncate">{species.label}</span>
               <span className="block text-xs font-normal text-stone-500">

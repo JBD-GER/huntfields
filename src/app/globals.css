@@ -29,6 +29,13 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+button,
+input,
+select,
+textarea {
+  max-width: 100%;
+}
+
 ::selection {
   background: #c76b2f;
   color: #fff;
@@ -164,6 +171,35 @@ body {
   animation: huntfields-app-loader 1.2s ease-in-out infinite;
 }
 
+@keyframes huntfields-onboarding-scan {
+  0% {
+    transform: translateX(-120%);
+  }
+
+  100% {
+    transform: translateX(320%);
+  }
+}
+
+@keyframes huntfields-step-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(35 67 49 / 0.16);
+  }
+
+  50% {
+    box-shadow: 0 0 0 8px rgb(35 67 49 / 0);
+  }
+}
+
+.huntfields-onboarding-scan {
+  animation: huntfields-onboarding-scan 2.8s ease-in-out infinite;
+}
+
+.huntfields-step-pulse {
+  animation: huntfields-step-pulse 1.7s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .huntfields-route-loading-bar,
   .huntfields-loader-pin,
@@ -171,7 +207,9 @@ body {
   .huntfields-loader-route,
   .huntfields-loader-route-secondary,
   .huntfields-loader-compass,
-  .huntfields-app-loader {
+  .huntfields-app-loader,
+  .huntfields-onboarding-scan,
+  .huntfields-step-pulse {
     animation: none;
     transform: none;
   }
@@ -182,6 +220,7 @@ body {
   font-size: 1.875rem;
   font-weight: 900;
   line-height: 1.15;
+  overflow-wrap: anywhere;
 }
 
 .lease-contract-content h2 {
@@ -195,10 +234,27 @@ body {
   color: #44403c;
   font-size: 0.95rem;
   line-height: 1.75;
+  overflow-wrap: anywhere;
 }
 
 .lease-contract-content ul,
 .lease-contract-content ol {
   margin: 0.75rem 0 0;
   padding-left: 1.25rem;
+}
+
+@media (max-width: 640px) {
+  .lease-contract-content h1 {
+    font-size: 1.5rem;
+  }
+
+  .lease-contract-content h2 {
+    font-size: 1rem;
+  }
+
+  .lease-contract-content p,
+  .lease-contract-content li {
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
 }

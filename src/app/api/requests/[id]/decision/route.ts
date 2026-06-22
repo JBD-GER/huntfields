@@ -122,7 +122,7 @@ export async function POST(request: Request, { params }: { params: Params }) {
     const template = emailTemplates.landownerResponse(
       listing.title,
       false,
-      appUrl(`/dashboard?request=${id}`),
+      appUrl(`/dashboard?view=requests&request=${id}`),
     );
     await sendTransactionalEmail({
       to: hunterUser.data.user.email,
@@ -133,7 +133,8 @@ export async function POST(request: Request, { params }: { params: Params }) {
     });
   }
 
-  return NextResponse.redirect(new URL(`/dashboard?request=${id}`, env.appUrl), {
-    status: 303,
-  });
+  return NextResponse.redirect(
+    new URL(`/dashboard?view=requests&request=${id}`, env.appUrl),
+    { status: 303 },
+  );
 }

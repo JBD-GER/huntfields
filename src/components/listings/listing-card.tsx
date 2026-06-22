@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, MapPin, Ruler, Trees } from "lucide-react";
+import { ArrowUpRight, MapPin, MapPinned, Ruler, Trees } from "lucide-react";
 import type { ListingCard as ListingCardType } from "@/lib/data/listings";
 import {
   formatAreaForViewer,
@@ -19,6 +19,10 @@ function cardLocation(listing: ListingCardType) {
   );
 }
 
+function propertyVerificationLabel(status?: ListingCardType["property_verification_status"]) {
+  return status === "verified" ? "Verified" : "Pending";
+}
+
 export function ListingCard({
   listing,
   viewerCanSeeDetails = false,
@@ -28,6 +32,7 @@ export function ListingCard({
 }) {
   const image =
     listingImageUrl(listing.cover_image_path, listing.slug) ?? fallbackImage;
+  const propertyVerified = listing.property_verification_status === "verified";
   const checkpoints = [
     {
       icon: MapPin,
@@ -51,7 +56,7 @@ export function ListingCard({
   return (
     <article className="group h-full overflow-hidden rounded-lg border border-[#234331]/10 bg-[#fffdf7] shadow-[0_18px_48px_rgba(25,35,29,0.08)] transition duration-300 hover:-translate-y-1 hover:border-[#234331]/24 hover:shadow-[0_26px_70px_rgba(25,35,29,0.14)]">
       <Link href={`/listings/${listing.slug}`} className="flex h-full flex-col">
-        <div className="relative h-[17.5rem] shrink-0 overflow-hidden bg-stone-200 sm:h-[18.5rem] lg:h-[19rem]">
+        <div className="relative h-[14.5rem] shrink-0 overflow-hidden bg-stone-200 sm:h-[17rem] lg:h-[18rem]">
           <Image
             src={image}
             alt=""
@@ -64,6 +69,24 @@ export function ListingCard({
           <div className="absolute left-3 top-3 rounded-md border border-white/30 bg-white/88 px-2.5 py-1.5 text-[11px] font-black uppercase tracking-[0.12em] text-[#183326] shadow-sm backdrop-blur">
             {listing.listing_type_label}
           </div>
+          <div
+            className={`absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] shadow-sm backdrop-blur ${
+              propertyVerified
+                ? "border-[#234331]/24 bg-[#eef3ec]/92 text-[#183326]"
+                : "border-white/30 bg-white/64 text-stone-600"
+            }`}
+          >
+            <MapPinned
+              size={13}
+              aria-hidden="true"
+              className={
+                propertyVerified
+                  ? "text-[#234331]"
+                  : "text-stone-400 opacity-60"
+              }
+            />
+            {propertyVerificationLabel(listing.property_verification_status)}
+          </div>
           <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-3 text-white">
             <div className="max-w-[calc(100%-3.25rem)] truncate text-sm font-black drop-shadow sm:text-base">
               {formatPriceForViewer(listing, viewerCanSeeDetails)}
@@ -75,7 +98,7 @@ export function ListingCard({
         </div>
         <div className="flex flex-1 flex-col p-4 sm:p-5">
           <div className="shrink-0">
-            <h3 className="truncate text-base font-black leading-6 tracking-normal text-stone-950 sm:text-lg">
+            <h3 className="line-clamp-2 text-base font-black leading-6 tracking-normal text-stone-950 sm:text-lg">
               {listing.title}
             </h3>
             <p className="mt-2 line-clamp-2 min-h-12 text-sm leading-6 text-stone-600">

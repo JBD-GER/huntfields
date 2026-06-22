@@ -5,15 +5,19 @@ export type CheckoutInput = {
   currency: string;
   successUrl: string;
   cancelUrl: string;
+  customerId?: string;
   customerEmail?: string;
+  customerName?: string;
   connectedAccountId?: string;
   platformFeeCents?: number;
+  transferGroup?: string;
 };
 
 export type CheckoutResult = {
   provider: "manual" | "stripe";
   checkoutId: string | null;
   checkoutUrl: string | null;
+  customerId?: string | null;
   requiresLiveKeys: boolean;
 };
 

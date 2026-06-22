@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import { appUrl } from "@/lib/email/templates";
 import { getPaymentProvider } from "@/lib/payments/provider";
+import { ensureStripeCustomer } from "@/lib/payments/stripe-customer";
 import {
   createSupabaseServerClient,
   createSupabaseServiceClient,
 } from "@/lib/supabase/server";
+import { getRequestVerificationGate } from "@/lib/verification/gates";
 
 type Params = Promise<{ id: string }>;
 
@@ -33,7 +35,7 @@ export async function POST(request: Request, { params }: { params: Params }) {
   const { data: booking, error } = await service
     .from("bookings")
     .select(
-      "id, listing_id, hunter_id, landowner_id, status, workflow_stage, payment_status, currency, total_charge_cents, lease_amount_cents, amount_cents, hunter_platform_fee_cents, landowner_platform_fee_cents, landowner_payout_cents, provider_checkout_id, checkout_url, listings(title)",
+      "id, request_id, listing_id, hunter_id, landowner_id, status, workflow_stage, payment_status, currency, total_charge_cents, lease_amount_cents, amount_cents, hunter_platform_fee_cents, landowner_platform_fee_cents, landowner_payout_cents, provider_checkout_id, checkout_url, listings(title)",
     )
     .eq("id", id)
     .single();
@@ -58,10 +60,51 @@ export async function POST(request: Request, { params }: { params: Params }) {
     .eq("booking_id", booking.id)
     .maybeSingle();
 
-  if (contract?.status !== "signed") {
+  if (!contract) {
     return NextResponse.json(
-      { error: "Both parties must sign before payment starts." },
+      { error: "Contract not found for this booking." },
+      { status: 404 },
+    );
+  }
+
+  const { data: signatures } = await service
+    .from("contract_signatures")
+    .select("signer_role")
+    .eq("contract_id", contract.id);
+  const hunterSigned = (signatures ?? []).some(
+    (signature) => signature.signer_role === "hunter",
+  );
+
+  if (!hunterSigned || !["partially_signed", "signed"].includes(contract.status)) {
+    return NextResponse.json(
+      { error: "Hunter signature is required before checkout starts." },
       { status: 400 },
+    );
+  }
+
+  if (!booking.request_id) {
+    return NextResponse.json(
+      { error: "This booking is missing its request verification link." },
+      { status: 400 },
+    );
+  }
+
+  const verificationGate = await getRequestVerificationGate(
+    service,
+    booking.request_id,
+  );
+
+  if (verificationGate.error || !verificationGate.data) {
+    return NextResponse.json(
+      { error: verificationGate.error ?? "Verification status unavailable." },
+      { status: verificationGate.status },
+    );
+  }
+
+  if (!verificationGate.data.canFinalize) {
+    return NextResponse.json(
+      { error: verificationGate.data.reason },
+      { status: 403 },
     );
   }
 
@@ -70,6 +113,10 @@ export async function POST(request: Request, { params }: { params: Params }) {
       new URL(`/contracts/${contract.id}`, request.url),
       { status: 303 },
     );
+  }
+
+  if (booking.payment_status === "checkout_created" && booking.checkout_url) {
+    return NextResponse.redirect(booking.checkout_url, { status: 303 });
   }
 
   const listing = Array.isArray(booking.listings)
@@ -92,6 +139,17 @@ export async function POST(request: Request, { params }: { params: Params }) {
     .maybeSingle();
 
   const provider = getPaymentProvider();
+  const { data: hunterProfile } = await service
+    .from("profiles")
+    .select("full_name, first_name, last_name, phone")
+    .eq("id", user.id)
+    .maybeSingle();
+  const customerName =
+    [hunterProfile?.first_name, hunterProfile?.last_name]
+      .filter(Boolean)
+      .join(" ") ||
+    hunterProfile?.full_name ||
+    null;
 
   if (
     provider.name === "manual" ||
@@ -133,6 +191,17 @@ export async function POST(request: Request, { params }: { params: Params }) {
     );
   }
 
+  const customerId = await ensureStripeCustomer({
+    supabase: service,
+    userId: user.id,
+    email: user.email,
+    name: customerName,
+    phone: hunterProfile?.phone,
+    metadata: {
+      huntfields_role: "hunter",
+    },
+  });
+
   const result = await provider.createCheckout({
     bookingId: booking.id,
     listingTitle: listing?.title ?? "Huntfields hunting lease",
@@ -140,9 +209,12 @@ export async function POST(request: Request, { params }: { params: Params }) {
     currency: booking.currency,
     successUrl: appUrl(`/contracts/${contract.id}?payment_state=success`),
     cancelUrl: appUrl(`/contracts/${contract.id}?payment_state=cancelled`),
+    customerId,
     customerEmail: user.email ?? undefined,
+    customerName: customerName ?? undefined,
     connectedAccountId: account.provider_account_id,
     platformFeeCents: applicationFeeCents,
+    transferGroup: booking.id,
   });
 
   await Promise.all([
@@ -159,7 +231,9 @@ export async function POST(request: Request, { params }: { params: Params }) {
       application_fee_cents: applicationFeeCents,
       landowner_payout_cents: booking.landowner_payout_cents ?? 0,
       provider_checkout_id: result.checkoutId,
+      provider_customer_id: result.customerId ?? customerId,
       checkout_url: result.checkoutUrl,
+      transfer_status: "not_started",
     }),
     service
       .from("bookings")
@@ -172,6 +246,7 @@ export async function POST(request: Request, { params }: { params: Params }) {
           : "payment_due",
         payment_provider: result.provider,
         provider_checkout_id: result.checkoutId,
+        provider_customer_id: result.customerId ?? customerId,
         checkout_url: result.checkoutUrl,
       })
       .eq("id", booking.id),

@@ -8,20 +8,49 @@ import {
   TerraDrawPolygonMode,
   TerraDrawSelectMode,
   ValidateNotSelfIntersecting,
+  type GeoJSONStoreFeatures,
+  type GeoJSONStoreGeometries,
 } from "terra-draw";
 import { TerraDrawMapLibreGLAdapter } from "terra-draw-maplibre-gl-adapter";
-import { MousePointer2, Pencil, Trash2 } from "lucide-react";
+import { CheckCircle2, MousePointer2, Pencil, Plus, Trash2 } from "lucide-react";
 import { fallbackRasterStyle, getMapStyle } from "@/lib/maps/style";
 import { formatAreaDisplay } from "@/lib/area-format";
-import type { Feature, GeoJsonProperties, Polygon } from "geojson";
+import type { MultiPolygon, Polygon } from "geojson";
 
 export type PolygonEditorValue = {
-  geometry: Polygon | null;
+  geometry: Polygon | MultiPolygon | null;
   areaAcres: number;
   areaHectares: number;
 };
 
+type StoreFeature = GeoJSONStoreFeatures<GeoJSONStoreGeometries>;
+type PolygonFeature = GeoJSONStoreFeatures<Polygon>;
+
 const initialCenter: [number, number] = [-98.5795, 39.8283];
+
+function isFinishedPolygon(feature: StoreFeature): feature is PolygonFeature {
+  return (
+    feature.geometry.type === "Polygon" &&
+    !Boolean(feature.properties?.currentlyDrawing)
+  );
+}
+
+function combinePolygons(
+  polygons: PolygonFeature[],
+): Polygon | MultiPolygon | null {
+  if (polygons.length === 0) {
+    return null;
+  }
+
+  if (polygons.length === 1) {
+    return polygons[0].geometry;
+  }
+
+  return {
+    type: "MultiPolygon",
+    coordinates: polygons.map((polygon) => polygon.geometry.coordinates),
+  };
+}
 
 export function PolygonEditor({
   name = "boundary_geojson",
@@ -37,6 +66,8 @@ export function PolygonEditor({
   const [geojson, setGeojson] = useState("");
   const [areaAcres, setAreaAcres] = useState(0);
   const [areaHectares, setAreaHectares] = useState(0);
+  const [hasPolygon, setHasPolygon] = useState(false);
+  const [polygonCount, setPolygonCount] = useState(0);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) {
@@ -121,29 +152,33 @@ export function PolygonEditor({
       });
 
       const sync = () => {
-        const polygon = draw
-          .getSnapshot()
-          .find((feature) => feature.geometry.type === "Polygon") as
-          | Feature<Polygon, GeoJsonProperties>
-          | undefined;
+        const polygons = draw.getSnapshot().filter(isFinishedPolygon);
+        const storedGeometry = combinePolygons(polygons);
 
-        if (!polygon) {
+        if (!storedGeometry) {
           setGeojson("");
           setAreaAcres(0);
           setAreaHectares(0);
+          setHasPolygon(false);
+          setPolygonCount(0);
           onValueChange?.({ geometry: null, areaAcres: 0, areaHectares: 0 });
           return;
         }
 
-        const squareMeters = area(polygon);
+        const squareMeters = polygons.reduce(
+          (total, polygon) => total + area(polygon),
+          0,
+        );
         const acres = Number((squareMeters / 4046.8564224).toFixed(2));
         const hectares = Number((squareMeters / 10000).toFixed(2));
 
-        setGeojson(JSON.stringify(polygon.geometry));
+        setGeojson(JSON.stringify(storedGeometry));
         setAreaAcres(acres);
         setAreaHectares(hectares);
+        setHasPolygon(true);
+        setPolygonCount(polygons.length);
         onValueChange?.({
-          geometry: polygon.geometry,
+          geometry: storedGeometry,
           areaAcres: acres,
           areaHectares: hectares,
         });
@@ -175,6 +210,14 @@ export function PolygonEditor({
     setMode(nextMode);
   }
 
+  function addAnotherArea() {
+    setDrawMode("polygon");
+  }
+
+  function finishEditing() {
+    setDrawMode("select");
+  }
+
   function clearPolygon() {
     const draw = drawRef.current;
 
@@ -191,63 +234,109 @@ export function PolygonEditor({
     setGeojson("");
     setAreaAcres(0);
     setAreaHectares(0);
+    setHasPolygon(false);
+    setPolygonCount(0);
     setDrawMode("polygon");
   }
+
+  const statusText = hasPolygon
+    ? `${polygonCount} saved ${polygonCount === 1 ? "area" : "areas"}`
+    : "No area saved yet";
+  const helpText =
+    mode === "polygon"
+      ? "Click each corner. Press Enter or click the orange first point to save the shape."
+      : hasPolygon
+        ? "Drag corners or midpoint handles to refine the saved boundary."
+        : "Start by drawing the hunting area boundary.";
 
   return (
     <div className="grid gap-3">
       <input name={name} type="hidden" value={geojson} readOnly />
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
+      <div className="grid gap-3 rounded-md border border-stone-200 bg-white p-3">
+        <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+          <div className="min-w-0">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-[#c76b2f]">
+              {statusText}
+            </p>
+            <p className="mt-1 text-sm font-semibold leading-5 text-stone-600">
+              {helpText}
+            </p>
+          </div>
+          <div className="rounded-md border border-stone-200 bg-[#faf8f1] px-3 py-2 text-center text-sm font-semibold text-stone-800 md:text-left">
+            {formatAreaDisplay({
+              area_acres: areaAcres,
+              area_hectares: areaHectares,
+            })}
+          </div>
+        </div>
+
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-[auto_auto_auto_auto_auto]">
           <button
             type="button"
-            title="Draw polygon"
-            aria-label="Draw polygon"
+            title="Draw hunting area"
+            aria-label="Draw hunting area"
             onClick={() => setDrawMode("polygon")}
-            className={`inline-flex min-h-10 items-center gap-2 rounded-md border px-3 text-sm font-bold transition ${
+            className={`inline-flex h-11 items-center justify-center gap-2 rounded-md border px-3 text-sm font-bold transition ${
               mode === "polygon"
                 ? "border-[#234331] bg-[#234331] text-white"
                 : "border-stone-300 bg-white text-stone-700"
             }`}
           >
             <Pencil size={17} aria-hidden="true" />
-            Draw
+            {hasPolygon ? "Draw area" : "Start drawing"}
           </button>
           <button
             type="button"
-            title="Edit polygon"
-            aria-label="Edit polygon"
+            title="Move boundary points"
+            aria-label="Move boundary points"
             onClick={() => setDrawMode("select")}
-            className={`inline-flex min-h-10 items-center gap-2 rounded-md border px-3 text-sm font-bold transition ${
+            disabled={!hasPolygon}
+            className={`inline-flex h-11 items-center justify-center gap-2 rounded-md border px-3 text-sm font-bold transition disabled:opacity-45 ${
               mode === "select"
                 ? "border-[#234331] bg-[#234331] text-white"
                 : "border-stone-300 bg-white text-stone-700"
             }`}
           >
             <MousePointer2 size={17} aria-hidden="true" />
-            Edit
+            Edit points
           </button>
           <button
             type="button"
-            title="Clear polygon"
-            aria-label="Clear polygon"
+            title="Save current map areas"
+            aria-label="Save current map areas"
+            onClick={finishEditing}
+            disabled={!hasPolygon}
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-[#234331]/20 bg-[#eef3ec] px-3 text-sm font-bold text-[#183326] transition hover:border-[#234331]/40 hover:bg-[#e5eee2] disabled:opacity-45"
+          >
+            <CheckCircle2 size={17} aria-hidden="true" />
+            Done
+          </button>
+          <button
+            type="button"
+            title="Add another separate area"
+            aria-label="Add another separate area"
+            onClick={addAnotherArea}
+            disabled={!hasPolygon}
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-stone-300 bg-white px-3 text-sm font-bold text-stone-700 transition hover:border-[#234331] hover:text-[#183326] disabled:opacity-45"
+          >
+            <Plus size={17} aria-hidden="true" />
+            Add area
+          </button>
+          <button
+            type="button"
+            title="Clear all areas"
+            aria-label="Clear all areas"
             onClick={clearPolygon}
-            className="inline-flex min-h-10 items-center gap-2 rounded-md border border-stone-300 bg-white px-3 text-sm font-bold text-stone-700 transition hover:border-red-400 hover:text-red-700"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-stone-300 bg-white px-3 text-sm font-bold text-stone-700 transition hover:border-red-400 hover:text-red-700 lg:col-start-auto"
           >
             <Trash2 size={17} aria-hidden="true" />
-            Clear
+            Clear all
           </button>
-        </div>
-        <div className="rounded-md border border-stone-200 bg-white px-3 py-2 text-sm font-semibold text-stone-800">
-          {formatAreaDisplay({
-            area_acres: areaAcres,
-            area_hectares: areaHectares,
-          })}
         </div>
       </div>
       <div
         ref={containerRef}
-        className="min-h-[420px] overflow-hidden rounded-md border border-stone-200 bg-stone-200"
+        className="min-h-[300px] overflow-hidden rounded-md border border-stone-200 bg-stone-200 sm:min-h-[380px] lg:min-h-[420px]"
         aria-label="Draw exact land access polygon"
       />
     </div>

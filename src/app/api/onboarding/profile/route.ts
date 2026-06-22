@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  createSupabaseServerClient,
+  createSupabaseServiceClient,
+} from "@/lib/supabase/server";
 import { formValue } from "@/lib/utils";
 
 const schema = z.object({
@@ -13,6 +16,67 @@ const schema = z.object({
   postal_code: z.string().max(40).optional(),
   phone: z.string().max(80).optional(),
 });
+
+type OnboardingProfile = z.infer<typeof schema>;
+
+function rpcUnavailable(error: { code?: string; message?: string }) {
+  const message = error.message ?? "";
+
+  return (
+    error.code === "PGRST202" ||
+    message.includes("complete_profile_onboarding") ||
+    message.includes("schema cache")
+  );
+}
+
+async function saveProfileDirectly(
+  userId: string,
+  data: OnboardingProfile,
+  fallbackClient: NonNullable<Awaited<ReturnType<typeof createSupabaseServerClient>>>,
+) {
+  const service = createSupabaseServiceClient();
+  const db = service ?? fallbackClient;
+  const fullName = `${data.first_name} ${data.last_name}`.trim();
+  const now = new Date().toISOString();
+  const fullPayload = {
+    id: userId,
+    role: data.role,
+    full_name: fullName,
+    first_name: data.first_name,
+    last_name: data.last_name,
+    street_address: data.street_address,
+    city: data.city,
+    admin_area_code: data.admin_area_code || null,
+    postal_code: data.postal_code || null,
+    phone: data.phone || null,
+    country_code: "US",
+    onboarding_completed: true,
+    role_selected_at: now,
+  };
+
+  const { error: fullError } = await db
+    .from("profiles")
+    .upsert(fullPayload, { onConflict: "id" });
+
+  if (!fullError) {
+    return null;
+  }
+
+  const basePayload = {
+    id: userId,
+    role: data.role,
+    full_name: fullName,
+    phone: data.phone || null,
+    country_code: "US",
+    onboarding_completed: true,
+  };
+
+  const { error: baseError } = await db
+    .from("profiles")
+    .upsert(basePayload, { onConflict: "id" });
+
+  return baseError ?? fullError;
+}
 
 export async function POST(request: Request) {
   const supabase = await createSupabaseServerClient();
@@ -74,6 +138,23 @@ export async function POST(request: Request) {
     p_postal_code: parsed.data.postal_code || null,
     p_phone: parsed.data.phone || null,
   });
+
+  if (error && rpcUnavailable(error)) {
+    const fallbackError = await saveProfileDirectly(
+      user.id,
+      parsed.data,
+      supabase,
+    );
+
+    if (!fallbackError) {
+      return NextResponse.json({ ok: true, saved_via: "direct_profile" });
+    }
+
+    return NextResponse.json(
+      { error: fallbackError.message },
+      { status: 500 },
+    );
+  }
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

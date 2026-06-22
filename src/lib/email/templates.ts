@@ -75,6 +75,21 @@ export const emailTemplates = {
       ),
     };
   },
+  messageReceived(
+    title: string,
+    senderName: string,
+    requestUrl: string,
+    hasAttachments: boolean,
+  ) {
+    return {
+      subject: `New message about ${title}`,
+      text: `${senderName} sent a new message${hasAttachments ? " with attachments" : ""} about ${title}.\n${requestUrl}`,
+      html: layout(
+        "New request message",
+        `<p><strong>${senderName}</strong> sent a new message${hasAttachments ? " with attachments" : ""} about <strong>${title}</strong>.</p>${button("Open conversation", requestUrl)}`,
+      ),
+    };
+  },
   bookingStatus(title: string, status: string, bookingUrl: string) {
     return {
       subject: `Booking ${status}: ${title}`,
@@ -87,21 +102,41 @@ export const emailTemplates = {
   },
   leaseContractReady(title: string, contractUrl: string) {
     return {
-      subject: `Lease agreement ready: ${title}`,
-      text: `The hunting lease agreement for ${title} is ready for electronic signature.\n${contractUrl}`,
+      subject: `Lease agreement ready for hunter signature: ${title}`,
+      text: `The hunting lease agreement for ${title} is ready for the hunter signature. Payment opens after the hunter signs.\n${contractUrl}`,
       html: layout(
-        "Lease agreement ready",
-        `<p>The hunting lease agreement for <strong>${title}</strong> is ready for electronic signature.</p>${button("Review and sign", contractUrl)}`,
+        "Lease agreement ready for hunter signature",
+        `<p>The hunting lease agreement for <strong>${title}</strong> is ready for the hunter signature. Payment opens after the hunter signs, and the landowner signs after payment clears.</p>${button("Review and sign", contractUrl)}`,
+      ),
+    };
+  },
+  hunterPaymentDue(title: string, contractUrl: string) {
+    return {
+      subject: `Payment due after signature: ${title}`,
+      text: `Your hunter signature for ${title} is saved. Complete checkout so the landowner can countersign.\n${contractUrl}`,
+      html: layout(
+        "Payment due after signature",
+        `<p>Your hunter signature for <strong>${title}</strong> is saved. Complete checkout so the landowner can countersign and activate the agreement.</p>${button("Complete checkout", contractUrl)}`,
+      ),
+    };
+  },
+  ownerSignatureReady(title: string, contractUrl: string) {
+    return {
+      subject: `Owner signature ready: ${title}`,
+      text: `The hunter signed and completed checkout for ${title}. Review and countersign to activate the contract.\n${contractUrl}`,
+      html: layout(
+        "Owner signature ready",
+        `<p>The hunter signed and completed checkout for <strong>${title}</strong>. Review and countersign to activate the contract and release the owner payout workflow.</p>${button("Review and sign", contractUrl)}`,
       ),
     };
   },
   leaseContractSigned(title: string, contractUrl: string) {
     return {
-      subject: `Lease agreement signed: ${title}`,
-      text: `The hunting lease agreement for ${title} has been fully signed.\n${contractUrl}`,
+      subject: `Lease agreement active: ${title}`,
+      text: `The hunting lease agreement for ${title} has been fully signed and is active. Owner payout processing has started.\n${contractUrl}`,
       html: layout(
-        "Lease agreement signed",
-        `<p>The hunting lease agreement for <strong>${title}</strong> has been fully signed. The booking is now confirmed.</p>${button("Open agreement", contractUrl)}`,
+        "Lease agreement active",
+        `<p>The hunting lease agreement for <strong>${title}</strong> has been fully signed and is active. Owner payout processing has started.</p>${button("Open agreement", contractUrl)}`,
       ),
     };
   },

@@ -1,5 +1,4 @@
-import Stripe from "stripe";
-import { env } from "@/lib/env";
+import { createStripeClient } from "@/lib/payments/stripe-client";
 import type {
   CheckoutInput,
   CheckoutResult,
@@ -8,35 +7,66 @@ import type {
 
 export class StripePaymentProvider implements PaymentProvider {
   name = "stripe" as const;
-  private stripe: Stripe;
+  private stripe;
 
   constructor() {
-    if (!env.stripeSecretKey) {
-      throw new Error("STRIPE_SECRET_KEY is required for Stripe payments.");
-    }
-
-    this.stripe = new Stripe(env.stripeSecretKey, {
-      apiVersion: "2026-05-27.dahlia",
-    });
+    this.stripe = createStripeClient();
   }
 
   async createCheckout(input: CheckoutInput): Promise<CheckoutResult> {
+    const metadata = {
+      booking_id: input.bookingId,
+      connected_account_id: input.connectedAccountId ?? "",
+      platform_fee_cents: String(input.platformFeeCents ?? 0),
+    };
+
     const session = await this.stripe.checkout.sessions.create({
       mode: "payment",
       success_url: input.successUrl,
       cancel_url: input.cancelUrl,
-      customer_email: input.customerEmail,
+      ...(input.customerId
+        ? {
+            customer: input.customerId,
+            customer_update: {
+              address: "auto" as const,
+              name: "auto" as const,
+            },
+          }
+        : {
+            customer_email: input.customerEmail,
+            customer_creation: "always" as const,
+          }),
+      automatic_tax: {
+        enabled: true,
+        liability: {
+          type: "self",
+        },
+      },
+      billing_address_collection: "auto",
+      invoice_creation: {
+        enabled: true,
+        invoice_data: {
+          description: `Huntfields hunting lease payment for ${input.listingTitle}`,
+          metadata,
+        },
+      },
+      tax_id_collection: {
+        enabled: true,
+      },
       client_reference_id: input.bookingId,
       line_items: [
         {
           quantity: 1,
+          metadata,
           price_data: {
             currency: input.currency.toLowerCase(),
+            tax_behavior: "exclusive",
             unit_amount: input.amountCents,
             product_data: {
               name: input.listingTitle,
               metadata: {
                 booking_id: input.bookingId,
+                connected_account_id: input.connectedAccountId ?? "",
               },
             },
           },
@@ -44,21 +74,30 @@ export class StripePaymentProvider implements PaymentProvider {
       ],
       payment_intent_data: input.connectedAccountId
         ? {
-            application_fee_amount: input.platformFeeCents,
-            transfer_data: {
-              destination: input.connectedAccountId,
+            transfer_group: input.transferGroup ?? input.bookingId,
+            setup_future_usage: "off_session",
+            metadata: {
+              ...metadata,
+              stripe_customer_id: input.customerId ?? "",
             },
           }
-        : undefined,
-      metadata: {
-        booking_id: input.bookingId,
-      },
+        : {
+            transfer_group: input.transferGroup ?? input.bookingId,
+            setup_future_usage: "off_session",
+            metadata: {
+              ...metadata,
+              stripe_customer_id: input.customerId ?? "",
+            },
+          },
+      metadata,
     });
 
     return {
       provider: "stripe",
       checkoutId: session.id,
       checkoutUrl: session.url,
+      customerId:
+        typeof session.customer === "string" ? session.customer : input.customerId,
       requiresLiveKeys: true,
     };
   }

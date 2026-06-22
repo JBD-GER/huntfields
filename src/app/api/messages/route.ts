@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { appUrl, emailTemplates } from "@/lib/email/templates";
+import { sendTransactionalEmail } from "@/lib/email/resend";
 import {
   createSupabaseServerClient,
   createSupabaseServiceClient,
 } from "@/lib/supabase/server";
+import { getRequestVerificationGate } from "@/lib/verification/gates";
 
 const schema = z.object({
   request_id: z.uuid(),
-  body: z.string().min(1).max(4000),
+  body: z.string().max(4000).optional(),
 });
 
 function safeFileName(value: string) {
@@ -48,14 +51,21 @@ export async function POST(request: Request) {
   }
 
   const formData = await request.formData();
+  const attachmentFiles = formData
+    .getAll("attachments")
+    .filter((value): value is File => value instanceof File && value.size > 0)
+    .slice(0, 5);
   const parsed = schema.safeParse({
     request_id: formData.get("request_id"),
-    body: formData.get("body"),
+    body: String(formData.get("body") ?? "").trim(),
   });
 
-  if (!parsed.success) {
+  if (
+    !parsed.success ||
+    (!parsed.data.body?.trim() && attachmentFiles.length === 0)
+  ) {
     return NextResponse.json(
-      { error: "Write a message before sending." },
+      { error: "Write a message or attach a file before sending." },
       { status: 400 },
     );
   }
@@ -63,7 +73,7 @@ export async function POST(request: Request) {
   const db = service ?? supabase;
   const { data: accessRequest, error: requestError } = await db
     .from("listing_requests")
-    .select("id, listing_id, hunter_id, listings(owner_id)")
+    .select("id, listing_id, hunter_id, listings(owner_id, title)")
     .eq("id", parsed.data.request_id)
     .single();
 
@@ -88,6 +98,34 @@ export async function POST(request: Request) {
     );
   }
 
+  if (attachmentFiles.length > 0) {
+    if (!service) {
+      return NextResponse.json(
+        { error: "Supabase service role is required for file uploads." },
+        { status: 500 },
+      );
+    }
+
+    const verificationGate = await getRequestVerificationGate(
+      service,
+      accessRequest.id,
+    );
+
+    if (verificationGate.error || !verificationGate.data) {
+      return NextResponse.json(
+        { error: verificationGate.error ?? "Verification status unavailable." },
+        { status: verificationGate.status },
+      );
+    }
+
+    if (!verificationGate.data.canFinalize) {
+      return NextResponse.json(
+        { error: verificationGate.data.reason },
+        { status: 403 },
+      );
+    }
+  }
+
   const recipientId = isHunter ? listing.owner_id : accessRequest.hunter_id;
   const { data: createdMessage, error } = await db
     .from("messages")
@@ -96,7 +134,7 @@ export async function POST(request: Request) {
       listing_id: accessRequest.listing_id,
       sender_id: user.id,
       recipient_id: recipientId,
-      body: parsed.data.body,
+      body: parsed.data.body?.trim() || "Shared attachments.",
     })
     .select("id")
     .single();
@@ -107,11 +145,6 @@ export async function POST(request: Request) {
       { status: 500 },
     );
   }
-
-  const attachmentFiles = formData
-    .getAll("attachments")
-    .filter((value): value is File => value instanceof File && value.size > 0)
-    .slice(0, 5);
 
   if (attachmentFiles.length > 0 && service) {
     for (const file of attachmentFiles) {
@@ -156,6 +189,30 @@ export async function POST(request: Request) {
         content_type: contentType,
         file_size: file.size,
         attachment_kind: attachmentKind(contentType),
+      });
+    }
+  }
+
+  if (service) {
+    const [{ data: senderProfile }, recipientAuth] = await Promise.all([
+      service.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
+      service.auth.admin.getUserById(recipientId),
+    ]);
+    const recipientEmail = recipientAuth.data.user?.email;
+
+    if (recipientEmail) {
+      const template = emailTemplates.messageReceived(
+        listing.title ?? "a Huntfields request",
+        senderProfile?.full_name ?? user.email ?? "A Huntfields user",
+        appUrl(`/dashboard?view=requests&request=${accessRequest.id}`),
+        attachmentFiles.length > 0,
+      );
+      await sendTransactionalEmail({
+        to: recipientEmail,
+        subject: template.subject,
+        html: template.html,
+        text: template.text,
+        replyTo: user.email ?? undefined,
       });
     }
   }

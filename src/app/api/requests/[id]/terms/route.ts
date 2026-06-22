@@ -11,6 +11,7 @@ import {
   createSupabaseServiceClient,
 } from "@/lib/supabase/server";
 import { formValue, priceToCents } from "@/lib/utils";
+import { getRequestVerificationGate } from "@/lib/verification/gates";
 
 type Params = Promise<{ id: string }>;
 
@@ -29,6 +30,18 @@ const schema = z.object({
 
 function firstRelation<T>(value: T | T[] | null | undefined) {
   return Array.isArray(value) ? value[0] : value;
+}
+
+function fileFrom(formData: FormData, name: string) {
+  const value = formData.get(name);
+  return value instanceof File && value.size > 0 ? value : null;
+}
+
+function safeFileName(value: string) {
+  return value
+    .replace(/[^a-zA-Z0-9._-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 120);
 }
 
 export async function POST(request: Request, { params }: { params: Params }) {
@@ -74,16 +87,6 @@ export async function POST(request: Request, { params }: { params: Params }) {
   if (!parsed.success || leaseAmountCents === null) {
     return NextResponse.json(
       { error: "Enter final price, dates, party size, and contract source." },
-      { status: 400 },
-    );
-  }
-
-  if (
-    parsed.data.contract_source === "uploaded_pdf" &&
-    !parsed.data.uploaded_contract_path
-  ) {
-    return NextResponse.json(
-      { error: "Upload or attach the owner contract PDF before using uploaded PDF mode." },
       { status: 400 },
     );
   }
@@ -149,6 +152,71 @@ export async function POST(request: Request, { params }: { params: Params }) {
     return NextResponse.json(
       { error: "Only the landowner can propose final lease terms." },
       { status: 403 },
+    );
+  }
+
+  const verificationGate = await getRequestVerificationGate(service, id);
+
+  if (verificationGate.error || !verificationGate.data) {
+    return NextResponse.json(
+      { error: verificationGate.error ?? "Verification status unavailable." },
+      { status: verificationGate.status },
+    );
+  }
+
+  if (!verificationGate.data.canFinalize) {
+    return NextResponse.json(
+      { error: verificationGate.data.reason },
+      { status: 403 },
+    );
+  }
+
+  let uploadedContractPath = parsed.data.uploaded_contract_path || null;
+  const uploadedContractFile = fileFrom(formData, "uploaded_contract_file");
+
+  if (parsed.data.contract_source === "uploaded_pdf" && uploadedContractFile) {
+    if (uploadedContractFile.type !== "application/pdf") {
+      return NextResponse.json(
+        { error: "Upload contract documents as PDF files." },
+        { status: 400 },
+      );
+    }
+
+    if (uploadedContractFile.size > 20 * 1024 * 1024) {
+      return NextResponse.json(
+        { error: "Contract PDFs must be 20 MB or smaller." },
+        { status: 400 },
+      );
+    }
+
+    const fileName =
+      safeFileName(uploadedContractFile.name || "lease-contract.pdf") ||
+      "lease-contract.pdf";
+    const storagePath = `${user.id}/${id}/${crypto.randomUUID()}-${fileName}`;
+    const upload = await service.storage
+      .from("contract-documents")
+      .upload(storagePath, uploadedContractFile, {
+        contentType: "application/pdf",
+        upsert: false,
+      });
+
+    if (upload.error) {
+      return NextResponse.json(
+        { error: upload.error.message },
+        { status: 500 },
+      );
+    }
+
+    uploadedContractPath = storagePath;
+  }
+
+  if (
+    parsed.data.contract_source === "uploaded_pdf" &&
+    !uploadedContractPath
+  ) {
+    return NextResponse.json(
+      { error: "Upload the owner contract PDF before using uploaded PDF mode." },
+      { status: 400 },
     );
   }
 
@@ -224,7 +292,7 @@ export async function POST(request: Request, { params }: { params: Params }) {
       renewal_type: parsed.data.renewal_type,
       renewal_notice_days: parsed.data.renewal_notice_days ?? null,
       contract_source: parsed.data.contract_source,
-      uploaded_contract_path: parsed.data.uploaded_contract_path || null,
+      uploaded_contract_path: uploadedContractPath,
       ai_contract_requested: parsed.data.contract_source === "generated",
       terms_notes: parsed.data.terms_notes || null,
       proposed_by: user.id,
@@ -284,9 +352,9 @@ export async function POST(request: Request, { params }: { params: Params }) {
     hunterTotalCents: feeBreakdown.hunterTotalCents,
     currency: listing.currency,
     renewalType: parsed.data.renewal_type,
-    paymentSchedule: "due_after_signature",
+    paymentSchedule: "due_after_hunter_signature",
     contractSource: parsed.data.contract_source,
-    uploadedContractPath: parsed.data.uploaded_contract_path || null,
+    uploadedContractPath: uploadedContractPath,
     termsNotes: parsed.data.terms_notes || null,
     hunterName:
       hunterProfile.data?.full_name ??
@@ -326,7 +394,7 @@ export async function POST(request: Request, { params }: { params: Params }) {
       electronic_records_disclosure: generated.electronicRecordsDisclosure,
       source_rule_state_code: listing.admin_area_code,
       contract_source: parsed.data.contract_source,
-      uploaded_contract_path: parsed.data.uploaded_contract_path || null,
+      uploaded_contract_path: uploadedContractPath,
       lease_amount_cents: feeBreakdown.leaseAmountCents,
       additional_fee_cents: feeBreakdown.additionalFeeCents,
       hunter_platform_fee_cents: feeBreakdown.hunterPlatformFeeCents,
@@ -371,15 +439,11 @@ export async function POST(request: Request, { params }: { params: Params }) {
   ]);
 
   const contractUrl = appUrl(`/contracts/${contract.id}`);
-  const recipients = [
-    hunterAuth.data.user?.email,
-    landownerAuth.data.user?.email,
-  ].filter(Boolean) as string[];
 
-  if (recipients.length > 0) {
+  if (hunterAuth.data.user?.email) {
     const ready = emailTemplates.leaseContractReady(listing.title, contractUrl);
     await sendTransactionalEmail({
-      to: recipients,
+      to: hunterAuth.data.user.email,
       subject: ready.subject,
       html: ready.html,
       text: ready.text,

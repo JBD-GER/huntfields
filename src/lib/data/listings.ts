@@ -2,6 +2,7 @@ import { createSupabasePublicClient } from "@/lib/supabase/server";
 import { hasSupabaseBrowserEnv } from "@/lib/env";
 import type { AreaDisplaySource } from "@/lib/area-format";
 import type { MultiPolygon, Polygon } from "geojson";
+import type { VerificationStatus } from "@/lib/verification/gates";
 export { formatPrice, listingImageUrl } from "@/lib/listing-display";
 
 export type PublicBoundaryGeojson = Polygon | MultiPolygon;
@@ -28,6 +29,7 @@ export type ListingCard = {
   price_cents: number | null;
   currency: string;
   price_unit: "per_day" | "per_week" | "per_season" | "per_request";
+  property_verification_status?: VerificationStatus;
   cover_image_path: string | null;
   featured_score: number;
   published_at: string | null;

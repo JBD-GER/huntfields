@@ -1,9 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Send } from "lucide-react";
+import { LockKeyhole, Paperclip, Send } from "lucide-react";
 
-export function MessageReplyForm({ requestId }: { requestId: string }) {
+export function MessageReplyForm({
+  requestId,
+  uploadsEnabled = true,
+}: {
+  requestId: string;
+  uploadsEnabled?: boolean;
+}) {
   const [state, setState] = useState<"idle" | "loading" | "sent" | "error">(
     "idle",
   );
@@ -38,28 +44,41 @@ export function MessageReplyForm({ requestId }: { requestId: string }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="grid gap-3">
+    <form onSubmit={onSubmit} className="grid min-w-0 gap-3">
       <label className="grid gap-2 text-sm font-semibold text-stone-800">
-        Reply
+        Message
         <textarea
           name="body"
-          required
           rows={3}
-          className="rounded-md border border-stone-300 px-3 py-2 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
+          placeholder={
+            uploadsEnabled
+              ? "Write a reply or just attach files below."
+              : "Write a text reply. File uploads unlock after both verifications."
+          }
+          className="min-h-24 rounded-md border border-stone-300 px-3 py-2 font-normal outline-none focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20"
         />
       </label>
       <label className="grid gap-2 text-sm font-semibold text-stone-800">
-        Attach photos or documents
+        <span className="inline-flex items-center gap-2">
+          {uploadsEnabled ? (
+            <Paperclip size={16} aria-hidden="true" />
+          ) : (
+            <LockKeyhole size={16} aria-hidden="true" />
+          )}
+          Attach photos or documents
+        </span>
         <input
           name="attachments"
           type="file"
           multiple
+          disabled={!uploadsEnabled}
           accept="image/jpeg,image/png,image/webp,application/pdf"
-          className="rounded-md border border-dashed border-stone-300 bg-[#fbfaf6] px-3 py-2 text-sm font-normal file:mr-3 file:rounded-md file:border-0 file:bg-[#234331] file:px-3 file:py-2 file:text-xs file:font-bold file:text-white"
+          className="w-full min-w-0 rounded-md border border-dashed border-stone-300 bg-[#fbfaf6] px-3 py-2 text-xs font-normal file:mr-3 file:rounded-md file:border-0 file:bg-[#234331] file:px-3 file:py-2 file:text-xs file:font-bold file:text-white disabled:cursor-not-allowed disabled:opacity-55 sm:text-sm"
         />
         <span className="text-xs font-normal leading-5 text-stone-500">
-          Up to 5 files. PDF, JPG, PNG, or WebP. Useful for insurance,
-          ownership proof, trail photos, and contract notes.
+          {uploadsEnabled
+            ? "Up to 5 files. PDF, JPG, PNG, or WebP. Use this for hunter documents, owner documents, property photos, contract notes, or insurance proof."
+            : "File uploads unlock after hunter and property verification are both complete. Text chat stays open."}
         </span>
       </label>
       {state === "error" && (
@@ -71,10 +90,10 @@ export function MessageReplyForm({ requestId }: { requestId: string }) {
       <button
         type="submit"
         disabled={state === "loading"}
-        className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-[#234331] px-4 text-sm font-bold text-white transition hover:bg-[#162d22] disabled:opacity-60"
+        className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-[#234331] px-4 text-sm font-bold text-white transition hover:bg-[#162d22] disabled:opacity-60 sm:w-auto"
       >
         <Send size={16} aria-hidden="true" />
-        {state === "loading" ? "Sending" : "Send reply"}
+        {state === "loading" ? "Sending" : "Send message / files"}
       </button>
     </form>
   );

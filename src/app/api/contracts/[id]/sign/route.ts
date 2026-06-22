@@ -7,6 +7,8 @@ import {
   createSupabaseServiceClient,
 } from "@/lib/supabase/server";
 import { env } from "@/lib/env";
+import { releaseOwnerPayoutTransfer } from "@/lib/payments/owner-payout";
+import { getRequestVerificationGate } from "@/lib/verification/gates";
 
 type Params = Promise<{ id: string }>;
 
@@ -84,6 +86,94 @@ export async function POST(request: Request, { params }: { params: Params }) {
     );
   }
 
+  const [{ data: booking }, { data: signatures }] = await Promise.all([
+    service
+      .from("bookings")
+      .select("id, payment_status")
+      .eq("id", contract.booking_id)
+      .maybeSingle(),
+    service
+      .from("contract_signatures")
+      .select("signer_id, signer_role")
+      .eq("contract_id", contract.id),
+  ]);
+
+  if (!booking) {
+    return NextResponse.json(
+      { error: "Booking not found for this contract." },
+      { status: 404 },
+    );
+  }
+
+  const hunterSigned = (signatures ?? []).some(
+    (signature) => signature.signer_role === "hunter",
+  );
+  const landownerSigned = (signatures ?? []).some(
+    (signature) => signature.signer_role === "landowner",
+  );
+  const alreadySigned = (signatures ?? []).some(
+    (signature) => signature.signer_id === user.id,
+  );
+
+  if (alreadySigned) {
+    return NextResponse.json(
+      { error: "Your signature is already saved for this contract." },
+      { status: 400 },
+    );
+  }
+
+  if (
+    expectedRole === "hunter" &&
+    (contract.status !== "sent" || hunterSigned)
+  ) {
+    return NextResponse.json(
+      { error: "The hunter signature is already complete." },
+      { status: 400 },
+    );
+  }
+
+  if (expectedRole === "landowner") {
+    if (!hunterSigned || contract.status !== "partially_signed" || landownerSigned) {
+      return NextResponse.json(
+        { error: "The hunter must sign before the landowner can countersign." },
+        { status: 400 },
+      );
+    }
+
+    if (booking.payment_status !== "paid") {
+      return NextResponse.json(
+        { error: "Hunter payment is required before landowner signature." },
+        { status: 400 },
+      );
+    }
+  }
+
+  if (!contract.request_id) {
+    return NextResponse.json(
+      { error: "This contract is missing its request verification link." },
+      { status: 400 },
+    );
+  }
+
+  const verificationGate = await getRequestVerificationGate(
+    service,
+    contract.request_id,
+  );
+
+  if (verificationGate.error || !verificationGate.data) {
+    return NextResponse.json(
+      { error: verificationGate.error ?? "Verification status unavailable." },
+      { status: verificationGate.status },
+    );
+  }
+
+  if (!verificationGate.data.canFinalize) {
+    return NextResponse.json(
+      { error: verificationGate.data.reason },
+      { status: 403 },
+    );
+  }
+
   const forwardedFor = request.headers.get("x-forwarded-for");
   const ipAddress = forwardedFor?.split(",")[0]?.trim() || null;
 
@@ -115,7 +205,33 @@ export async function POST(request: Request, { params }: { params: Params }) {
     payload: { contract_id: contract.id, signer_role: expectedRole, status },
   });
 
+  if (status === "partially_signed" && expectedRole === "hunter") {
+    const hunter = await service.auth.admin.getUserById(contract.hunter_id);
+    const hunterEmail = hunter.data.user?.email ?? user.email;
+
+    if (hunterEmail) {
+      const template = emailTemplates.hunterPaymentDue(
+        contract.title,
+        appUrl(`/contracts/${contract.id}`),
+      );
+      await sendTransactionalEmail({
+        to: hunterEmail,
+        subject: template.subject,
+        html: template.html,
+        text: template.text,
+        replyTo: user.email ?? undefined,
+      });
+    }
+  }
+
   if (status === "signed") {
+    await releaseOwnerPayoutTransfer({
+      supabase: service,
+      bookingId: contract.booking_id,
+      contractId: contract.id,
+      actorId: user.id,
+    });
+
     const [hunter, landowner] = await Promise.all([
       service.auth.admin.getUserById(contract.hunter_id),
       service.auth.admin.getUserById(contract.landowner_id),

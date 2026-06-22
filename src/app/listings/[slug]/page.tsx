@@ -4,6 +4,7 @@ import {
   CalendarDays,
   LockKeyhole,
   MapPin,
+  MapPinned,
   MessageCircle,
   Ruler,
   ShieldCheck,
@@ -172,6 +173,8 @@ export default async function ListingDetailPage({ params }: { params: Params }) 
     ? await supabase.auth.getUser()
     : { data: { user: null } };
   const viewerCanSeeDetails = Boolean(user);
+  const propertyVerified =
+    listing.data.property_verification_status === "verified";
 
   return (
     <div>
@@ -190,6 +193,20 @@ export default async function ListingDetailPage({ params }: { params: Params }) 
           <div className="mb-4 flex flex-wrap items-center gap-2">
             <p className="inline-flex items-center gap-2 rounded-md border border-white/18 bg-white/12 px-3 py-2 text-xs font-black uppercase tracking-[0.14em] backdrop-blur">
               {listing.data.listing_type_label}
+            </p>
+            <p
+              className={`inline-flex items-center gap-2 rounded-md border px-3 py-2 text-xs font-black uppercase tracking-[0.12em] backdrop-blur ${
+                propertyVerified
+                  ? "border-[#b8d0b3]/32 bg-[#eef3ec]/18 text-white"
+                  : "border-white/14 bg-black/18 text-white/78"
+              }`}
+            >
+              <MapPinned
+                size={14}
+                aria-hidden="true"
+                className={propertyVerified ? "text-[#b8d0b3]" : "text-white/50"}
+              />
+              {propertyVerified ? "Property verified" : "Verification pending"}
             </p>
             <p className="inline-flex items-center gap-2 rounded-md border border-white/14 bg-black/18 px-3 py-2 text-xs font-bold text-white/78 backdrop-blur">
               <MapPin size={14} aria-hidden="true" />

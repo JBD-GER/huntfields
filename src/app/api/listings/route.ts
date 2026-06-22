@@ -30,6 +30,18 @@ const listingSchema = z.object({
   price_unit: z.enum(["per_day", "per_week", "per_season", "per_request"]),
 });
 
+function fileFrom(formData: FormData, name: string) {
+  const value = formData.get(name);
+  return value instanceof File && value.size > 0 ? value : null;
+}
+
+function safeFileName(value: string) {
+  return value
+    .replace(/[^a-zA-Z0-9._-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 120);
+}
+
 export async function POST(request: Request) {
   const supabase = await createSupabaseServerClient();
 
@@ -108,12 +120,17 @@ export async function POST(request: Request) {
   const service = createSupabaseServiceClient();
   const db = service ?? supabase;
   const landownerHasAuthority = formData.get("landowner_has_authority") === "on";
-  const leaseLicenseRequired =
-    formData.get("hunting_lease_license_required") === "on";
+  const leaseLicenseRequirement =
+    formValue(formData, "hunting_lease_license_required") || "unknown";
   const leaseLicenseNumber = formValue(
     formData,
     "hunting_lease_license_number",
   );
+  const leaseLicenseRequired =
+    leaseLicenseRequirement === "yes" ||
+    leaseLicenseRequirement === "on" ||
+    Boolean(leaseLicenseNumber);
+  const authorityDocument = fileFrom(formData, "authority_document");
 
   if (!landownerHasAuthority) {
     return NextResponse.json(
@@ -127,6 +144,29 @@ export async function POST(request: Request) {
       { error: "Enter the hunting lease license number when required." },
       { status: 400 },
     );
+  }
+
+  if (authorityDocument) {
+    if (
+      ![
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "application/pdf",
+      ].includes(authorityDocument.type || "application/octet-stream")
+    ) {
+      return NextResponse.json(
+        { error: "Authority documents must be PDF, JPG, PNG, or WebP files." },
+        { status: 400 },
+      );
+    }
+
+    if (authorityDocument.size > 15 * 1024 * 1024) {
+      return NextResponse.json(
+        { error: "Authority documents must be 15 MB or smaller." },
+        { status: 400 },
+      );
+    }
   }
 
   const reportedAreaValue = formValue(formData, "reported_area_acres");
@@ -228,7 +268,7 @@ export async function POST(request: Request) {
       amenities,
       rules,
       price_cents: priceToCents(formValue(formData, "price")),
-      currency: (formValue(formData, "currency") || "USD").toUpperCase(),
+      currency: "USD",
       price_unit: parsed.data.price_unit,
     })
     .select("id, title, slug, cover_image_path")
@@ -246,6 +286,50 @@ export async function POST(request: Request) {
       listing_id: listing.id,
       status: "needs_review",
       notes: "Auto-created when listing was submitted.",
+    });
+  }
+
+  let authorityDocumentPath: string | null = null;
+
+  if (service && authorityDocument) {
+    const fileName =
+      safeFileName(authorityDocument.name || "authority-document") ||
+      "authority-document";
+    const storagePath = `${user.id}/${listing.id}/${crypto.randomUUID()}-${fileName}`;
+    const upload = await service.storage
+      .from("verification-documents")
+      .upload(storagePath, authorityDocument, {
+        contentType: authorityDocument.type || "application/octet-stream",
+        upsert: false,
+      });
+
+    if (upload.error) {
+      return NextResponse.json(
+        { error: upload.error.message },
+        { status: 500 },
+      );
+    }
+
+    authorityDocumentPath = storagePath;
+  }
+
+  if (service) {
+    await service.from("property_verifications").insert({
+      listing_id: listing.id,
+      owner_id: user.id,
+      status: "pending",
+      document_path: authorityDocumentPath,
+      submitted_at: new Date().toISOString(),
+      metadata: {
+        source: "listing_submission",
+        authority_attested: landownerHasAuthority,
+        authority_document_uploaded: Boolean(authorityDocumentPath),
+        hunting_lease_license_requirement: leaseLicenseRequirement,
+        hunting_lease_license_required: leaseLicenseRequired,
+        hunting_lease_license_number: leaseLicenseNumber || null,
+        minimum_review:
+          "Confirm owner or agent authority for this property before final terms, signatures, uploads, or checkout are enabled.",
+      },
     });
   }
 
@@ -267,6 +351,7 @@ export async function POST(request: Request) {
     emergency_contact_phone:
       formValue(formData, "emergency_contact_phone") || null,
     state_specific_answers: {
+      lease_license_requirement: leaseLicenseRequirement,
       acknowledged_listing_requirements: formData.getAll(
         "state_listing_requirements",
       ),

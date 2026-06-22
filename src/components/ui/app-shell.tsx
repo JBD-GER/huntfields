@@ -1,11 +1,29 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { CircleHelp, LogIn, MapPinned, PlusCircle } from "lucide-react";
 import { MobileNav } from "@/components/ui/mobile-nav";
 import { CookieSettingsButton } from "@/components/privacy/cookie-consent";
 import { HeaderBrand } from "@/components/ui/header-brand";
 import { BrandLogo } from "@/components/ui/brand-assets";
 
+function chromeHidden(pathname: string | null) {
+  return Boolean(
+    pathname &&
+      ["/onboarding", "/dashboard"].some(
+        (route) => pathname === route || pathname.startsWith(`${route}/`),
+      ),
+  );
+}
+
 export function AppHeader() {
+  const pathname = usePathname();
+
+  if (chromeHidden(pathname)) {
+    return null;
+  }
+
   return (
     <header className="sticky top-0 z-40 border-b border-[#234331]/10 bg-[#f6f2e9]/86 shadow-[0_10px_32px_rgba(25,35,29,0.08)] backdrop-blur-xl">
       <div className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between px-3 sm:h-16 sm:px-6 lg:px-8">
@@ -49,6 +67,12 @@ export function AppHeader() {
 }
 
 export function AppFooter() {
+  const pathname = usePathname();
+
+  if (chromeHidden(pathname)) {
+    return null;
+  }
+
   return (
     <footer className="border-t border-[#234331]/10 bg-[#171f1a] text-stone-200">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 text-sm sm:px-6 md:grid-cols-[1.3fr_1fr_1fr] lg:px-8">
