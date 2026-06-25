@@ -78,17 +78,23 @@ export const metadata: Metadata = {
     email: false,
   },
   icons: {
-    shortcut: ["/favicon.ico"],
-    icon: [
-      {
-        url: "/favicon.ico",
-        type: "image/x-icon",
-        sizes: "16x16 32x32",
-      },
+    shortcut: [
       {
         url: "/Favicon.png",
         type: "image/png",
         sizes: "512x512",
+      },
+    ],
+    icon: [
+      {
+        url: "/Favicon.png",
+        type: "image/png",
+        sizes: "512x512",
+      },
+      {
+        url: "/favicon.ico",
+        type: "image/x-icon",
+        sizes: "16x16 32x32 48x48 64x64 128x128 256x256",
       },
     ],
     apple: [
