@@ -14,6 +14,13 @@ export type GuideFaq = {
   answer: string;
 };
 
+export type GuideImage = {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+};
+
 export type GuidePost = {
   slug: string;
   category: string;
@@ -26,6 +33,7 @@ export type GuidePost = {
   readingMinutes: number;
   primaryKeyword: string;
   secondaryKeywords: string[];
+  image?: GuideImage;
   takeaways: string[];
   sections: GuideSection[];
   faq: GuideFaq[];
@@ -69,6 +77,330 @@ export const guideCategories: GuideCategory[] = [
 ];
 
 const guidePostDrafts: GuidePost[] = [
+  {
+    slug: "hunting-lease-near-me-landowner-guide",
+    category: "listing-optimization",
+    title: "Hunting Lease Near Me: Landowner SEO Guide",
+    seoTitle: "Hunting Lease Near Me | Landowner SEO Listing Guide",
+    description:
+      "Learn how landowners can capture hunting lease near me searches with privacy-safe location context, local habitat details, photos, rules, and request-first access.",
+    excerpt:
+      "Near-me search intent is local, practical, and high value, but landowners can answer it without publishing exact gates or private addresses.",
+    publishedAt: "2026-06-25",
+    updatedAt: "2026-06-25",
+    readingMinutes: 12,
+    primaryKeyword: "hunting lease near me",
+    secondaryKeywords: [
+      "hunting leases near me",
+      "private hunting land near me",
+      "local hunting lease",
+    ],
+    image: {
+      src: "/images/guides/hunting-lease-near-me-landowner-guide.jpg",
+      alt: "Private farm road between woods and fields for a local hunting lease guide",
+      width: 1672,
+      height: 941,
+    },
+    takeaways: [
+      "Near-me hunting lease pages should use useful local context, not exact private access details.",
+      "Searchers want to understand broad location, habitat, species, dates, rules, and how to request access.",
+      "Landowners can use nearest town, county-level context, state, region, and habitat language to support local SEO.",
+      "The best local pages move qualified hunters into a request before maps, gates, and final terms are shared.",
+    ],
+    sections: [
+      {
+        heading: "Understand near-me search intent",
+        body: [
+          "A hunter searching for hunting lease near me is usually trying to find local private land access that can be evaluated quickly. They want to know whether the property is close enough, whether the species fit their goal, and whether the owner appears organized.",
+          "That search intent is different from a broad educational article. The page should answer practical questions about general location, habitat, lease type, rules, access quality, and the request process.",
+          "Landowners should not treat near-me intent as permission to expose exact property details. The page can be locally useful while still protecting private gates, addresses, and route instructions.",
+        ],
+      },
+      {
+        heading: "Use location signals safely",
+        body: [
+          "Strong local SEO can come from nearest town, state, county-level context, habitat region, road-access quality, and nearby travel context. Those signals help search engines and hunters understand where the opportunity fits.",
+          "Exact driveway names, gate codes, home addresses, parcel screenshots, and sensitive boundary descriptions should stay out of public copy.",
+          "A safe local listing might say private whitetail and turkey access near a named town, then keep precise maps and arrival instructions gated until the owner approves a hunter.",
+        ],
+      },
+      {
+        heading: "Describe local habitat in plain language",
+        body: [
+          "Near-me searches convert better when the page feels grounded in real land. Mention timber, creek bottoms, crop edges, pasture, marsh, brush, ridges, field corners, ponds, or bedding cover when those features are true.",
+          "Habitat language helps search engines understand the page and helps hunters decide whether the property is worth a request.",
+          "The goal is not to overpromise. It is to explain why the land is huntable in the local area and which species or access styles make sense.",
+        ],
+      },
+      {
+        heading: "Make rules visible before the request",
+        body: [
+          "Local hunters may assume they know the area, but they still need owner-specific rules. Guests, vehicles, stands, cameras, dogs, check-in, parking, and excluded areas should be clear before a request becomes serious.",
+          "Rules are part of local SEO because they create useful, unique content. They also filter out hunters who would not be a good fit.",
+          "A landowner can publish the basic fit rules while saving exact parking pins, private routes, and final map notes for approved hunters.",
+        ],
+      },
+      {
+        heading: "Use photos that prove the local opportunity",
+        body: [
+          "Photos help a near-me page feel real. Useful images show habitat, field edges, woods, water, roads, blinds if approved, or general terrain.",
+          "Avoid photos that reveal sensitive owner details such as house fronts, gate codes, private road signs, equipment yards, license plates, or exact access points.",
+          "A privacy-safe set of photos can earn trust without turning a local search result into an open invitation to visit the property unapproved.",
+        ],
+      },
+      {
+        heading: "Turn local discovery into owner-approved access",
+        body: [
+          "The page should not only rank for hunting lease near me. It should tell hunters what to do next: read the rules, choose desired dates, name the target species, explain party size, and send a request.",
+          "That request gives the owner room to review fit before exact maps, documents, signatures, payment, or private access instructions are shared.",
+          "This is the useful balance for local SEO: enough public detail to be found and trusted, enough workflow control to protect the land.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "How can a hunting lease page rank for near-me searches?",
+        answer:
+          "Use nearest town, state, regional habitat, species, lease type, rules, photos, and request steps while keeping exact addresses, gates, and private routes gated until approval.",
+      },
+      {
+        question: "Should landowners publish the exact address for local SEO?",
+        answer:
+          "Usually no. Local context can be strong without exposing the exact address. Use broad location signals publicly and save exact directions for approved hunters.",
+      },
+      {
+        question: "What should hunters see on a local hunting lease page?",
+        answer:
+          "They should see broad location, habitat, species, lease structure, rules, price context if available, photos, amenities, and a clear request process.",
+      },
+      {
+        question: "Can small properties compete in local hunting lease searches?",
+        answer:
+          "Yes. A smaller property can be attractive when the page explains realistic species opportunity, pressure limits, safe access, and owner-controlled rules clearly.",
+      },
+    ],
+    ctaTitle: "Capture local search without publishing the whole map.",
+    ctaBody:
+      "Huntfields helps landowners create local SEO-friendly hunting lease listings while keeping exact access, gates, and final maps approval-gated.",
+    ctaLabel: "List local hunting access",
+    ctaHref: "/list-your-land",
+  },
+  {
+    slug: "day-hunting-lease-landowner-guide",
+    category: "pricing-and-terms",
+    title: "Day Hunting Lease Guide for Landowners",
+    seoTitle: "Day Hunting Lease Guide | Landowner Pricing & Rules",
+    description:
+      "Learn how landowners can structure day hunting leases with clear dates, pricing units, check-in rules, parking, safety expectations, and request screening.",
+    excerpt:
+      "Day leases can create flexible income and lower commitment, but they need precise access windows, rules, pricing, and owner-approved requests.",
+    publishedAt: "2026-06-25",
+    updatedAt: "2026-06-25",
+    readingMinutes: 12,
+    primaryKeyword: "day hunting lease",
+    secondaryKeywords: [
+      "daily hunting lease",
+      "one day hunting lease",
+      "short term hunting lease",
+    ],
+    image: {
+      src: "/images/guides/day-hunting-lease-landowner-guide.jpg",
+      alt: "Gravel parking pull-off and field gate for a day hunting lease guide",
+      width: 1672,
+      height: 941,
+    },
+    takeaways: [
+      "Day hunting leases should define the exact date, arrival window, departure time, species, methods, and party size.",
+      "Short access does not mean casual access; roads, parking, guests, and safety still need clear rules.",
+      "Pricing should reflect the day, species, pressure, owner workload, amenities, and whether access is exclusive.",
+      "A request-first workflow helps owners approve the right hunter before sharing exact arrival instructions.",
+    ],
+    sections: [
+      {
+        heading: "Define the day before pricing it",
+        body: [
+          "A day hunting lease needs more precision than a seasonal listing because the whole value is tied to one short window. Landowners should define the date, arrival time, departure time, target species, allowed methods, scouting access, and whether the day is exclusive.",
+          "If the hunter may arrive before daylight, stay through evening, or return for recovery, those expectations should be clear before approval.",
+          "The listing should make the day feel organized rather than informal permission.",
+        ],
+      },
+      {
+        heading: "Choose the right pricing unit",
+        body: [
+          "Daily access can be priced per hunter, per party, per blind, per field, per species, or as a custom request. The billing unit matters because a single hunter and a group of four create different pressure and owner workload.",
+          "A public starting price can help filter serious hunters, but final terms may still change based on party size, dates, exclusivity, amenities, and special rules.",
+          "The price should explain what is included so hunters do not assume camping, extra guests, scouting days, or additional species are part of a one-day fee.",
+        ],
+      },
+      {
+        heading: "Make check-in and check-out simple",
+        body: [
+          "Day access works best when hunters know exactly how to check in, where to park, when to leave, and how to confirm they are off the property.",
+          "Public listings can describe the general process, while exact gates, parking pins, contact details, and emergency instructions stay private until approval.",
+          "A simple check-in rule protects owner time and helps prevent uncertainty during early morning or late evening access.",
+        ],
+      },
+      {
+        heading: "Control pressure even for one day",
+        body: [
+          "One day of access can still disrupt a property if party size, vehicles, dogs, guests, stands, or scouting are not controlled. Short-term does not mean unlimited.",
+          "Landowners should define whether the day is exclusive, whether other people may use the land, and which zones are open or closed.",
+          "Pressure rules are especially important for deer, turkey, waterfowl, and small acreage where one bad fit can affect future opportunities.",
+        ],
+      },
+      {
+        heading: "Plan for weather and unsafe access",
+        body: [
+          "Daily leases are sensitive to weather. Wet roads, flooding, snow, fire danger, high winds, or owner operations can make access unsafe or damaging.",
+          "The cancellation or rescheduling policy should explain what happens if the owner must close access or the hunter cannot use the date.",
+          "These rules should be visible before payment or final signatures so neither side has to invent a policy under pressure.",
+        ],
+      },
+      {
+        heading: "Screen before sharing exact directions",
+        body: [
+          "A day lease may move quickly, but the owner should still review dates, party size, method, experience, vehicle needs, and rule fit before final access is released.",
+          "Once the request is approved, the workflow can share exact arrival instructions, map notes, emergency expectations, payment status, and final terms.",
+          "This keeps day access convenient without turning the property into unmanaged open access.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "What is a day hunting lease?",
+        answer:
+          "A day hunting lease gives an approved hunter or party access for a specific date and defined access window, usually with species, method, parking, guest, and safety rules.",
+      },
+      {
+        question: "How should landowners price a day hunting lease?",
+        answer:
+          "Consider species, habitat, access quality, party size, exclusivity, amenities, demand, season timing, and owner workload before choosing a daily price or custom quote.",
+      },
+      {
+        question: "Should day lease directions be public?",
+        answer:
+          "No. General access quality can be public, but exact gates, parking points, routes, and emergency contacts should usually wait until the hunter is approved.",
+      },
+      {
+        question: "Can day leases become seasonal leases later?",
+        answer:
+          "Yes. A good day lease can help the owner evaluate hunter fit before offering longer seasonal or annual access with updated terms.",
+      },
+    ],
+    ctaTitle: "Offer short-term access without losing control.",
+    ctaBody:
+      "Huntfields helps landowners define day lease pricing, dates, rules, request questions, maps, and final terms before access becomes active.",
+    ctaLabel: "Create day lease terms",
+    ctaHref: "/list-your-land",
+  },
+  {
+    slug: "hunting-lease-screening-questions-guide",
+    category: "requests-and-screening",
+    title: "Hunting Lease Screening Questions Landowners Should Ask",
+    seoTitle: "Hunting Lease Screening Questions | Landowner Guide",
+    description:
+      "Use these hunting lease screening questions to review hunter requests, clarify dates, party size, methods, guest rules, documents, and property fit before approval.",
+    excerpt:
+      "Good screening questions help landowners separate serious, rule-aware hunters from vague requests before private access details are shared.",
+    publishedAt: "2026-06-25",
+    updatedAt: "2026-06-25",
+    readingMinutes: 12,
+    primaryKeyword: "hunting lease screening questions",
+    secondaryKeywords: [
+      "hunter screening questions",
+      "hunting lease request questions",
+      "screen hunters for hunting lease",
+    ],
+    image: {
+      src: "/images/guides/hunting-lease-screening-questions-guide.jpg",
+      alt: "Landowner desk with property map and blank checklist for screening hunting lease requests",
+      width: 1672,
+      height: 941,
+    },
+    takeaways: [
+      "Screening questions should confirm dates, species, method, party size, experience, rule fit, and access expectations.",
+      "The first request should stay easy while final documents, maps, payment, and signatures remain gated.",
+      "Questions should be specific enough to protect the property but simple enough that good hunters can answer them quickly.",
+      "Answers should carry into final terms so chat promises do not disappear when access becomes active.",
+    ],
+    sections: [
+      {
+        heading: "Start with the hunter's plan",
+        body: [
+          "The first screening question should clarify what the hunter actually wants to do. Ask for preferred dates, target species, hunting method, party size, and whether the request is for day, seasonal, annual, or custom access.",
+          "A vague message such as interested in your land does not give the owner enough to approve access. A clear plan makes the next step easier for both sides.",
+          "This does not need to feel harsh. Simple practical questions help serious hunters explain fit.",
+        ],
+      },
+      {
+        heading: "Ask who will be on the property",
+        body: [
+          "Landowners should know whether the request includes one hunter, a hunting party, youth hunters, non-hunting companions, guides, dog handlers, or guests.",
+          "Party size affects pressure, parking, safety, price, documents, and final agreement language.",
+          "If every guest must be named or approved, that expectation should be visible before final maps and access instructions are shared.",
+        ],
+      },
+      {
+        heading: "Confirm methods and equipment",
+        body: [
+          "Allowed methods should be confirmed before approval. Ask whether the hunter plans to use firearms, archery equipment, dogs, blinds, stands, cameras, vehicles, decoys, calls, or other equipment relevant to the lease.",
+          "The owner can then compare the plan against property rules, safety expectations, local requirements, and owner comfort.",
+          "This prevents a hunter from assuming that one type of access allows every method or tool.",
+        ],
+      },
+      {
+        heading: "Screen for rule fit",
+        body: [
+          "A useful request should ask the hunter to confirm that they read and accept the core rules: guests, vehicles, gates, check-in, alcohol, dogs, stands, cameras, closed areas, and emergency expectations.",
+          "The goal is not to trap the hunter. It is to make expectations visible before private access becomes active.",
+          "When a hunter pushes back on basic rules during screening, the owner has useful information before sharing exact details.",
+        ],
+      },
+      {
+        heading: "Save documents for the right stage",
+        body: [
+          "Some leases may require identity checks, hunter education proof, insurance documents, licenses, waivers, property-specific forms, or party details. Not every document belongs in the first message.",
+          "A staged workflow can collect initial intent first, then request documents when the owner is ready to move toward final terms.",
+          "This keeps discovery approachable while protecting maps, signatures, payment, and active access behind the right gates.",
+        ],
+      },
+      {
+        heading: "Carry answers into final terms",
+        body: [
+          "Screening is only useful if important answers become part of the agreement. Dates, species, methods, guests, price, vehicle rules, map zones, and special owner notes should not remain buried in chat.",
+          "Before approval, the owner should review whether final terms match the request answers.",
+          "That continuity makes the lease easier to enforce and gives hunters a clearer understanding of what has actually been approved.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "What questions should landowners ask hunters before approval?",
+        answer:
+          "Ask for desired dates, target species, method, party size, guests, equipment plans, vehicle needs, experience level, rule confirmation, and any required document readiness.",
+      },
+      {
+        question: "Should hunters upload documents before the first request?",
+        answer:
+          "Not always. Many workflows can start with simple request questions, then collect documents before final maps, signatures, payment, and active access.",
+      },
+      {
+        question: "How many screening questions are too many?",
+        answer:
+          "Ask only what helps the owner decide fit at that stage. Early requests should be focused; final approval can require more detailed documents and terms.",
+      },
+      {
+        question: "What is a red flag in a hunter request?",
+        answer:
+          "Red flags include vague dates, unclear party size, ignoring rules, asking for exact access too early, pressure for instant approval, or plans that conflict with the property rules.",
+      },
+    ],
+    ctaTitle: "Ask better questions before private access is shared.",
+    ctaBody:
+      "Huntfields helps landowners collect useful request details, review hunter fit, protect maps, and move approved hunters into final lease terms.",
+    ctaLabel: "Screen hunter requests",
+    ctaHref: "/list-your-land",
+  },
   {
     slug: "hunter-verification-hunting-lease-guide",
     category: "requests-and-screening",

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, Clock, Layers3 } from "lucide-react";
@@ -116,29 +117,41 @@ export default async function GuideCategoryPage({
           {posts.map((post) => (
             <article
               key={post.slug}
-              className="flex min-w-0 flex-col rounded-lg border border-[#234331]/10 bg-[#fffdf7] p-5 shadow-[0_18px_48px_rgba(25,35,29,0.07)]"
+              className="flex min-w-0 flex-col overflow-hidden rounded-lg border border-[#234331]/10 bg-[#fffdf7] shadow-[0_18px_48px_rgba(25,35,29,0.07)]"
             >
-              <div className="flex flex-wrap items-center gap-2 text-xs font-black uppercase tracking-[0.12em] text-[#c76b2f]">
-                <span>{category.name}</span>
-                <span className="text-stone-300">/</span>
-                <span className="inline-flex items-center gap-1 text-stone-500">
-                  <Clock size={13} aria-hidden="true" />
-                  {post.readingMinutes} min
-                </span>
+              {post.image ? (
+                <Image
+                  src={post.image.src}
+                  alt={post.image.alt}
+                  width={post.image.width}
+                  height={post.image.height}
+                  sizes="(min-width: 1024px) 33vw, 100vw"
+                  className="aspect-[16/9] h-auto w-full object-cover"
+                />
+              ) : null}
+              <div className="flex grow flex-col p-5">
+                <div className="flex flex-wrap items-center gap-2 text-xs font-black uppercase tracking-[0.12em] text-[#c76b2f]">
+                  <span>{category.name}</span>
+                  <span className="text-stone-300">/</span>
+                  <span className="inline-flex items-center gap-1 text-stone-500">
+                    <Clock size={13} aria-hidden="true" />
+                    {post.readingMinutes} min
+                  </span>
+                </div>
+                <h2 className="mt-3 text-2xl font-black leading-tight text-stone-950">
+                  <Link href={`/guides/${post.slug}`}>{post.title}</Link>
+                </h2>
+                <p className="mt-3 grow text-sm leading-7 text-stone-600">
+                  {post.excerpt}
+                </p>
+                <Link
+                  href={`/guides/${post.slug}`}
+                  className="mt-5 inline-flex min-h-10 items-center gap-2 rounded-md border border-[#234331]/12 px-3 text-sm font-black text-[#183326] transition hover:bg-[#eef3ec]"
+                >
+                  Read guide
+                  <ArrowRight size={15} aria-hidden="true" />
+                </Link>
               </div>
-              <h2 className="mt-3 text-2xl font-black leading-tight text-stone-950">
-                <Link href={`/guides/${post.slug}`}>{post.title}</Link>
-              </h2>
-              <p className="mt-3 grow text-sm leading-7 text-stone-600">
-                {post.excerpt}
-              </p>
-              <Link
-                href={`/guides/${post.slug}`}
-                className="mt-5 inline-flex min-h-10 items-center gap-2 rounded-md border border-[#234331]/12 px-3 text-sm font-black text-[#183326] transition hover:bg-[#eef3ec]"
-              >
-                Read guide
-                <ArrowRight size={15} aria-hidden="true" />
-              </Link>
             </article>
           ))}
         </div>

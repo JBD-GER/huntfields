@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -47,6 +48,10 @@ export async function generateMetadata({
     title: post.seoTitle,
     description: post.description,
     path: `/guides/${post.slug}`,
+    image: post.image?.src,
+    imageAlt: post.image?.alt,
+    imageWidth: post.image?.width,
+    imageHeight: post.image?.height,
   });
 
   return {
@@ -88,7 +93,9 @@ export default async function GuidePostPage({ params }: { params: Params }) {
       "@type": "BlogPosting",
       headline: post.title,
       description: post.description,
-      image: absoluteUrl("/opengraph-image"),
+      image: post.image
+        ? absoluteUrl(post.image.src)
+        : absoluteUrl("/opengraph-image"),
       inLanguage: "en-US",
       datePublished: post.publishedAt,
       dateModified: post.updatedAt,
@@ -184,6 +191,22 @@ export default async function GuidePostPage({ params }: { params: Params }) {
             </p>
           </div>
         </header>
+
+        {post.image ? (
+          <div className="mx-auto max-w-6xl px-3 pt-8 sm:px-6 sm:pt-10 lg:px-8">
+            <div className="overflow-hidden rounded-lg border border-[#234331]/10 bg-[#f7f3ea] shadow-[0_24px_70px_rgba(25,35,29,0.12)]">
+              <Image
+                src={post.image.src}
+                alt={post.image.alt}
+                width={post.image.width}
+                height={post.image.height}
+                priority
+                sizes="(min-width: 1280px) 1152px, calc(100vw - 24px)"
+                className="aspect-[16/9] h-auto w-full object-cover"
+              />
+            </div>
+          </div>
+        ) : null}
 
         <div className="mx-auto grid max-w-6xl gap-8 px-3 py-8 sm:px-6 sm:py-12 lg:grid-cols-[minmax(0,0.72fr)_minmax(280px,0.28fr)] lg:px-8">
           <div className="min-w-0">

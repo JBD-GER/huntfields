@@ -34,16 +34,23 @@ export function pageMetadata({
   description,
   path,
   image,
+  imageAlt,
+  imageWidth = 1200,
+  imageHeight = 630,
   index = true,
 }: {
   title: string;
   description: string;
   path: string;
   image?: string;
+  imageAlt?: string;
+  imageWidth?: number;
+  imageHeight?: number;
   index?: boolean;
 }): Metadata {
   const url = absoluteUrl(path);
   const imageUrl = image ? absoluteUrl(image) : absoluteUrl(site.defaultImage);
+  const resolvedImageAlt = imageAlt ?? `${site.name} hunting lease marketplace`;
 
   return {
     title,
@@ -73,9 +80,9 @@ export function pageMetadata({
       images: [
         {
           url: imageUrl,
-          width: 1200,
-          height: 630,
-          alt: `${site.name} hunting lease marketplace`,
+          width: imageWidth,
+          height: imageHeight,
+          alt: resolvedImageAlt,
         },
       ],
     },
