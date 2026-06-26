@@ -100,7 +100,7 @@ export default async function LoginPage({
                     ? "Old local auth cookies were cleared. Please sign in again."
                   : null
               }
-              initialMode={params.mode === "register" ? "register" : "login"}
+              initialMode={params.mode === "login" ? "login" : "register"}
               nextPath={next}
             />
           </div>
