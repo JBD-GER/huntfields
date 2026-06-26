@@ -82,10 +82,6 @@ export function AppFooter() {
             Privacy-first hunting access marketplace infrastructure for
             landowners, hunters, outfitters, and regional lease discovery.
           </p>
-          <p className="mt-5 max-w-sm text-xs leading-5 text-stone-500">
-            Operated by Flaaq Holding GmbH, Großer Kamp 5a, 31633 Leese,
-            Germany.
-          </p>
         </div>
         <div>
           <p className="font-bold text-white">Marketplace</p>
