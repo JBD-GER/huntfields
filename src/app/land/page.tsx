@@ -68,12 +68,20 @@ export default async function LandSearchPage({
   const lng = cleanNumber(stringParam(params.lng));
   const radius = stringParam(params.radius) ?? "statewide";
   const country = stringParam(params.country)?.toUpperCase() || "US";
-  const state = getUsLaunchState(stringParam(params.state) ?? "TX");
+  const stateParam = stringParam(params.state);
+  const state =
+    stateParam && stateParam.toLowerCase() !== "all"
+      ? getUsLaunchState(stateParam)
+      : null;
   const listingType = stringParam(params.type);
   const minAreaValue = stringParam(params.min_area);
   const minArea = cleanNumber(minAreaValue);
-  const searchLat = lat ?? state.lat;
-  const searchLng = lng ?? state.lng;
+  const hasCoordinates = lat !== null && lng !== null;
+  const searchLat = hasCoordinates ? lat : state?.lat;
+  const searchLng = hasCoordinates ? lng : state?.lng;
+  const shouldSearchByRadius =
+    radius !== "statewide" && searchLat !== undefined && searchLng !== undefined;
+  const effectiveRadius = shouldSearchByRadius ? radius : "statewide";
   const listingTypes = listingType ? [listingType] : undefined;
   const supabase = await createSupabaseServerClient();
   const {
@@ -84,19 +92,19 @@ export default async function LandSearchPage({
   const viewerCanSeeDetails = Boolean(user);
 
   const listings =
-    radius === "statewide"
-      ? await searchListingsByRegion({
+    shouldSearchByRadius
+      ? await searchListingsByRadius({
           countryCode: country,
-          adminAreaCode: country === "US" ? state.code : null,
+          lat: searchLat!,
+          lng: searchLng!,
+          radiusMeters: cleanNumber(radius) ?? 160934,
           listingTypes,
           minAreaAcres: minArea,
           limit: pageSize,
         })
-      : await searchListingsByRadius({
+      : await searchListingsByRegion({
           countryCode: country,
-          lat: searchLat,
-          lng: searchLng,
-          radiusMeters: cleanNumber(radius) ?? 160934,
+          adminAreaCode: country === "US" ? state?.code ?? null : null,
           listingTypes,
           minAreaAcres: minArea,
           limit: pageSize,
@@ -107,7 +115,7 @@ export default async function LandSearchPage({
     (region) => region.country_code === "US" && region.admin_area_code,
   );
   const activeRegion = stateRegions.find(
-    (region) => region.admin_area_code === state.code,
+    (region) => region.admin_area_code === state?.code,
   );
 
   const jsonLd = {
@@ -195,12 +203,12 @@ export default async function LandSearchPage({
         <section className="-mt-12 mb-6 rounded-lg border border-[#234331]/10 bg-[#fffdf7]/96 p-3 shadow-[0_24px_70px_rgba(25,35,29,0.13)] backdrop-blur sm:p-4">
           <div className="mb-3 flex items-center gap-2 px-1 text-sm font-black text-stone-950">
             <SlidersHorizontal size={17} aria-hidden="true" />
-            Start with state, distance, and acreage
+            Start with all states, then narrow by distance and acreage
           </div>
           <LeaseFilterForm
             defaults={{
-              state: state.code,
-              radius,
+              state: state?.code ?? "all",
+              radius: effectiveRadius,
               minArea: minAreaValue ?? "",
             }}
           />
@@ -209,8 +217,8 @@ export default async function LandSearchPage({
         <section className="mb-6 grid gap-3 sm:grid-cols-3">
           {[
             [listings.data.length.toLocaleString(), "shown now"],
-            [state.label, "selected state"],
-            [radiusLabel(radius), "search range"],
+            [state?.label ?? "All states", "selected state"],
+            [state ? radiusLabel(effectiveRadius) : "all states", "search range"],
           ].map(([value, label]) => (
             <div
               key={label}
@@ -241,8 +249,8 @@ export default async function LandSearchPage({
                 Search setup
               </p>
               <div className="mt-3 grid gap-2 text-sm font-bold text-stone-700">
-                <p>{state.label} hunting leases</p>
-                <p>{radiusLabel(radius)} range</p>
+                <p>{state ? `${state.label} hunting leases` : "All hunting leases"}</p>
+                <p>{state ? `${radiusLabel(effectiveRadius)} range` : "All states"}</p>
                 <p>{minArea ? `${minArea.toLocaleString()}+ acres` : "Any acreage"}</p>
               </div>
             </div>
@@ -267,8 +275,8 @@ export default async function LandSearchPage({
                 viewerCanSeeDetails={viewerCanSeeDetails}
                 searchQuery={{
                   country,
-                  state: state.code,
-                  radius,
+                  state: state?.code,
+                  radius: effectiveRadius,
                   type: listingType,
                   min_area: minAreaValue,
                   lat: lat ? String(lat) : undefined,
@@ -284,11 +292,11 @@ export default async function LandSearchPage({
                     Map view
                   </p>
                   <h2 className="mt-1 text-xl font-black text-stone-950">
-                    General lease areas in {state.label}
+                    General lease areas {state ? `in ${state.label}` : "across all states"}
                   </h2>
                 </div>
                 <p className="text-xs font-semibold text-stone-500">
-                  Filter by state first, then tighten by radius.
+                  Start broad, then choose a state or radius.
                 </p>
               </div>
               <LazyListingMap

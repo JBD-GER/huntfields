@@ -7,7 +7,7 @@ import type { ListingCard } from "@/lib/data/listings";
 
 type SearchQuery = {
   country: string;
-  state: string;
+  state?: string;
   radius: string;
   type?: string;
   min_area?: string;

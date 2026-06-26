@@ -15,7 +15,11 @@ function numberParam(value: string | null) {
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const country = url.searchParams.get("country")?.toUpperCase() || "US";
-  const state = getUsLaunchState(url.searchParams.get("state") ?? "TX");
+  const stateParam = url.searchParams.get("state");
+  const state =
+    stateParam && stateParam.toLowerCase() !== "all"
+      ? getUsLaunchState(stateParam)
+      : null;
   const radius = url.searchParams.get("radius") ?? "statewide";
   const listingType = url.searchParams.get("type");
   const minArea = numberParam(url.searchParams.get("min_area"));
@@ -27,22 +31,27 @@ export async function GET(request: Request) {
     pageSizeCap,
   );
   const listingTypes = listingType ? [listingType] : undefined;
+  const hasCoordinates = lat !== null && lng !== null;
+  const searchLat = hasCoordinates ? lat : state?.lat;
+  const searchLng = hasCoordinates ? lng : state?.lng;
+  const shouldSearchByRadius =
+    radius !== "statewide" && searchLat !== undefined && searchLng !== undefined;
 
   const result =
-    radius === "statewide"
-      ? await searchListingsByRegion({
+    shouldSearchByRadius
+      ? await searchListingsByRadius({
           countryCode: country,
-          adminAreaCode: country === "US" ? state.code : null,
+          lat: searchLat!,
+          lng: searchLng!,
+          radiusMeters: numberParam(radius) ?? 160934,
           listingTypes,
           minAreaAcres: minArea,
           limit,
           offset,
         })
-      : await searchListingsByRadius({
+      : await searchListingsByRegion({
           countryCode: country,
-          lat: lat ?? state.lat,
-          lng: lng ?? state.lng,
-          radiusMeters: numberParam(radius) ?? 160934,
+          adminAreaCode: country === "US" ? state?.code ?? null : null,
           listingTypes,
           minAreaAcres: minArea,
           limit,

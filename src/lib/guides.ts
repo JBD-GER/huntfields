@@ -78,6 +78,330 @@ export const guideCategories: GuideCategory[] = [
 
 const guidePostDrafts: GuidePost[] = [
   {
+    slug: "hunting-land-for-lease-by-owner-guide",
+    category: "listing-optimization",
+    title: "Hunting Land for Lease by Owner: Landowner Listing Guide",
+    seoTitle: "Hunting Land for Lease by Owner | Landowner SEO Guide",
+    description:
+      "Learn how landowners can list hunting land for lease by owner with privacy-safe location details, habitat photos, clear rules, pricing context, and request-first approval.",
+    excerpt:
+      "By-owner hunting lease pages work best when they feel direct and trustworthy without exposing exact gates, routes, homes, or private boundaries.",
+    publishedAt: "2026-06-26",
+    updatedAt: "2026-06-26",
+    readingMinutes: 13,
+    primaryKeyword: "hunting land for lease by owner",
+    secondaryKeywords: [
+      "lease hunting land by owner",
+      "private hunting land by owner",
+      "owner listed hunting lease",
+    ],
+    image: {
+      src: "/images/guides/hunting-land-for-lease-by-owner-guide.jpg",
+      alt: "Private field edge with notebook and camera for an owner-listed hunting lease guide",
+      width: 1672,
+      height: 941,
+    },
+    takeaways: [
+      "By-owner hunting lease listings should communicate direct owner control without publishing sensitive property details.",
+      "Useful public details include broad location, habitat, species, rules, amenities, price structure, and request steps.",
+      "Photos should prove the land is real while avoiding addresses, gate codes, equipment yards, and exact access points.",
+      "The best by-owner workflow moves from public discovery to request review, private maps, final terms, and approved access.",
+    ],
+    sections: [
+      {
+        heading: "Start with the owner's direct offer",
+        body: [
+          "A hunting land for lease by owner page should make the ownership relationship clear: the hunter is reviewing access offered by the landowner or an authorized manager, not an anonymous classified post.",
+          "That directness can build trust when the listing explains what the owner is offering, what the owner controls, and how a hunter should request access.",
+          "The page should still avoid oversharing. Direct by-owner marketing does not mean public gate details, exact route instructions, or private owner documents belong on the open web.",
+        ],
+      },
+      {
+        heading: "Use location context without exposing the address",
+        body: [
+          "Searchers want to know whether the land is close enough and whether the region fits their hunt. Nearest town, state, county-level context, habitat region, and approximate acreage can answer that question safely.",
+          "Exact addresses, driveway names, gate combinations, home locations, private road signs, and parcel screenshots should stay out of public content.",
+          "A privacy-safe by-owner page gives enough local context for search and hunter evaluation while keeping operational access inside the approval workflow.",
+        ],
+      },
+      {
+        heading: "Show habitat and owner rules together",
+        body: [
+          "Habitat makes the listing attractive, but rules make it usable. A strong page explains timber, fields, water, brush, crop edges, pasture, trails, or wetlands alongside allowed methods, guests, vehicles, check-in, dogs, and closed areas.",
+          "By-owner listings often perform better when they sound like a real owner explaining real expectations.",
+          "Clear rules also reduce low-quality messages because hunters can decide whether the property fits before asking for private details.",
+        ],
+      },
+      {
+        heading: "Add photos that prove the opportunity",
+        body: [
+          "Photos are especially important for by-owner pages because they help hunters trust that the lease is real. Good photos show habitat, terrain, water, roads, field edges, blinds if approved, and general access quality.",
+          "Avoid photos that reveal gate codes, house fronts, vehicle plates, equipment, exact stand locations, or anything that could invite unapproved visits.",
+          "A few honest habitat photos can support SEO and conversion better than a long claim about great hunting.",
+        ],
+      },
+      {
+        heading: "Make price and next steps plain",
+        body: [
+          "By-owner does not have to mean informal. The page should explain whether price is per day, weekend, season, year, hunter, party, or custom request.",
+          "If the owner wants to quote after reviewing dates and party size, say that directly instead of leaving hunters to guess.",
+          "The next step should be obvious: send a request with dates, target species, method, party size, and a short note before exact access is shared.",
+        ],
+      },
+      {
+        heading: "Move serious hunters into a controlled workflow",
+        body: [
+          "The public page should create confidence, but the agreement should happen in a controlled workflow. That is where the owner can review the hunter, clarify terms, request documents if needed, and share exact maps only after approval.",
+          "This protects the owner while still letting the listing rank for by-owner searches.",
+          "A professional by-owner process feels direct without becoming risky or loose.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "What should a hunting land for lease by owner page include?",
+        answer:
+          "Include broad location, approximate acreage, habitat, species, photos, rules, amenities, price structure, owner approval steps, and a clear request process while keeping exact access private.",
+      },
+      {
+        question: "Should by-owner hunting lease listings show the exact address?",
+        answer:
+          "Usually no. Nearest town, state, region, and habitat context are useful publicly, while exact gates, routes, and address details should wait until approval.",
+      },
+      {
+        question: "How can landowners make by-owner listings look trustworthy?",
+        answer:
+          "Use clear photos, realistic habitat descriptions, specific rules, transparent price units, owner-controlled request steps, and consistent final terms.",
+      },
+      {
+        question: "Can a manager list hunting land by owner?",
+        answer:
+          "A manager can list access when they have authority to do so, but authority proof should stay private and final access should wait until the required review is complete.",
+      },
+    ],
+    ctaTitle: "List hunting land directly without exposing private access.",
+    ctaBody:
+      "Huntfields helps landowners publish by-owner hunting lease listings, screen requests, protect exact maps, and move serious hunters toward final terms.",
+    ctaLabel: "List by owner",
+    ctaHref: "/list-your-land",
+  },
+  {
+    slug: "weekend-hunting-lease-guide",
+    category: "pricing-and-terms",
+    title: "Weekend Hunting Lease Guide for Landowners",
+    seoTitle: "Weekend Hunting Lease Guide | Pricing, Rules & Access",
+    description:
+      "Learn how landowners can offer weekend hunting leases with clear arrival windows, pricing units, parking, guest rules, weather policies, and owner-approved access.",
+    excerpt:
+      "Weekend hunting leases can be flexible and attractive, but they need tighter scheduling, pressure control, and access instructions than casual permission.",
+    publishedAt: "2026-06-26",
+    updatedAt: "2026-06-26",
+    readingMinutes: 13,
+    primaryKeyword: "weekend hunting lease",
+    secondaryKeywords: [
+      "weekend hunting land lease",
+      "short term hunting lease",
+      "weekend deer lease",
+    ],
+    image: {
+      src: "/images/guides/weekend-hunting-lease-guide.jpg",
+      alt: "Quiet gravel pull-off and field gate for a weekend hunting lease guide",
+      width: 1672,
+      height: 941,
+    },
+    takeaways: [
+      "Weekend leases should define exact dates, arrival time, departure time, species, methods, party size, and whether scouting is included.",
+      "Pricing can be per weekend, per hunter, per party, per blind, or custom after request review.",
+      "Short access still needs clear parking, gates, vehicles, check-in, weather, and safety rules.",
+      "A weekend lease can help owners test hunter fit before offering longer seasonal or annual access.",
+    ],
+    sections: [
+      {
+        heading: "Define the weekend window",
+        body: [
+          "Weekend access sounds simple, but the details matter. Does the lease start Friday afternoon, Saturday morning, or sunrise on a specific date? Does it end Sunday evening, at dark, or at a fixed checkout time?",
+          "The listing should explain the access window before the hunter sends a serious request.",
+          "Clear dates and times prevent assumptions about scouting, early arrival, late departure, camping, and recovery access.",
+        ],
+      },
+      {
+        heading: "Price the access unit clearly",
+        body: [
+          "A weekend hunting lease can be priced per weekend, per hunter, per party, per blind, per field, or per species. Each model changes pressure and owner workload.",
+          "If the owner allows one hunter and one guest, the price may differ from a full party lease with multiple vehicles.",
+          "The price should state what is included so hunters do not assume lodging, camping, extra species, or additional weekends are part of the offer.",
+        ],
+      },
+      {
+        heading: "Control pressure over two or three days",
+        body: [
+          "Weekend access can create concentrated pressure. Multiple hunters, vehicles, scouting walks, camera checks, dogs, or guests can affect the property quickly.",
+          "Landowners should decide whether the weekend is exclusive, whether other groups may use separate zones, and whether any areas need rest.",
+          "Those rules should appear in the listing and carry into final terms.",
+        ],
+      },
+      {
+        heading: "Make arrival and parking private but precise",
+        body: [
+          "Approved weekend hunters need practical instructions: where to park, which gate to use, when to check in, what roads are open, and what to do if conditions change.",
+          "Those details should not be fully public. A listing can describe access quality while saving exact gates, routes, and emergency contacts for approved hunters.",
+          "Weekend hunts often start early, so clarity before arrival matters.",
+        ],
+      },
+      {
+        heading: "Plan weather and owner closures",
+        body: [
+          "Weekend leases are vulnerable to weather because there is not much room to recover lost access. Wet roads, flooding, ice, high wind, fire danger, crop work, or livestock movement can change plans quickly.",
+          "A useful policy explains whether the owner can close access, whether rescheduling is possible, and how refunds or credits are handled if payment is involved.",
+          "This should be visible before final approval so expectations are calm when weather is not.",
+        ],
+      },
+      {
+        heading: "Use weekends to evaluate fit",
+        body: [
+          "A weekend lease can be a practical trial before seasonal or annual access. The owner can evaluate communication, rule compliance, gate handling, cleanup, and respect for property boundaries.",
+          "A hunter who handles a weekend well may be a strong candidate for a longer relationship.",
+          "A hunter who ignores rules during a short lease is easier to decline before the land is committed for a full season.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "What should a weekend hunting lease include?",
+        answer:
+          "Include dates, arrival and departure windows, species, methods, party size, guests, parking, gates, vehicle rules, weather policy, price unit, and final request steps.",
+      },
+      {
+        question: "How should landowners price weekend hunting leases?",
+        answer:
+          "Consider species, demand, weekend timing, exclusivity, party size, habitat, amenities, access quality, and owner workload before setting a weekend price.",
+      },
+      {
+        question: "Should weekend access include scouting?",
+        answer:
+          "Only if the owner wants it to. Scouting days, camera checks, stand setup, and early arrival should be defined clearly.",
+      },
+      {
+        question: "Can weekend leases become annual leases?",
+        answer:
+          "Yes. Weekend access can help owners evaluate hunter fit before offering seasonal or annual terms with updated rules and pricing.",
+      },
+    ],
+    ctaTitle: "Offer weekend access with clear owner controls.",
+    ctaBody:
+      "Huntfields helps landowners define weekend dates, pricing, parking, rules, request review, and final terms before exact access is shared.",
+    ctaLabel: "Create weekend access",
+    ctaHref: "/list-your-land",
+  },
+  {
+    slug: "hunting-lease-request-message-guide",
+    category: "requests-and-screening",
+    title: "Hunting Lease Request Message Guide",
+    seoTitle: "Hunting Lease Request Message | What Hunters Should Send",
+    description:
+      "Learn what a hunting lease request message should include, from dates and species to party size, method, experience, rule fit, and follow-up questions.",
+    excerpt:
+      "A strong request message helps hunters look serious and gives landowners enough context to decide whether private access should move forward.",
+    publishedAt: "2026-06-26",
+    updatedAt: "2026-06-26",
+    readingMinutes: 13,
+    primaryKeyword: "hunting lease request message",
+    secondaryKeywords: [
+      "hunting lease request",
+      "message landowner for hunting lease",
+      "hunter request message",
+    ],
+    image: {
+      src: "/images/guides/hunting-lease-request-message-guide.jpg",
+      alt: "Desk with map and blurred request messages for a hunting lease request guide",
+      width: 1672,
+      height: 941,
+    },
+    takeaways: [
+      "A good request message should include dates, species, method, party size, experience, and confirmation that the hunter read the rules.",
+      "Hunters should ask practical questions without pressuring the owner for exact gates or private maps too early.",
+      "Landowners can use request messages to screen fit before documents, payment, signatures, and final access.",
+      "The best messages are short, specific, respectful, and easy for the owner to answer.",
+    ],
+    sections: [
+      {
+        heading: "Lead with the planned hunt",
+        body: [
+          "The first message should tell the owner what the hunter wants to do. Useful details include preferred dates, target species, hunting method, party size, and whether the request is for day, weekend, seasonal, or annual access.",
+          "A specific plan is easier to approve than a vague message asking whether the land is still available.",
+          "The hunter does not need to write an essay, but the message should give the owner enough context to respond intelligently.",
+        ],
+      },
+      {
+        heading: "Show that the rules were read",
+        body: [
+          "Landowners notice when a request matches the listing. If the listing says walk-in only, no guests, or owner-approved stands, the message should acknowledge that.",
+          "A simple line such as I read the vehicle and guest rules and can follow them helps the request feel serious.",
+          "This is especially important on private land where trust matters before exact access details are shared.",
+        ],
+      },
+      {
+        heading: "Explain who is coming",
+        body: [
+          "Party size is one of the most important request details. The owner needs to know whether the request includes one hunter, a party, youth hunters, non-hunting companions, dogs, or guests.",
+          "If the hunter expects to bring anyone else, the message should say so early.",
+          "Clear party details help the owner evaluate pressure, parking, safety, documents, and price.",
+        ],
+      },
+      {
+        heading: "Ask practical questions at the right time",
+        body: [
+          "Good request questions focus on fit: terrain, access difficulty, allowed methods, parking style, lodging availability, camping rules, dog policy, and whether the requested dates are realistic.",
+          "The first message should not demand exact gate codes, parcel boundaries, or private route details.",
+          "Those details belong later, after the owner approves the request and the workflow moves toward final terms.",
+        ],
+      },
+      {
+        heading: "Keep the tone respectful and direct",
+        body: [
+          "A request message is the first trust signal. Hunters should write clearly, avoid pressure, and make it easy for the owner to say yes, ask a follow-up, or decline.",
+          "Landowners are often evaluating communication style as much as dates and species.",
+          "A respectful message can separate a serious hunter from broad, copy-paste outreach.",
+        ],
+      },
+      {
+        heading: "Move from message to final terms",
+        body: [
+          "If the owner is interested, the request can move into chat, document review, map sharing, final terms, signatures, payment if needed, and approved access.",
+          "The original message should not be the final agreement. Important details should carry into structured terms before access starts.",
+          "That keeps both sides aligned and prevents casual chat from becoming unclear permission.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "What should hunters include in a hunting lease request message?",
+        answer:
+          "Include desired dates, target species, hunting method, party size, experience level, rule confirmation, and practical questions about access or fit.",
+      },
+      {
+        question: "Should hunters ask for exact gate locations in the first message?",
+        answer:
+          "No. Exact gates, maps, addresses, and routes should usually wait until the owner approves the request and final access steps are complete.",
+      },
+      {
+        question: "How long should a request message be?",
+        answer:
+          "A few specific sentences are usually enough. The message should be short, respectful, and complete enough for the owner to evaluate fit.",
+      },
+      {
+        question: "Can landowners decline vague request messages?",
+        answer:
+          "Yes. If a request lacks dates, species, party size, method, or rule fit, the owner can ask follow-up questions or decline before sharing private details.",
+      },
+    ],
+    ctaTitle: "Turn better messages into better lease decisions.",
+    ctaBody:
+      "Huntfields helps hunters send useful requests and helps landowners review fit before private maps, documents, and final access are shared.",
+    ctaLabel: "Review request workflow",
+    ctaHref: "/list-your-land",
+  },
+  {
     slug: "hunting-lease-near-me-landowner-guide",
     category: "listing-optimization",
     title: "Hunting Lease Near Me: Landowner SEO Guide",

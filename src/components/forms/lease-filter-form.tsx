@@ -41,9 +41,10 @@ export function LeaseFilterForm({
         State
         <select
           name="state"
-          defaultValue={defaults?.state ?? "TX"}
+          defaultValue={defaults?.state ?? "all"}
           className="min-h-10 rounded-md border border-[#234331]/15 bg-[#fbfaf6] px-3 text-sm font-bold normal-case tracking-normal text-stone-950 outline-none transition focus:border-[#234331] focus:ring-2 focus:ring-[#234331]/20 sm:min-h-12"
         >
+          <option value="all">All states</option>
           {usLaunchStates.map((state) => (
             <option key={state.code} value={state.code}>
               {state.label}
