@@ -125,13 +125,22 @@ export async function POST(request: Request) {
         profile?.full_name ?? user.email ?? "A hunter",
         appUrl(`/dashboard?view=requests&request=${created.id}`),
       );
-      await sendTransactionalEmail({
+      const mail = await sendTransactionalEmail({
         to: ownerEmail,
         subject: template.subject,
         html: template.html,
         text: template.text,
         replyTo: user.email ?? undefined,
       });
+
+      if (!mail.ok) {
+        console.error(
+          "Hunter request notification email failed",
+          mail.skipped ? mail.error : (mail.error ?? "Unknown email error"),
+        );
+      }
+    } else {
+      console.error("Hunter request notification skipped: owner email missing.");
     }
   }
 

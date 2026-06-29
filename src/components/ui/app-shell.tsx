@@ -82,12 +82,19 @@ export function AppFooter() {
             Privacy-first hunting access marketplace infrastructure for
             landowners, hunters, outfitters, and regional lease discovery.
           </p>
+          <p className="mt-4 max-w-md text-xs leading-5 text-stone-500">
+            Huntfields provides marketplace software and planning tools. We do
+            not guarantee the accuracy of user-submitted listing details,
+            pricing calculator inputs, wildlife claims, availability, legal
+            compliance, or third-party information.
+          </p>
         </div>
         <div>
           <p className="font-bold text-white">Marketplace</p>
           <div className="mt-3 grid gap-2 text-stone-400">
             <Link href="/land">Search land</Link>
             <Link href="/list-your-land">List your land</Link>
+            <Link href="/lease-pricing-calculator">Lease Pricing Calculator</Link>
             <Link href="/guides">Landowner Guides</Link>
             <Link href="/faq">FAQ</Link>
             <Link href="/dashboard">Requests and bookings</Link>

@@ -222,6 +222,114 @@ export const emailTemplates = {
       ),
     };
   },
+  leasePricingReportLead({
+    name,
+    email,
+    priceRange,
+    targetAsk,
+    deposit,
+    propertySummary,
+    scores,
+    recommendations,
+  }: {
+    name: string;
+    email: string;
+    priceRange: string;
+    targetAsk: string;
+    deposit: string;
+    propertySummary: string;
+    scores: {
+      market: number;
+      readiness: number;
+      confidence: number;
+      confidenceLabel: string;
+    };
+    recommendations: string[];
+  }) {
+    const rows = [
+      ["Price range", priceRange],
+      ["Target ask", targetAsk],
+      ["Suggested deposit", deposit],
+      ["Property", propertySummary],
+      ["Market demand", `${scores.market}/100`],
+      ["Listing readiness", `${scores.readiness}/100`],
+      [
+        "Estimate confidence",
+        `${scores.confidenceLabel} (${scores.confidence}/100)`,
+      ],
+    ];
+    const htmlRows = rows
+      .map(
+        ([label, value]) =>
+          `<tr><td style="padding:10px 12px;border-bottom:1px solid #e8e1d5;color:#6a6258;font-size:13px;font-weight:700;">${escapeHtml(label)}</td><td style="padding:10px 12px;border-bottom:1px solid #e8e1d5;color:#19231d;font-size:14px;font-weight:700;">${escapeHtml(value)}</td></tr>`,
+      )
+      .join("");
+    const htmlRecommendations = recommendations
+      .map(
+        (item) =>
+          `<li style="margin:0 0 8px;color:#344239;">${escapeHtml(item)}</li>`,
+      )
+      .join("");
+    const textRows = rows.map(([label, value]) => `${label}: ${value}`).join("\n");
+
+    return {
+      subject: `Huntfields lease pricing report: ${name}`,
+      text: `${name} <${email}> downloaded a lease pricing PDF report.\n\n${textRows}\n\nRecommendations:\n${recommendations.map((item) => `- ${item}`).join("\n")}`,
+      html: layout(
+        "Lease pricing report downloaded",
+        `<p><strong>${escapeHtml(name)}</strong> &lt;${escapeHtml(email)}&gt; downloaded a hunting lease pricing PDF report.</p><table style="width:100%;border-collapse:collapse;margin:18px 0;background:#fffaf1;border:1px solid #e8e1d5;border-radius:10px;overflow:hidden;">${htmlRows}</table><p style="margin:18px 0 10px;font-weight:700;color:#19231d;">Recommended follow-up</p><ul style="margin:0;padding-left:20px;">${htmlRecommendations}</ul>`,
+      ),
+    };
+  },
+  leasePricingReportConfirmation({
+    name,
+    priceRange,
+    targetAsk,
+    deposit,
+    propertySummary,
+    scores,
+  }: {
+    name: string;
+    priceRange: string;
+    targetAsk: string;
+    deposit: string;
+    propertySummary: string;
+    scores: {
+      market: number;
+      readiness: number;
+      confidence: number;
+      confidenceLabel: string;
+    };
+  }) {
+    const rows = [
+      ["Price range", priceRange],
+      ["Target ask", targetAsk],
+      ["Suggested deposit", deposit],
+      ["Property", propertySummary],
+      ["Market demand", `${scores.market}/100`],
+      ["Listing readiness", `${scores.readiness}/100`],
+      [
+        "Estimate confidence",
+        `${scores.confidenceLabel} (${scores.confidence}/100)`,
+      ],
+    ];
+    const htmlRows = rows
+      .map(
+        ([label, value]) =>
+          `<tr><td style="padding:10px 12px;border-bottom:1px solid #e8e1d5;color:#6a6258;font-size:13px;font-weight:700;">${escapeHtml(label)}</td><td style="padding:10px 12px;border-bottom:1px solid #e8e1d5;color:#19231d;font-size:14px;font-weight:700;">${escapeHtml(value)}</td></tr>`,
+      )
+      .join("");
+    const textRows = rows.map(([label, value]) => `${label}: ${value}`).join("\n");
+
+    return {
+      subject: "Your Huntfields lease pricing PDF report",
+      text: `Hi ${name},\n\nYour Huntfields hunting lease pricing report is attached as a PDF.\n\n${textRows}\n\nThis is a planning estimate, not an appraisal, legal advice, tax advice, or a guarantee of market demand.`,
+      html: layout(
+        "Your lease pricing PDF is attached",
+        `<p>Hi ${escapeHtml(name)},</p><p>Your Huntfields hunting lease pricing report is attached as a PDF.</p><table style="width:100%;border-collapse:collapse;margin:18px 0;background:#fffaf1;border:1px solid #e8e1d5;border-radius:10px;overflow:hidden;">${htmlRows}</table><p style="margin:18px 0 0;color:#6a6258;font-size:13px;">This is a planning estimate, not an appraisal, legal advice, tax advice, or a guarantee of market demand.</p>`,
+      ),
+    };
+  },
   dashboardProblemReport(
     name: string,
     email: string,

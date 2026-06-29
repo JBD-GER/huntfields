@@ -14,6 +14,11 @@ type SendMailInput = {
   html: string;
   text: string;
   replyTo?: string;
+  attachments?: Array<{
+    filename: string;
+    content: Buffer | string;
+    contentType?: string;
+  }>;
 };
 
 export async function sendTransactionalEmail(
@@ -35,6 +40,7 @@ export async function sendTransactionalEmail(
     html: input.html,
     text: input.text,
     replyTo: input.replyTo,
+    attachments: input.attachments,
   });
 
   if (error) {
