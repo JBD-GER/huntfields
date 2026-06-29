@@ -78,6 +78,366 @@ export const guideCategories: GuideCategory[] = [
 
 const guidePostDrafts: GuidePost[] = [
   {
+    slug: "lease-your-land-for-hunting-landowner-guide",
+    category: "landowner-basics",
+    title: "How to Lease Your Land for Hunting: Landowner Guide",
+    seoTitle: "Lease Your Land for Hunting | Landowner Listing Guide",
+    description:
+      "Learn how property owners can lease land for hunting with privacy-safe listings, clear rules, request screening, pricing context, photos, and owner-approved access.",
+    excerpt:
+      "Leasing your land for hunting works best when the public listing attracts serious hunters while exact access, maps, gates, and final terms stay under owner control.",
+    publishedAt: "2026-06-29",
+    updatedAt: "2026-06-29",
+    readingMinutes: 16,
+    primaryKeyword: "lease your land for hunting",
+    secondaryKeywords: [
+      "lease my land for hunting",
+      "list land for hunting lease",
+      "rent out land for hunting",
+      "hunting lease for landowners",
+    ],
+    image: {
+      src: "/images/guides/lease-your-land-for-hunting-landowner-guide.jpg",
+      alt: "Private field edge with owner planning notes for leasing land for hunting",
+      width: 1672,
+      height: 941,
+    },
+    takeaways: [
+      "Property owners should start with a controlled listing that explains the opportunity without publishing exact access details.",
+      "A useful hunting lease listing needs broad location, habitat, species, dates, price context, rules, photos, and a clear request step.",
+      "Owner approval should happen before private maps, gates, routes, documents, signatures, payment, or active access are shared.",
+      "The best owner workflow turns casual interest into screened requests and agreement-ready terms instead of unmanaged permission.",
+    ],
+    sections: [
+      {
+        heading: "Decide what kind of hunting access you want to offer",
+        body: [
+          "Before a landowner lists private land for hunting, the first decision is not price. It is the type of access the owner actually wants to allow. A small weekend deer opportunity, a seasonal turkey lease, an annual multi-species lease, and a one-day waterfowl setup all create different expectations.",
+          "That access type affects how many hunters can be on the land, how often they may visit, whether guests are allowed, which parts of the property are open, and how much owner involvement is needed during the season.",
+          "A clear listing should tell hunters whether the property is available for day access, weekend access, seasonal access, annual access, exclusive use, shared zones, or custom owner approval. Vague access attracts vague messages.",
+          "When the access model is clear from the start, property owners can screen faster and avoid conversations with hunters who want a completely different arrangement.",
+        ],
+      },
+      {
+        heading: "Describe the land without exposing private access",
+        body: [
+          "Hunters need enough public information to decide whether the land is worth a request. They usually want broad location, approximate acreage, habitat, target species, access style, and whether the owner appears organized.",
+          "Public information should stop before it becomes an invitation to visit without approval. Exact addresses, gate combinations, private road names, home locations, equipment yards, stand locations, and sensitive boundary details should stay out of the open listing.",
+          "A strong owner listing can say that the land is near a town, in a certain state or region, with timber, fields, creek bottoms, pasture, ridges, water, crop edges, or brush. It can also explain that exact maps and arrival instructions are shared only after owner approval.",
+          "This balance is important for SEO and trust. The page gives search engines and hunters useful context while still protecting the property from unapproved traffic.",
+        ],
+      },
+      {
+        heading: "Use photos that prove the opportunity",
+        body: [
+          "Photos help a landowner listing feel real. Good images show habitat, field edges, woods, water, access roads, trails, pasture, blinds if approved, and the general character of the property.",
+          "The goal is not to reveal every detail. Owners should avoid photos that show gate codes, house fronts, license plates, private road signs, equipment storage, exact stand trees, or landmarks that make the property too easy to identify.",
+          "A few honest, privacy-safe photos can reduce low-quality questions because hunters can see the type of land before they send a request. They also make the owner look prepared instead of casual.",
+          "For SEO, images should support the article or listing topic with descriptive alt text, realistic filenames, and visual proof of private land access rather than generic outdoor decoration.",
+        ],
+      },
+      {
+        heading: "Set rules before hunters ask for access",
+        body: [
+          "The most successful owner listings answer the big rule questions early. Hunters should be able to see guest limits, vehicle rules, parking expectations, stand and camera policy, dog rules, check-in expectations, alcohol policy, recovery rules, and whether any zones are closed.",
+          "Rules do more than protect the land. They filter requests. A hunter who ignores a no-guest policy in the first message is easier to decline before private details are shared.",
+          "Owners do not need to publish every final contract clause in the listing. The public page should explain the rules that determine fit, while final documents and exact map notes can come later in the approval workflow.",
+          "When rules are visible, serious hunters can self-select. That saves the owner time and makes the listing feel professional.",
+        ],
+      },
+      {
+        heading: "Price with a clear unit and realistic expectations",
+        body: [
+          "A hunting lease price is easier to understand when the billing unit is clear. The listing should explain whether pricing is per day, weekend, season, year, hunter, party, blind, field, zone, or custom owner quote.",
+          "Owners should think about species, season timing, exclusivity, party size, habitat, access quality, amenities, pressure, and owner workload before choosing the structure. A full-season exclusive lease is very different from one approved weekend.",
+          "If the owner wants to quote after reviewing dates and party size, the listing can say that. Clear price context is better than leaving hunters to guess and send broad messages.",
+          "Pricing should also match the final terms. If a hunter requests additional guests, different species, scouting days, camping, or a longer access window, those changes should be handled before approval.",
+        ],
+      },
+      {
+        heading: "Move from public listing to owner-approved access",
+        body: [
+          "A public listing is only the first step. The owner should still review the request, confirm the hunter's plan, ask follow-up questions, verify required details, and decide whether the person or party fits the property.",
+          "Private maps, gates, routes, emergency contacts, documents, signatures, payment, and arrival instructions should come after the owner has enough confidence to move forward.",
+          "This is where a dedicated hunting lease workflow helps. It keeps discovery public, keeps sensitive property details gated, and turns approved requests into clear terms instead of loose text messages.",
+          "For property owners, the real value is control. A good listing brings qualified hunters to the door, but the owner decides who gets access, when they get it, and under what rules.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "How do I lease my land for hunting?",
+        answer:
+          "Start by defining the access type, broad location, habitat, species, dates, rules, price structure, photos, and request process. Keep exact maps, gates, routes, and final access private until you approve the hunter.",
+      },
+      {
+        question: "Should I publish my exact property address in a hunting lease listing?",
+        answer:
+          "Usually no. Broad location and habitat context are useful publicly, while exact addresses, gates, private roads, and detailed maps should wait until owner approval.",
+      },
+      {
+        question: "What information should hunters send before approval?",
+        answer:
+          "Useful request details include desired dates, target species, hunting method, party size, guest plans, vehicle needs, rule confirmation, and any owner-specific questions.",
+      },
+      {
+        question: "Can small properties be listed for hunting access?",
+        answer:
+          "Yes. Small properties can work when the listing is honest about species, access windows, pressure limits, safety buffers, boundaries, and realistic owner rules.",
+      },
+      {
+        question: "Why use Huntfields instead of casual messages?",
+        answer:
+          "Huntfields helps owners publish privacy-safe listings, screen requests, protect exact access details, and move serious hunters toward clearer lease terms.",
+      },
+    ],
+    ctaTitle: "List your land without giving up control.",
+    ctaBody:
+      "Huntfields helps property owners turn private acreage into owner-approved hunting lease listings with protected maps, clear rules, request review, and agreement-ready next steps.",
+    ctaLabel: "List your land",
+    ctaHref: "/list-your-land",
+  },
+  {
+    slug: "advertise-hunting-land-for-lease-owner-guide",
+    category: "listing-optimization",
+    title: "How to Advertise Hunting Land for Lease Online",
+    seoTitle: "Advertise Hunting Land for Lease | Owner SEO Guide",
+    description:
+      "Learn how landowners can advertise hunting land for lease with SEO-friendly listings, safe location details, strong photos, clear rules, and request-first conversion.",
+    excerpt:
+      "Advertising hunting land online should attract serious hunters without turning private gates, maps, and owner contact details into public information.",
+    publishedAt: "2026-06-29",
+    updatedAt: "2026-06-29",
+    readingMinutes: 17,
+    primaryKeyword: "advertise hunting land for lease",
+    secondaryKeywords: [
+      "advertise hunting lease",
+      "list hunting land for lease online",
+      "hunting land advertising",
+      "hunting lease listing SEO",
+    ],
+    image: {
+      src: "/images/guides/advertise-hunting-land-for-lease-owner-guide.jpg",
+      alt: "Owner preparing an online hunting land lease listing with private acreage visible outside",
+      width: 1672,
+      height: 941,
+    },
+    takeaways: [
+      "Owner-focused advertising should explain the hunting opportunity, rules, and request process before asking hunters to contact the owner.",
+      "Local SEO works best with broad location, habitat, species, lease type, photos, and owner-safe details instead of repeated keywords.",
+      "A strong listing filters hunters by dates, methods, party size, and rule fit before sensitive maps or arrival instructions are shared.",
+      "Every advertised hunting lease should have one clear next action: send a request for owner review.",
+    ],
+    sections: [
+      {
+        heading: "Match the listing to owner-intent search",
+        body: [
+          "A landowner advertising hunting land is usually trying to reach hunters who are actively looking for private access. The listing should be written for that moment: practical, specific, and easy to evaluate.",
+          "Good SEO does not mean repeating advertise hunting land for lease in every paragraph. It means answering the searcher's real questions about location, species, habitat, timing, rules, pricing, and how to request access.",
+          "Owner-intent pages should also make it clear that the property is not open to walk-ins. The next step is a request, not an unapproved visit.",
+          "When the listing matches search intent, it can bring in better inquiries and reduce the time the owner spends explaining basic details one message at a time.",
+        ],
+      },
+      {
+        heading: "Write a headline that sells the fit",
+        body: [
+          "The headline should communicate the core opportunity quickly. A useful title might mention broad location, species, lease type, and a property feature, such as whitetail and turkey lease near a town, weekend waterfowl access, or private bowhunting acreage.",
+          "Avoid headlines that sound inflated or generic. Phrases like best land ever or hunter paradise do not help serious hunters understand whether the lease fits their plan.",
+          "The headline should also match the actual terms. If the owner only wants weekend access, the title should not imply annual exclusive access.",
+          "A precise headline improves scanability on listing pages, supports SEO, and helps the right hunters click before the owner shares any sensitive details.",
+        ],
+      },
+      {
+        heading: "Build the page around useful public details",
+        body: [
+          "A strong hunting lease advertisement should include broad location, approximate acreage, habitat, species, access style, rules, price unit, dates, amenities, and request instructions.",
+          "Useful public details are not the same as private access details. Owners can describe a gravel access road, field edge, timber block, pond, or walk-in route without posting the exact gate or address.",
+          "The page should answer common questions before the hunter asks: Are guests allowed? Are vehicles limited? Is access exclusive? Are stands or cameras allowed? Is camping included? Is the price per hunter or per party?",
+          "The more complete the public listing is, the easier it is for serious hunters to send a request that the owner can actually evaluate.",
+        ],
+      },
+      {
+        heading: "Use photos as trust signals",
+        body: [
+          "Photos are often the first proof that the hunting lease is real. They help hunters see habitat, terrain, cover, water, field edges, access quality, and general land character before sending a request.",
+          "Owners should choose photos that support the listing without exposing private information. Avoid closeups of gate codes, mailboxes, home fronts, equipment, private signs, exact stand trees, or vehicle plates.",
+          "A balanced photo set can show one wide habitat image, one field or timber edge, one water or terrain feature if relevant, and one access-quality image that does not reveal exact arrival instructions.",
+          "For search and sharing, image filenames and alt text should describe the topic naturally. The goal is useful context, not keyword stuffing.",
+        ],
+      },
+      {
+        heading: "Turn advertising into screened requests",
+        body: [
+          "Advertising should not push the owner into giving out private phone numbers, maps, or gates too early. The best conversion step is a request that asks hunters for the details the owner needs.",
+          "A request should capture desired dates, target species, method, party size, guest plans, experience level if relevant, and confirmation that the hunter read the rules.",
+          "The owner can then compare the request against the listing terms before moving forward. If the request does not fit, the owner can decline or ask follow-up questions without exposing the property.",
+          "This request-first flow is especially useful for landowners who want more visibility but do not want open-ended classified messages from every interested hunter.",
+        ],
+      },
+      {
+        heading: "Keep the CTA focused on listing, not browsing",
+        body: [
+          "An owner-facing SEO article should not end with a vague invitation. The call to action should match the reader's intent: create a listing, list your land, define rules, or start owner onboarding.",
+          "For hunters, the CTA might be request access. For landowners, the CTA should make the next owner step obvious and low-friction.",
+          "The page should also reinforce the benefit of the platform: privacy-safe public listings, controlled request review, protected exact access, and structured lease terms.",
+          "That is how advertising becomes a workflow. The owner is not just publishing a page; the owner is guiding serious hunters toward a controlled approval process.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "Where can I advertise hunting land for lease?",
+        answer:
+          "You can advertise on a dedicated hunting lease marketplace such as Huntfields, where listings can include owner-safe location context, photos, rules, request screening, and controlled access steps.",
+      },
+      {
+        question: "What should a hunting lease advertisement include?",
+        answer:
+          "Include broad location, approximate acreage, habitat, species, lease type, dates, rules, price unit, photos, amenities, and a clear request process while keeping exact access private.",
+      },
+      {
+        question: "How do I advertise hunting land without revealing the address?",
+        answer:
+          "Use nearest town, state, region, habitat, and access-quality descriptions publicly. Save exact addresses, gates, routes, and private maps for approved hunters.",
+      },
+      {
+        question: "What makes hunters trust an online hunting lease listing?",
+        answer:
+          "Clear photos, realistic habitat descriptions, visible owner rules, pricing context, request steps, and professional communication all help hunters trust the listing.",
+      },
+      {
+        question: "Should owners put their phone number in public ads?",
+        answer:
+          "Owners can choose their own contact preferences, but a request-first workflow usually keeps screening cleaner and reduces pressure to share private access details too early.",
+      },
+    ],
+    ctaTitle: "Advertise your hunting land with owner-safe details.",
+    ctaBody:
+      "Huntfields helps landowners publish SEO-friendly hunting lease listings, show useful habitat information, review requests, and keep exact access details gated until approval.",
+    ctaLabel: "Advertise your land",
+    ctaHref: "/list-your-land",
+  },
+  {
+    slug: "hunting-lease-income-landowner-guide",
+    category: "pricing-and-terms",
+    title: "Hunting Lease Income Guide for Landowners",
+    seoTitle: "Hunting Lease Income | Landowner Pricing Guide",
+    description:
+      "Learn how landowners can think about hunting lease income, pricing units, lease structure, owner workload, request screening, and safer access terms.",
+    excerpt:
+      "Hunting lease income starts with pricing, but sustainable owner value depends on clear terms, pressure control, screening, and private access protection.",
+    publishedAt: "2026-06-29",
+    updatedAt: "2026-06-29",
+    readingMinutes: 17,
+    primaryKeyword: "hunting lease income",
+    secondaryKeywords: [
+      "make money leasing hunting land",
+      "hunting lease pricing",
+      "hunting land income",
+      "lease land for hunting income",
+    ],
+    image: {
+      src: "/images/guides/hunting-lease-income-landowner-guide.jpg",
+      alt: "Landowner pricing notes and calculator on private acreage for a hunting lease income guide",
+      width: 1672,
+      height: 941,
+    },
+    takeaways: [
+      "Hunting lease income should be evaluated by access type, species, season timing, exclusivity, amenities, pressure, and owner workload.",
+      "Landowners should choose a clear billing unit before publishing price context: day, weekend, season, year, hunter, party, field, zone, or custom quote.",
+      "Higher-quality requests usually come from listings that explain rules, photos, access type, and approval steps before private details are shared.",
+      "Income is more sustainable when final terms protect the land, define access, and reduce avoidable owner stress.",
+    ],
+    sections: [
+      {
+        heading: "Think beyond a single price number",
+        body: [
+          "Many owners start with the question, how much can I make from a hunting lease? A better first question is what kind of access can the property support without creating problems.",
+          "Income depends on more than acreage. Species, demand, season timing, habitat, travel distance, road access, exclusivity, amenities, owner workload, and pressure limits all affect the structure.",
+          "A property that works well for a limited weekend lease may not be a good fit for full-season access. A small bowhunting corridor may have value if expectations are clear, while a larger property may need careful zone and guest rules.",
+          "The listing should help owners and hunters understand the value unit before anyone treats the price as final.",
+        ],
+      },
+      {
+        heading: "Choose the right pricing unit",
+        body: [
+          "Hunting leases can be priced per day, weekend, season, year, hunter, party, blind, field, zone, species, or custom request. Each unit changes how hunters understand value and how owners manage pressure.",
+          "Per-hunter pricing can work when the owner needs to limit individual access. Per-party pricing can be cleaner for group hunts. Seasonal or annual pricing can reduce scheduling work but requires stronger terms.",
+          "Custom quotes can make sense when dates, party size, species, and access rights vary widely. If the owner uses custom pricing, the listing should say what details are needed before a quote is given.",
+          "The pricing unit should be visible before final approval so the hunter does not assume that guests, extra days, camping, scouting, or additional species are included.",
+        ],
+      },
+      {
+        heading: "Match income goals to property protection",
+        body: [
+          "A higher price is not helpful if the access creates property damage, neighbor conflict, road issues, livestock problems, or constant owner follow-up. The lease structure should protect the land as much as it monetizes it.",
+          "Owners should define vehicle rules, parking, gates, guests, dogs, stands, cameras, open zones, closed zones, check-in, recovery, cleanup, and weather closures before access starts.",
+          "Some owners may earn more reliably by offering fewer, better-controlled access windows instead of broad availability. Better fit can matter more than maximum traffic.",
+          "A listing that highlights owner control can attract hunters who value professionalism and understand that private land access comes with rules.",
+        ],
+      },
+      {
+        heading: "Use screening to protect revenue quality",
+        body: [
+          "Not every inquiry is equally valuable. A vague message can create more work than income if the owner has to ask basic questions about dates, species, method, party size, and rule fit.",
+          "A request-first marketplace can ask for the key details before the owner shares private maps or access instructions. That gives the owner better information earlier.",
+          "Screening also protects the value of future access. Hunters who communicate clearly, respect rules, and handle gates properly are more likely to become repeat or longer-term candidates.",
+          "For income-focused owners, the best outcome is not just one booking. It is a manageable lease process that can be repeated without making the property feel exposed.",
+        ],
+      },
+      {
+        heading: "Make final terms support the price",
+        body: [
+          "The final agreement should reflect what the hunter is paying for: dates, species, methods, party members, guests, zones, exclusivity, amenities, check-in, payment timing, cancellation rules, and owner closures.",
+          "If the listing promises one access type but the final terms are vague, both sides can become frustrated. Clear terms make the price easier to justify because the hunter knows what is included.",
+          "Owners should also be careful about special requests. Extra scouting days, additional guests, camping, dogs, other species, or extended access can all change the value and should be approved before access starts.",
+          "A structured workflow helps keep these details out of scattered messages and tied to the actual lease decision.",
+        ],
+      },
+      {
+        heading: "Measure value after the hunt",
+        body: [
+          "Hunting lease income should be reviewed after each access period. Owners can look at communication, rule compliance, gate handling, road impact, cleanup, harvest reporting if required, and whether the property felt over-pressured.",
+          "If the access created too much stress for the income, the next listing can adjust price, dates, exclusivity, party size, methods, zones, or screening questions.",
+          "If the hunter was a strong fit, the owner may consider renewal, a longer lease, a different access package, or priority for future dates.",
+          "The most useful income strategy is iterative. Owners can start controlled, learn from real requests, and improve the listing without giving up private access protections.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "How can landowners make income from hunting leases?",
+        answer:
+          "Landowners can offer controlled hunting access by day, weekend, season, year, hunter, party, field, zone, or custom request, then screen hunters and finalize clear terms before access starts.",
+      },
+      {
+        question: "What affects hunting lease pricing?",
+        answer:
+          "Pricing depends on species, habitat, season timing, location, acreage, access quality, exclusivity, party size, amenities, pressure limits, and owner workload.",
+      },
+      {
+        question: "Should owners publish a fixed price or custom quote?",
+        answer:
+          "Either can work. Fixed price helps filter quickly, while custom quotes fit properties where dates, species, party size, and access rights change from request to request.",
+      },
+      {
+        question: "How can owners protect the land while earning lease income?",
+        answer:
+          "Use clear rules, request screening, private maps after approval, defined access windows, guest limits, vehicle rules, final terms, and owner-controlled closures when needed.",
+      },
+      {
+        question: "Can hunting lease income come from short-term access?",
+        answer:
+          "Yes. Day, weekend, and seasonal access can all work when the property fits the structure and the owner defines dates, rules, pressure limits, and approval steps clearly.",
+      },
+    ],
+    ctaTitle: "Turn hunting lease interest into controlled owner income.",
+    ctaBody:
+      "Huntfields helps landowners create pricing-ready listings, screen hunters, protect exact access details, and move approved requests into clearer lease terms.",
+    ctaLabel: "Start your listing",
+    ctaHref: "/list-your-land",
+  },
+  {
     slug: "hunting-land-for-lease-by-owner-guide",
     category: "listing-optimization",
     title: "Hunting Land for Lease by Owner: Landowner Listing Guide",
