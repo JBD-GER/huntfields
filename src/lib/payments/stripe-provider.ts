@@ -16,6 +16,8 @@ export class StripePaymentProvider implements PaymentProvider {
   async createCheckout(input: CheckoutInput): Promise<CheckoutResult> {
     const metadata = {
       booking_id: input.bookingId,
+      payment_kind: input.renewalCycleId ? "lease_renewal" : "initial_lease",
+      renewal_cycle_id: input.renewalCycleId ?? "",
       connected_account_id: input.connectedAccountId ?? "",
       platform_fee_cents: String(input.platformFeeCents ?? 0),
     };

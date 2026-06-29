@@ -14,6 +14,7 @@ export const env = {
   stripeSecretKey: process.env.STRIPE_SECRET_KEY,
   stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
   stripePublishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+  leaseRenewalCronSecret: process.env.LEASE_RENEWAL_CRON_SECRET,
   openaiApiKey: process.env.OPENAI_API_KEY,
   openaiTextModel: process.env.OPENAI_TEXT_MODEL ?? "gpt-5-mini",
   openaiImageModel: process.env.OPENAI_IMAGE_MODEL ?? "gpt-image-2",

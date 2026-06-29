@@ -4,6 +4,7 @@ import { appUrl, emailTemplates } from "@/lib/email/templates";
 import { sendTransactionalEmail } from "@/lib/email/resend";
 import { env } from "@/lib/env";
 import { createStripeClient } from "@/lib/payments/stripe-client";
+import { releaseRenewalPayoutTransfer } from "@/lib/payments/owner-payout";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
 
 type ServiceClient = NonNullable<ReturnType<typeof createSupabaseServiceClient>>;
@@ -125,6 +126,186 @@ async function notifySignatureReady(service: ServiceClient, bookingId: string) {
   }
 }
 
+async function notifyRenewalPaymentReceived(
+  service: ServiceClient,
+  renewalCycleId: string,
+) {
+  const { data: cycle } = await service
+    .from("booking_renewal_cycles")
+    .select(
+      "id, booking_id, hunter_id, landowner_id, renewal_starts_on, renewal_ends_on, bookings(listings(title))",
+    )
+    .eq("id", renewalCycleId)
+    .maybeSingle();
+
+  if (!cycle) {
+    return;
+  }
+
+  const { data: contract } = await service
+    .from("booking_contracts")
+    .select("id, title")
+    .eq("booking_id", cycle.booking_id)
+    .maybeSingle();
+
+  if (!contract) {
+    return;
+  }
+
+  const [hunter, landowner] = await Promise.all([
+    service.auth.admin.getUserById(cycle.hunter_id),
+    service.auth.admin.getUserById(cycle.landowner_id),
+  ]);
+  const recipients = [
+    hunter.data.user?.email,
+    landowner.data.user?.email,
+  ].filter(Boolean) as string[];
+
+  if (!recipients.length) {
+    return;
+  }
+
+  const booking = Array.isArray(cycle.bookings)
+    ? cycle.bookings[0]
+    : cycle.bookings;
+  const listing = Array.isArray(booking?.listings)
+    ? booking?.listings[0]
+    : booking?.listings;
+  const template = emailTemplates.renewalPaymentReceived(
+    contract.title ?? listing?.title ?? "Huntfields hunting lease",
+    cycle.renewal_starts_on,
+    cycle.renewal_ends_on,
+    appUrl(`/contracts/${contract.id}`),
+  );
+
+  await sendTransactionalEmail({
+    to: recipients,
+    subject: template.subject,
+    html: template.html,
+    text: template.text,
+  });
+}
+
+async function markRenewalCheckoutPaid({
+  stripe,
+  service,
+  session,
+  eventType,
+  renewalCycleId,
+}: {
+  stripe: Stripe;
+  service: ServiceClient;
+  session: Stripe.Checkout.Session;
+  eventType: string;
+  renewalCycleId: string;
+}) {
+  if (
+    eventType === "checkout.session.completed" &&
+    session.payment_status !== "paid"
+  ) {
+    await Promise.all([
+      service
+        .from("booking_renewal_cycles")
+        .update({
+          status: "payment_processing",
+          payment_status: "payment_processing",
+          provider_checkout_id: session.id,
+          provider_customer_id: stripeId(session.customer),
+          tax_amount_cents: session.total_details?.amount_tax ?? 0,
+          tax_status: session.automatic_tax?.status ?? null,
+        })
+        .eq("id", renewalCycleId),
+      service
+        .from("booking_payment_intents")
+        .update({
+          status: "checkout_created",
+          provider_checkout_id: session.id,
+          provider_customer_id: stripeId(session.customer),
+          tax_amount_cents: session.total_details?.amount_tax ?? 0,
+          tax_status: session.automatic_tax?.status ?? null,
+        })
+        .eq("renewal_cycle_id", renewalCycleId)
+        .neq("status", "paid"),
+    ]);
+    return;
+  }
+
+  const paymentIntentId = stripeId(session.payment_intent);
+  const invoiceId = stripeId(session.invoice);
+  const invoice = await invoiceSummary(stripe, invoiceId);
+  let chargeId: string | null = null;
+  let receiptUrl: string | null = null;
+  let intent: Stripe.PaymentIntent | null = null;
+
+  if (paymentIntentId) {
+    intent = await stripe.paymentIntents.retrieve(paymentIntentId, {
+      expand: ["latest_charge", "payment_method"],
+    });
+    const charge =
+      typeof intent.latest_charge === "string" ? null : intent.latest_charge;
+    chargeId = stripeId(intent.latest_charge);
+    receiptUrl = (charge as Stripe.Charge | null)?.receipt_url ?? null;
+  }
+
+  const method = paymentMethodSummary(intent);
+  const { error: paidError } = await service.rpc("mark_booking_renewal_paid", {
+    p_renewal_cycle_id: renewalCycleId,
+    p_provider_checkout_id: session.id,
+    p_provider_payment_id: paymentIntentId,
+    p_provider_charge_id: chargeId,
+    p_provider_customer_id: stripeId(session.customer),
+    p_provider_invoice_id: invoice.providerInvoiceId,
+    p_provider_invoice_url: invoice.providerInvoiceUrl,
+    p_provider_invoice_pdf: invoice.providerInvoicePdf,
+    p_tax_amount_cents: session.total_details?.amount_tax ?? 0,
+    p_receipt_url: receiptUrl,
+    p_payment_method_type: method.type,
+    p_payment_method_summary: method.summary,
+  });
+
+  if (paidError) {
+    throw new Error(paidError.message);
+  }
+
+  await Promise.all([
+    service.from("booking_workflow_events").insert({
+      booking_id: session.client_reference_id ?? session.metadata?.booking_id,
+      event_type: "stripe_renewal_checkout_paid",
+      payload: {
+        event_type: eventType,
+        renewal_cycle_id: renewalCycleId,
+        checkout_session_id: session.id,
+        payment_intent: paymentIntentId,
+        charge_id: chargeId,
+        invoice_id: invoice.providerInvoiceId,
+        customer_id: stripeId(session.customer),
+        tax_amount_cents: session.total_details?.amount_tax ?? 0,
+        tax_status: session.automatic_tax?.status ?? null,
+      },
+    }),
+    service
+      .from("booking_payment_intents")
+      .update({
+        tax_status: session.automatic_tax?.status ?? null,
+      })
+      .eq("renewal_cycle_id", renewalCycleId)
+      .eq("provider_checkout_id", session.id),
+    service
+      .from("booking_renewal_cycles")
+      .update({
+        tax_status: session.automatic_tax?.status ?? null,
+      })
+      .eq("id", renewalCycleId),
+  ]);
+
+  await releaseRenewalPayoutTransfer({
+    supabase: service,
+    renewalCycleId,
+    actorId: null,
+  });
+  await notifyRenewalPaymentReceived(service, renewalCycleId);
+}
+
 async function markCheckoutPaid({
   stripe,
   service,
@@ -137,8 +318,20 @@ async function markCheckoutPaid({
   eventType: string;
 }) {
   const bookingId = session.client_reference_id ?? session.metadata?.booking_id;
+  const renewalCycleId = session.metadata?.renewal_cycle_id || null;
 
   if (!bookingId) {
+    return;
+  }
+
+  if (renewalCycleId) {
+    await markRenewalCheckoutPaid({
+      stripe,
+      service,
+      session,
+      eventType,
+      renewalCycleId,
+    });
     return;
   }
 
@@ -247,8 +440,46 @@ async function syncCheckoutFailure({
   eventType: string;
 }) {
   const bookingId = session.client_reference_id ?? session.metadata?.booking_id;
+  const renewalCycleId = session.metadata?.renewal_cycle_id || null;
 
   if (!bookingId) {
+    return;
+  }
+
+  if (renewalCycleId) {
+    await Promise.all([
+      service
+        .from("booking_renewal_cycles")
+        .update({
+          status: status === "failed" ? "payment_due" : "cancelled",
+          payment_status: status === "failed" ? "payment_failed" : "cancelled",
+          provider_checkout_id: session.id,
+          provider_customer_id: stripeId(session.customer),
+          tax_amount_cents: session.total_details?.amount_tax ?? 0,
+          tax_status: session.automatic_tax?.status ?? null,
+        })
+        .eq("id", renewalCycleId)
+        .neq("payment_status", "paid"),
+      service
+        .from("booking_payment_intents")
+        .update({
+          status,
+          provider_checkout_id: session.id,
+          provider_customer_id: stripeId(session.customer),
+          error_message: eventType,
+        })
+        .eq("renewal_cycle_id", renewalCycleId)
+        .neq("status", "paid"),
+      service.from("booking_workflow_events").insert({
+        booking_id: bookingId,
+        event_type: eventType.replaceAll(".", "_"),
+        payload: {
+          renewal_cycle_id: renewalCycleId,
+          checkout_session_id: session.id,
+          payment_status: session.payment_status,
+        },
+      }),
+    ]);
     return;
   }
 
@@ -294,7 +525,47 @@ async function syncPaymentIntentStatus({
   eventType: string;
 }) {
   const bookingId = intent.metadata?.booking_id;
+  const renewalCycleId = intent.metadata?.renewal_cycle_id || null;
   const chargeId = stripeId(intent.latest_charge);
+
+  if (bookingId && renewalCycleId) {
+    await Promise.all([
+      service
+        .from("booking_renewal_cycles")
+        .update({
+          status: status === "failed" ? "payment_due" : "cancelled",
+          payment_status: status === "failed" ? "payment_failed" : "cancelled",
+          provider_payment_id: intent.id,
+          provider_charge_id: chargeId,
+        })
+        .eq("id", renewalCycleId)
+        .neq("payment_status", "paid"),
+      service
+        .from("booking_payment_intents")
+        .update({
+          status,
+          provider_payment_id: intent.id,
+          provider_charge_id: chargeId,
+          error_message:
+            intent.last_payment_error?.message ??
+            intent.cancellation_reason ??
+            eventType,
+        })
+        .eq("renewal_cycle_id", renewalCycleId)
+        .neq("status", "paid"),
+      service.from("booking_workflow_events").insert({
+        booking_id: bookingId,
+        event_type: eventType.replaceAll(".", "_"),
+        payload: {
+          renewal_cycle_id: renewalCycleId,
+          payment_intent: intent.id,
+          charge_id: chargeId,
+          error: intent.last_payment_error?.message ?? null,
+        },
+      }),
+    ]);
+    return;
+  }
 
   if (bookingId) {
     await Promise.all([
@@ -356,6 +627,7 @@ async function syncInvoice({
   status?: "paid" | "failed" | "cancelled";
 }) {
   const bookingId = invoice.metadata?.booking_id;
+  const renewalCycleId = invoice.metadata?.renewal_cycle_id || null;
 
   if (!bookingId) {
     return;
@@ -371,6 +643,42 @@ async function syncInvoice({
       0,
     ),
   };
+
+  if (renewalCycleId) {
+    await Promise.all([
+      service
+        .from("booking_renewal_cycles")
+        .update({
+          ...payload,
+          ...(status === "failed"
+            ? { payment_status: "payment_failed", status: "payment_due" }
+            : {}),
+          ...(status === "cancelled"
+            ? { payment_status: "cancelled", status: "cancelled" }
+            : {}),
+        })
+        .eq("id", renewalCycleId),
+      service
+        .from("booking_payment_intents")
+        .update({
+          ...payload,
+          ...(status && status !== "paid" ? { status } : {}),
+        })
+        .eq("renewal_cycle_id", renewalCycleId),
+      service.from("booking_workflow_events").insert({
+        booking_id: bookingId,
+        event_type: `stripe_renewal_invoice_${invoice.status ?? "updated"}`,
+        payload: {
+          renewal_cycle_id: renewalCycleId,
+          invoice_id: invoice.id,
+          hosted_invoice_url: invoice.hosted_invoice_url,
+          invoice_pdf: invoice.invoice_pdf,
+          invoice_status: invoice.status,
+        },
+      }),
+    ]);
+    return;
+  }
 
   await Promise.all([
     service
@@ -411,6 +719,7 @@ async function syncTransfer({
   transfer: Stripe.Transfer;
   eventType: string;
 }) {
+  const renewalCycleId = transfer.metadata?.renewal_cycle_id || null;
   const bookingId =
     transfer.metadata?.booking_id ||
     (typeof transfer.transfer_group === "string" ? transfer.transfer_group : null);
@@ -424,7 +733,40 @@ async function syncTransfer({
       ? "reversed"
       : eventType === "transfer.updated"
         ? "updated"
-        : "created";
+      : "created";
+
+  if (renewalCycleId) {
+    await Promise.all([
+      service
+        .from("booking_renewal_cycles")
+        .update({
+          provider_transfer_id: transfer.id,
+          transfer_status: status,
+          transfer_error: null,
+        })
+        .eq("id", renewalCycleId),
+      service
+        .from("booking_payment_intents")
+        .update({
+          provider_transfer_id: transfer.id,
+          transfer_status: status,
+          transfer_error: null,
+        })
+        .eq("renewal_cycle_id", renewalCycleId),
+      service.from("booking_workflow_events").insert({
+        booking_id: bookingId,
+        event_type: eventType.replaceAll(".", "_"),
+        payload: {
+          renewal_cycle_id: renewalCycleId,
+          transfer_id: transfer.id,
+          amount: transfer.amount,
+          destination: stripeId(transfer.destination),
+          transfer_group: transfer.transfer_group,
+        },
+      }),
+    ]);
+    return;
+  }
 
   await Promise.all([
     service

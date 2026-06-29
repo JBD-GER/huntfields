@@ -110,6 +110,29 @@ export default async function ContractPage({
   const paymentState = Array.isArray(query.payment_state)
     ? query.payment_state[0]
     : query.payment_state;
+  const renewalState = Array.isArray(query.renewal_state)
+    ? query.renewal_state[0]
+    : query.renewal_state;
+  const { data: renewalCycle } = await supabase
+    .from("booking_renewal_cycles")
+    .select(
+      "id, status, payment_status, renewal_starts_on, renewal_ends_on, hunter_total_cents, currency, checkout_url",
+    )
+    .eq("booking_id", contract.booking_id)
+    .in("status", [
+      "notice_due",
+      "notice_sent",
+      "payment_due",
+      "checkout_created",
+      "payment_processing",
+      "manual_pending",
+      "paid",
+      "expired",
+      "cancelled",
+    ])
+    .order("renewal_number", { ascending: false })
+    .limit(1)
+    .maybeSingle();
   const verificationGate =
     contract.request_id && service
       ? await getRequestVerificationGate(service, contract.request_id)
@@ -137,6 +160,15 @@ export default async function ContractPage({
     !landownerSigned &&
     contract.status === "partially_signed" &&
     finalizationReady;
+  const renewalPayable =
+    renewalCycle &&
+    !["paid", "expired", "cancelled"].includes(renewalCycle.status) &&
+    renewalCycle.payment_status !== "paid";
+  const canRenew =
+    signerRole === "hunter" &&
+    fullySigned &&
+    paymentPaid &&
+    Boolean(renewalPayable);
   const workflowTitle = !hunterSigned
     ? "Waiting for hunter signature"
     : !paymentPaid
@@ -240,9 +272,27 @@ export default async function ContractPage({
               Payment is marked as manual pending.
             </p>
           ) : null}
+          {renewalState === "connect_required" ? (
+            <p className="font-semibold text-[#8a4a20]">
+              Stripe Connect is not fully enabled for this landowner yet.
+              Renewal payment is marked as manual pending.
+            </p>
+          ) : null}
           {booking?.payment_status ? (
             <p className="font-semibold">
               Payment status: {booking.payment_status.replaceAll("_", " ")}
+            </p>
+          ) : null}
+          {renewalCycle ? (
+            <p className="font-semibold">
+              Renewal: {renewalCycle.status.replaceAll("_", " ")}
+              {" / "}
+              {formatMoney(
+                renewalCycle.hunter_total_cents,
+                renewalCycle.currency ?? currency,
+              )}{" "}
+              for {renewalCycle.renewal_starts_on} through{" "}
+              {renewalCycle.renewal_ends_on}
             </p>
           ) : null}
           {booking?.owner_transfer_status &&
@@ -279,6 +329,17 @@ export default async function ContractPage({
             <button className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-[#234331] px-5 font-bold text-white transition hover:bg-[#162d22] sm:w-auto">
               <CreditCard size={17} aria-hidden="true" />
               Complete checkout
+            </button>
+          </form>
+        ) : null}
+        {canRenew ? (
+          <form
+            action={`/api/bookings/${contract.booking_id}/renewal-checkout`}
+            method="post"
+          >
+            <button className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-[#234331] px-5 font-bold text-white transition hover:bg-[#162d22] sm:w-auto">
+              <CreditCard size={17} aria-hidden="true" />
+              Complete renewal checkout
             </button>
           </form>
         ) : null}

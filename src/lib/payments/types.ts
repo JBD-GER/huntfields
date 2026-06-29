@@ -1,5 +1,6 @@
 export type CheckoutInput = {
   bookingId: string;
+  renewalCycleId?: string;
   listingTitle: string;
   amountCents: number;
   currency: string;

@@ -152,6 +152,66 @@ export const emailTemplates = {
       ),
     };
   },
+  renewalPaymentDue(
+    title: string,
+    startsOn: string,
+    endsOn: string,
+    amountLabel: string,
+    contractUrl: string,
+  ) {
+    return {
+      subject: `Renewal payment due: ${title}`,
+      text: `Renewal payment is due for ${title} (${startsOn} through ${endsOn}). Amount due: ${amountLabel}.\n${contractUrl}`,
+      html: layout(
+        "Renewal payment due",
+        `<p>The renewal window for <strong>${title}</strong> is open for <strong>${startsOn}</strong> through <strong>${endsOn}</strong>.</p><p>Amount due: <strong>${amountLabel}</strong>. The existing signed agreement stays on file, but the renewed lease period is not active until checkout is complete.</p>${button("Complete renewal payment", contractUrl)}`,
+      ),
+    };
+  },
+  ownerRenewalNotice(
+    title: string,
+    startsOn: string,
+    endsOn: string,
+    contractUrl: string,
+  ) {
+    return {
+      subject: `Lease renewal window open: ${title}`,
+      text: `The renewal window for ${title} is open for ${startsOn} through ${endsOn}. The hunter must complete a new payment for the renewed term; the existing signed agreement remains on file.\n${contractUrl}`,
+      html: layout(
+        "Lease renewal window open",
+        `<p>The renewal window for <strong>${title}</strong> is open for <strong>${startsOn}</strong> through <strong>${endsOn}</strong>.</p><p>The hunter must complete a new payment for the renewed term. The existing signed agreement remains on file.</p>${button("Open agreement", contractUrl)}`,
+      ),
+    };
+  },
+  renewalPaymentReceived(
+    title: string,
+    startsOn: string,
+    endsOn: string,
+    contractUrl: string,
+  ) {
+    return {
+      subject: `Lease renewed: ${title}`,
+      text: `The renewal payment for ${title} has cleared. The lease is renewed for ${startsOn} through ${endsOn}, and owner payout processing has started.\n${contractUrl}`,
+      html: layout(
+        "Lease renewed",
+        `<p>The renewal payment for <strong>${title}</strong> has cleared. The lease is renewed for <strong>${startsOn}</strong> through <strong>${endsOn}</strong>, and owner payout processing has started.</p>${button("Open agreement", contractUrl)}`,
+      ),
+    };
+  },
+  leaseExpired(
+    title: string,
+    endedOn: string,
+    contractUrl: string,
+  ) {
+    return {
+      subject: `Lease expired: ${title}`,
+      text: `The lease for ${title} expired on ${endedOn}. Renewal payment was not completed before the end of the paid term.\n${contractUrl}`,
+      html: layout(
+        "Lease expired",
+        `<p>The lease for <strong>${title}</strong> expired on <strong>${endedOn}</strong>. Renewal payment was not completed before the end of the paid term.</p>${button("Open agreement", contractUrl)}`,
+      ),
+    };
+  },
   contactForm(name: string, email: string, topic: string, message: string) {
     return {
       subject: `Huntfields contact: ${topic}`,
