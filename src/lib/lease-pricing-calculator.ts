@@ -1,9 +1,9 @@
 export const leaseStateOptions = [
-  { id: "TX", label: "Texas", basePerAcre: 24, demandBias: 8 },
-  { id: "GA", label: "Georgia", basePerAcre: 22, demandBias: 6 },
-  { id: "CO", label: "Colorado", basePerAcre: 20, demandBias: 7 },
-  { id: "MT", label: "Montana", basePerAcre: 18, demandBias: 5 },
-  { id: "US", label: "Other US state", basePerAcre: 17, demandBias: 0 },
+  { id: "TX", label: "Texas", basePerAcre: 16, demandBias: 8 },
+  { id: "GA", label: "Georgia", basePerAcre: 15, demandBias: 6 },
+  { id: "CO", label: "Colorado", basePerAcre: 12, demandBias: 5 },
+  { id: "MT", label: "Montana", basePerAcre: 11, demandBias: 4 },
+  { id: "US", label: "Other US state", basePerAcre: 13, demandBias: 0 },
 ] as const;
 
 export const leaseTermOptions = [
@@ -38,44 +38,44 @@ export const leaseTermOptions = [
 ] as const;
 
 export const habitatOptions = [
-  { id: "crop_timber", label: "Crop edge + timber", multiplier: 1.18 },
-  { id: "ranch_mosaic", label: "Ranch mosaic", multiplier: 1.15 },
-  { id: "mountain", label: "Mountain / foothill", multiplier: 1.14 },
-  { id: "timber_creek", label: "Timber + creek bottom", multiplier: 1.12 },
-  { id: "wetland", label: "Wetland / waterfowl", multiplier: 1.1 },
-  { id: "pasture", label: "Pasture / open ground", multiplier: 0.92 },
+  { id: "crop_timber", label: "Crop edge + timber", multiplier: 1.12 },
+  { id: "ranch_mosaic", label: "Ranch mosaic", multiplier: 1.08 },
+  { id: "mountain", label: "Mountain / foothill", multiplier: 1.1 },
+  { id: "timber_creek", label: "Timber + creek bottom", multiplier: 1.08 },
+  { id: "wetland", label: "Wetland / waterfowl", multiplier: 1.08 },
+  { id: "pasture", label: "Pasture / open ground", multiplier: 0.9 },
 ] as const;
 
 export const demandOptions = [
-  { id: "remote", label: "Remote / local demand", multiplier: 0.9 },
+  { id: "remote", label: "Remote / local demand", multiplier: 0.88 },
   { id: "regional", label: "Regional drive market", multiplier: 1 },
-  { id: "metro", label: "Near major metro", multiplier: 1.18 },
-  { id: "destination", label: "Destination quality", multiplier: 1.25 },
+  { id: "metro", label: "Near major metro", multiplier: 1.15 },
+  { id: "destination", label: "Destination quality", multiplier: 1.22 },
 ] as const;
 
 export const evidenceOptions = [
-  { id: "unknown", label: "Limited proof", multiplier: 0.94, score: 2 },
+  { id: "unknown", label: "Limited proof", multiplier: 0.92, score: 2 },
   { id: "sign", label: "Tracks, rubs, roosts, sightings", multiplier: 1, score: 7 },
-  { id: "trail_camera", label: "Trail cam or scouting photos", multiplier: 1.09, score: 13 },
-  { id: "harvest_history", label: "Recent harvest history", multiplier: 1.16, score: 18 },
+  { id: "trail_camera", label: "Trail cam or scouting photos", multiplier: 1.06, score: 13 },
+  { id: "harvest_history", label: "Recent harvest history", multiplier: 1.12, score: 18 },
 ] as const;
 
 export const accessOptions = [
-  { id: "basic", label: "Basic access", multiplier: 0.95 },
-  { id: "good", label: "Good roads and parking", multiplier: 1.04 },
-  { id: "premium", label: "Gated, mapped, easy staging", multiplier: 1.12 },
+  { id: "basic", label: "Basic access", multiplier: 0.94 },
+  { id: "good", label: "Good roads and parking", multiplier: 1.02 },
+  { id: "premium", label: "Gated, mapped, easy staging", multiplier: 1.08 },
 ] as const;
 
 export const exclusivityOptions = [
-  { id: "shared", label: "Shared access", multiplier: 0.86 },
+  { id: "shared", label: "Shared access", multiplier: 0.82 },
   { id: "limited", label: "Limited party", multiplier: 1 },
-  { id: "exclusive", label: "Exclusive lease", multiplier: 1.26 },
+  { id: "exclusive", label: "Exclusive lease", multiplier: 1.22 },
 ] as const;
 
 export const pressureOptions = [
   { id: "open", label: "Frequent pressure", lift: -0.08 },
   { id: "standard", label: "Standard season use", lift: 0 },
-  { id: "managed", label: "Managed low-pressure plan", lift: 0.08 },
+  { id: "managed", label: "Managed low-pressure plan", lift: 0.05 },
 ] as const;
 
 export const boundaryOptions = [
@@ -97,23 +97,23 @@ export const rulesOptions = [
 ] as const;
 
 export const speciesOptions = [
-  { id: "whitetail", label: "Whitetail deer", lift: 0.18 },
-  { id: "mule_deer", label: "Mule deer", lift: 0.17 },
-  { id: "elk", label: "Elk", lift: 0.25 },
-  { id: "turkey", label: "Turkey", lift: 0.1 },
-  { id: "waterfowl", label: "Waterfowl", lift: 0.12 },
-  { id: "upland", label: "Upland birds", lift: 0.08 },
-  { id: "hog_predator", label: "Hog / predator", lift: 0.06 },
+  { id: "whitetail", label: "Whitetail deer", lift: 0.13 },
+  { id: "mule_deer", label: "Mule deer", lift: 0.14 },
+  { id: "elk", label: "Elk", lift: 0.22 },
+  { id: "turkey", label: "Turkey", lift: 0.07 },
+  { id: "waterfowl", label: "Waterfowl", lift: 0.1 },
+  { id: "upland", label: "Upland birds", lift: 0.06 },
+  { id: "hog_predator", label: "Hog / predator", lift: 0.04 },
 ] as const;
 
 export const amenityOptions = [
-  { id: "lodging", label: "Cabin or lodging", lift: 0.15 },
-  { id: "stands_blinds", label: "Stands or blinds", lift: 0.08 },
-  { id: "feeders_plots", label: "Feeders or food plots", lift: 0.08 },
-  { id: "trail_network", label: "Road or trail network", lift: 0.06 },
-  { id: "secure_parking", label: "Secure parking", lift: 0.04 },
-  { id: "guide_checkin", label: "Guide or owner check-in", lift: 0.07 },
-  { id: "insurance_ready", label: "Insurance-friendly terms", lift: 0.05 },
+  { id: "lodging", label: "Cabin or lodging", lift: 0.16 },
+  { id: "stands_blinds", label: "Stands or blinds", lift: 0.05 },
+  { id: "feeders_plots", label: "Feeders or food plots", lift: 0.05 },
+  { id: "trail_network", label: "Road or trail network", lift: 0.04 },
+  { id: "secure_parking", label: "Secure parking", lift: 0.03 },
+  { id: "guide_checkin", label: "Guide or owner check-in", lift: 0.06 },
+  { id: "insurance_ready", label: "Insurance-friendly terms", lift: 0.03 },
 ] as const;
 
 export const constraintOptions = [
@@ -217,11 +217,13 @@ function getOption<T extends { id: string }>(options: readonly T[], id: string) 
 }
 
 function acreageScale(acres: number) {
-  if (acres < 60) return 1.28;
-  if (acres < 160) return 1.14;
-  if (acres < 500) return 1.02;
-  if (acres < 1500) return 0.94;
-  return 0.86;
+  if (acres < 60) return 1.32;
+  if (acres < 160) return 1.15;
+  if (acres < 500) return 1;
+  if (acres < 1500) return 0.82;
+  if (acres < 5000) return 0.66;
+  if (acres < 10000) return 0.54;
+  return 0.46;
 }
 
 function confidenceLabel(score: number) {
@@ -275,18 +277,18 @@ export function calculateLeasePricing(
 
   const speciesLift = Math.min(
     selectedSpecies.reduce((total, option) => total + option.lift, 0),
-    0.72,
+    0.58,
   );
   const amenityLift = Math.min(
     selectedAmenities.reduce((total, option) => total + option.lift, 0),
-    0.38,
+    0.3,
   );
   const constraintDrag = Math.min(
     selectedConstraints.reduce((total, option) => total + option.drag, 0),
     0.3,
   );
-  const waterLift = inputs.hasWater ? 0.08 : 0;
-  const partyLift = 1 + Math.min(Math.max(inputs.partySize - 2, 0) * 0.04, 0.18);
+  const waterLift = inputs.hasWater ? 0.05 : 0;
+  const partyLift = 1 + Math.min(Math.max(inputs.partySize - 2, 0) * 0.035, 0.14);
   const valueLift =
     1 + speciesLift + amenityLift + waterLift + pressure.lift - constraintDrag;
 
@@ -299,8 +301,8 @@ export function calculateLeasePricing(
       access.multiplier *
       exclusivity.multiplier *
       valueLift,
-    6,
-    140,
+    4,
+    95,
   );
 
   const seasonTarget = Math.max(
@@ -308,8 +310,8 @@ export function calculateLeasePricing(
     term.minimum / Math.max(term.multiplier, 0.01),
   );
   const target = roundToNearest(seasonTarget * term.multiplier, 25);
-  const low = roundToNearest(Math.max(target * 0.86, term.minimum), 25);
-  const high = roundToNearest(Math.max(target * 1.18, term.minimum + 100), 25);
+  const low = roundToNearest(Math.max(target * 0.84, term.minimum), 25);
+  const high = roundToNearest(Math.max(target * 1.2, term.minimum + 100), 25);
   const deposit = roundToNearest(Math.max(target * 0.18, 250), 25);
 
   const marketIndex = clamp(
