@@ -14,6 +14,11 @@ export type GuideFaq = {
   answer: string;
 };
 
+export type GuideQualityNote = {
+  label: string;
+  body: string;
+};
+
 export type GuideImage = {
   src: string;
   alt: string;
@@ -34,6 +39,8 @@ export type GuidePost = {
   primaryKeyword: string;
   secondaryKeywords: string[];
   image?: GuideImage;
+  qualityNotes?: GuideQualityNote[];
+  relatedSlugs?: string[];
   takeaways: string[];
   sections: GuideSection[];
   faq: GuideFaq[];
@@ -75,6 +82,134 @@ export const guideCategories: GuideCategory[] = [
       "Ways to review hunters, protect sensitive location details, and move from a simple request into a safer hunting lease workflow.",
   },
 ];
+
+const guideImageSize = {
+  width: 1672,
+  height: 941,
+};
+
+const guidePostImageFallbacks: Record<string, { alt: string }> = {
+  "hunter-verification-hunting-lease-guide": {
+    alt: "Hunter ID verification checklist beside a private hunting lease map and locked access gate",
+  },
+  "property-authority-proof-hunting-lease-guide": {
+    alt: "Land ownership document, parcel map, and approval seal for hunting lease authority proof",
+  },
+  "multi-species-hunting-lease-guide": {
+    alt: "Private lease habitat with field, timber, wetland, and species planning cards",
+  },
+  "hunting-lease-harvest-reporting-guide": {
+    alt: "Harvest report clipboard, trail camera card, and mapped check-in area on private land",
+  },
+  "out-of-state-hunters-hunting-lease-guide": {
+    alt: "Route map, license checklist, and packed gear for an out-of-state hunting lease trip",
+  },
+  "bowhunting-lease-landowner-guide": {
+    alt: "Bowhunting stand zone, wind note card, and wooded field edge on a private lease",
+  },
+  "hog-hunting-lease-landowner-guide": {
+    alt: "Brushy pasture, rooting sign, and night access plan for a hog hunting lease",
+  },
+  "upland-bird-hunting-lease-guide": {
+    alt: "Grassland field edges, dog-safe route markers, and upland bird lease planning notes",
+  },
+  "small-acreage-hunting-lease-guide": {
+    alt: "Small parcel map with safety buffers, stand zones, and owner access notes",
+  },
+  "hunting-lease-habitat-description-guide": {
+    alt: "Creek bottom, hardwood edge, pasture, and habitat description notes for a lease listing",
+  },
+  "hunting-lease-insurance-landowner-guide": {
+    alt: "Insurance certificate, shield icon, and signed hunting lease protection documents",
+  },
+  "hunting-lease-payment-terms-guide": {
+    alt: "Payment schedule, receipt, and lease pricing cards arranged on a landowner desk",
+  },
+  "hunting-lease-cancellation-policy-guide": {
+    alt: "Calendar, notice card, and lease cancellation policy notes for private hunting access",
+  },
+  "hunting-lease-renewal-guide": {
+    alt: "Renewal calendar, performance notes, and returning hunter approval checklist",
+  },
+  "hunting-lease-safety-plan-guide": {
+    alt: "Safety plan checklist, emergency contact card, and marked access map for a hunting lease",
+  },
+  "exclusive-hunting-lease-guide": {
+    alt: "Locked parcel map, single access key, and exclusive hunting lease agreement",
+  },
+  "waterfowl-hunting-lease-landowner-guide": {
+    alt: "Wetland blind zone, water access map, and waterfowl lease rules checklist",
+  },
+  "ranch-hunting-lease-guide": {
+    alt: "Ranch gate, pasture roads, and lease agreement notes for private ranch hunting access",
+  },
+  "hunting-lease-access-roads-parking-guide": {
+    alt: "Gravel access road, parking marker, and road rules card for a hunting lease",
+  },
+  "hunting-lease-guest-policy-guide": {
+    alt: "Guest approval cards, hunter party limits, and landowner rule checklist",
+  },
+  "private-hunting-land-for-lease-guide": {
+    alt: "Private gate, field edge, and owner-approved lease listing map",
+  },
+  "turkey-hunting-lease-landowner-guide": {
+    alt: "Turkey habitat map with roost buffer notes, field edge, and spring access checklist",
+  },
+  "hunting-lease-map-guide": {
+    alt: "Boundary polygon, closed zones, and access route notes on a hunting lease map",
+  },
+  "seasonal-hunting-lease-guide": {
+    alt: "Season calendar, species windows, and access date plan for a hunting lease",
+  },
+  "landowner-hunting-lease-checklist": {
+    alt: "Landowner pre-publish checklist, photos, maps, rules, and verification cards",
+  },
+  "hunting-land-for-lease-landowner-marketing-guide": {
+    alt: "Search listing cards, field photo proofs, and private hunting land marketing plan",
+  },
+  "deer-lease-landowner-guide": {
+    alt: "Deer lease habitat map, stand rules card, and whitetail season planning notes",
+  },
+  "hunting-lease-rules-landowners": {
+    alt: "Hunting lease rulebook, checkmarks, and owner access limits for private land",
+  },
+  "write-hunting-lease-description": {
+    alt: "Listing description draft, habitat notes, and photos for hunting lease copywriting",
+  },
+  "find-hunters-for-hunting-lease": {
+    alt: "Hunter request cards, search signals, and screening workflow for a private lease",
+  },
+  "hunting-lease-landowner-guide": {
+    alt: "Owner lease workflow board with listing, request, map, agreement, and access steps",
+  },
+  "how-to-price-hunting-leases": {
+    alt: "Hunting lease pricing calculator, habitat value cards, and season quote notes",
+  },
+  "hunting-lease-agreement-checklist": {
+    alt: "Signed lease agreement checklist, rule clauses, and owner approval notes",
+  },
+  "prepare-land-for-hunting-lease-listing": {
+    alt: "Pre-listing property prep plan with photos, access notes, and safety markers",
+  },
+  "screen-hunter-requests-before-approval": {
+    alt: "Hunter request inbox, screening questions, and approval decision cards",
+  },
+  "hunting-lease-photos-landowners": {
+    alt: "Camera, field photo contact sheet, and privacy-safe hunting lease image checklist",
+  },
+  "protect-property-boundaries-hunting-lease": {
+    alt: "Boundary map, fence line, closed zone, and owner-protected access markers",
+  },
+  "hunting-lease-amenities-landowners": {
+    alt: "Lease amenity cards for parking, water, camping, blinds, and access support",
+  },
+  "annual-hunting-lease-vs-short-term-access": {
+    alt: "Annual calendar and short-term access cards comparing hunting lease options",
+  },
+  "common-hunting-lease-listing-mistakes": {
+    alt: "Corrected listing draft, warning markers, and quality checks for hunting lease mistakes",
+  },
+};
 
 const guidePostDrafts: GuidePost[] = [
   {
@@ -7017,7 +7152,151 @@ const guidePostExpansions: Record<string, GuidePostExpansion> = {
   },
 };
 
-export const guidePosts: GuidePost[] = guidePostDrafts.map((post) => {
+const guideCategoryCornerstoneSlugs: Record<string, string[]> = {
+  "landowner-basics": [
+    "lease-your-land-for-hunting-landowner-guide",
+    "hunting-lease-landowner-guide",
+    "landowner-hunting-lease-checklist",
+  ],
+  "pricing-and-terms": [
+    "how-to-price-hunting-leases",
+    "hunting-lease-agreement-checklist",
+    "hunting-lease-payment-terms-guide",
+  ],
+  "listing-optimization": [
+    "write-hunting-lease-description",
+    "hunting-lease-photos-landowners",
+    "hunting-land-for-lease-landowner-marketing-guide",
+  ],
+  "property-protection": [
+    "protect-property-boundaries-hunting-lease",
+    "hunting-lease-map-guide",
+    "property-authority-proof-hunting-lease-guide",
+  ],
+  "requests-and-screening": [
+    "screen-hunter-requests-before-approval",
+    "hunting-lease-request-message-guide",
+    "hunting-lease-screening-questions-guide",
+  ],
+};
+
+const guideCategoryQualityFocus: Record<string, string> = {
+  "landowner-basics":
+    "The strongest article should move from broad advice into a practical owner decision about access type, privacy, request flow, and next action.",
+  "pricing-and-terms":
+    "The strongest article should turn pricing or policy language into agreement-ready terms that hunters can understand before access is approved.",
+  "listing-optimization":
+    "The strongest article should make the listing easier to scan with concrete habitat, photos, rules, location context, and a clear request path.",
+  "property-protection":
+    "The strongest article should separate useful public context from exact gates, routes, maps, documents, and other details that belong after approval.",
+  "requests-and-screening":
+    "The strongest article should help owners turn interest into a screened request with enough detail to approve, decline, or ask one focused follow-up.",
+};
+
+function imageForGuidePost(post: GuidePost): GuideImage | undefined {
+  if (post.image) {
+    return post.image;
+  }
+
+  const fallback = guidePostImageFallbacks[post.slug];
+
+  if (!fallback) {
+    return undefined;
+  }
+
+  return {
+    src: `/images/guides/${post.slug}.jpg`,
+    alt: fallback.alt,
+    ...guideImageSize,
+  };
+}
+
+function uniqueGuidePosts(posts: GuidePost[]) {
+  const seen = new Set<string>();
+
+  return posts.filter((post) => {
+    if (seen.has(post.slug)) {
+      return false;
+    }
+
+    seen.add(post.slug);
+    return true;
+  });
+}
+
+function relatedGuidePostsFor(
+  post: GuidePost,
+  posts: GuidePost[],
+  limit = 4,
+) {
+  const cornerstonePosts = (guideCategoryCornerstoneSlugs[post.category] ?? [])
+    .filter((slug) => slug !== post.slug)
+    .map((slug) => posts.find((item) => item.slug === slug))
+    .filter((item): item is GuidePost => Boolean(item));
+  const categoryPosts = posts.filter(
+    (item) => item.slug !== post.slug && item.category === post.category,
+  );
+  const otherPosts = posts.filter(
+    (item) => item.slug !== post.slug && item.category !== post.category,
+  );
+
+  return uniqueGuidePosts([
+    ...cornerstonePosts,
+    ...categoryPosts,
+    ...otherPosts,
+  ]).slice(0, limit);
+}
+
+function qualityNotesForGuidePost(
+  post: GuidePost,
+  relatedPosts: GuidePost[],
+): GuideQualityNote[] {
+  const [firstRelated, secondRelated] = relatedPosts;
+  const categoryFocus =
+    guideCategoryQualityFocus[post.category] ??
+    "The strongest article should answer the reader's practical decision instead of repeating keywords for length.";
+  const linkBody =
+    firstRelated && secondRelated
+      ? `Connect this guide with [[${firstRelated.slug}|${firstRelated.title}]] and [[${secondRelated.slug}|${secondRelated.title}]] so readers can keep moving through the owner workflow instead of landing on an isolated SEO page.`
+      : "Connect this guide to the wider owner workflow so readers can keep moving instead of landing on an isolated SEO page.";
+
+  return [
+    {
+      label: "Search intent",
+      body: `Use **${post.primaryKeyword}** as a decision page, not a keyword page. The article should answer what the owner needs to publish, what should stay private, and which request detail changes the next step.`,
+    },
+    {
+      label: "Quality bar",
+      body: categoryFocus,
+    },
+    {
+      label: "Internal path",
+      body: linkBody,
+    },
+  ];
+}
+
+function countWords(value: string) {
+  return value.trim().split(/\s+/).filter(Boolean).length;
+}
+
+function estimateReadingMinutes(post: GuidePost) {
+  const words = [
+    post.title,
+    post.description,
+    post.excerpt,
+    ...post.takeaways,
+    ...(post.qualityNotes ?? []).flatMap((note) => [note.label, note.body]),
+    ...post.sections.flatMap((section) => [section.heading, ...section.body]),
+    ...post.faq.flatMap((item) => [item.question, item.answer]),
+    post.ctaTitle,
+    post.ctaBody,
+  ].reduce((total, item) => total + countWords(item), 0);
+
+  return Math.max(4, Math.ceil(words / 180));
+}
+
+const expandedGuidePosts: GuidePost[] = guidePostDrafts.map((post) => {
   const expansion = guidePostExpansions[post.slug];
 
   if (!expansion) {
@@ -7030,6 +7309,25 @@ export const guidePosts: GuidePost[] = guidePostDrafts.map((post) => {
     takeaways: [...post.takeaways, ...expansion.takeaways],
     sections: [...post.sections, ...expansion.sections],
     faq: [...post.faq, ...expansion.faq],
+  };
+});
+
+export const guidePosts: GuidePost[] = expandedGuidePosts.map((post, _, posts) => {
+  const relatedPosts = relatedGuidePostsFor(post, posts);
+  const qualityNotes = [
+    ...(post.qualityNotes ?? []),
+    ...qualityNotesForGuidePost(post, relatedPosts),
+  ];
+  const guidePost = {
+    ...post,
+    image: imageForGuidePost(post),
+    qualityNotes,
+    relatedSlugs: relatedPosts.map((item) => item.slug),
+  };
+
+  return {
+    ...guidePost,
+    readingMinutes: estimateReadingMinutes(guidePost),
   };
 });
 
@@ -7047,4 +7345,13 @@ export function getGuidePostsByCategory(categorySlug: string) {
 
 export function getGuideCategoryForPost(post: GuidePost) {
   return getGuideCategory(post.category);
+}
+
+export function getRelatedGuidePosts(post: GuidePost, limit = 4) {
+  const linkedPosts = (post.relatedSlugs ?? [])
+    .map((slug) => getGuidePost(slug))
+    .filter((item): item is GuidePost => Boolean(item));
+  const fallbackPosts = relatedGuidePostsFor(post, guidePosts, limit);
+
+  return uniqueGuidePosts([...linkedPosts, ...fallbackPosts]).slice(0, limit);
 }

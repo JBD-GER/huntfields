@@ -13,6 +13,7 @@ import {
   getGuideCategory,
   getGuideCategoryForPost,
   getGuidePost,
+  getRelatedGuidePosts,
   guidePosts,
 } from "@/lib/guides";
 import {
@@ -22,6 +23,42 @@ import {
 } from "@/lib/seo/site";
 
 type Params = Promise<{ slug: string }>;
+
+function renderGuideInlineText(text: string) {
+  return text
+    .split(/(\*\*[^*]+\*\*|\[\[[^\]]+\]\])/g)
+    .filter(Boolean)
+    .map((part, index) => {
+      if (part.startsWith("**") && part.endsWith("**")) {
+        return (
+          <strong key={`${part}-${index}`} className="font-black text-stone-900">
+            {part.slice(2, -2)}
+          </strong>
+        );
+      }
+
+      if (part.startsWith("[[") && part.endsWith("]]")) {
+        const [slug, label] = part.slice(2, -2).split("|");
+        const target = getGuidePost(slug.trim());
+
+        if (!target) {
+          return part;
+        }
+
+        return (
+          <Link
+            key={`${part}-${index}`}
+            href={`/guides/${target.slug}`}
+            className="font-black text-[#183326] underline decoration-[#d99a61]/55 underline-offset-4 transition hover:text-[#c76b2f]"
+          >
+            {label?.trim() || target.title}
+          </Link>
+        );
+      }
+
+      return part;
+    });
+}
 
 export function generateStaticParams() {
   return guidePosts.map((post) => ({ slug: post.slug }));
@@ -82,11 +119,7 @@ export default async function GuidePostPage({ params }: { params: Params }) {
   }
 
   const category = getGuideCategoryForPost(post);
-  const related = guidePosts
-    .filter((item) => item.slug !== post.slug)
-    .filter((item) => item.category === post.category)
-    .concat(guidePosts.filter((item) => item.slug !== post.slug))
-    .slice(0, 3);
+  const related = getRelatedGuidePosts(post, 4);
   const jsonLd = [
     {
       "@context": "https://schema.org",
@@ -219,12 +252,35 @@ export default async function GuidePostPage({ params }: { params: Params }) {
                   <div key={item} className="flex gap-3 rounded-md bg-[#f7f3ea] p-3">
                     <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-[#2f6f8f]" aria-hidden="true" />
                     <p className="text-sm font-semibold leading-6 text-stone-700">
-                      {item}
+                      {renderGuideInlineText(item)}
                     </p>
                   </div>
                 ))}
               </div>
             </section>
+
+            {post.qualityNotes?.length ? (
+              <section className="mt-7 rounded-lg border border-[#234331]/10 bg-[#fffdf7] p-5 shadow-[0_18px_48px_rgba(25,35,29,0.07)] sm:p-7">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-[#c76b2f]">
+                  Quality checks
+                </p>
+                <div className="mt-4 grid gap-4">
+                  {post.qualityNotes.map((note) => (
+                    <div
+                      key={`${note.label}-${note.body}`}
+                      className="border-l-2 border-[#d99a61] pl-4"
+                    >
+                      <h2 className="text-base font-black leading-6 text-stone-950">
+                        {note.label}
+                      </h2>
+                      <p className="mt-1 text-sm leading-7 text-stone-600">
+                        {renderGuideInlineText(note.body)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ) : null}
 
             <div className="mt-7 grid gap-7">
               {post.sections.map((section) => (
@@ -234,12 +290,45 @@ export default async function GuidePostPage({ params }: { params: Params }) {
                   </h2>
                   <div className="mt-4 grid gap-4 text-base leading-8 text-stone-600">
                     {section.body.map((paragraph) => (
-                      <p key={paragraph}>{paragraph}</p>
+                      <p key={paragraph}>{renderGuideInlineText(paragraph)}</p>
                     ))}
                   </div>
                 </section>
               ))}
             </div>
+
+            {related.length ? (
+              <section className="mt-8 border-y border-[#234331]/10 py-6">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-[#c76b2f]">
+                  Keep building the workflow
+                </p>
+                <h2 className="mt-2 text-2xl font-black leading-tight text-stone-950">
+                  Read this guide with the next practical step.
+                </h2>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  {related.map((item) => {
+                    const itemCategory = getGuideCategory(item.category);
+                    return (
+                      <Link
+                        key={item.slug}
+                        href={`/guides/${item.slug}`}
+                        className="rounded-md border border-[#234331]/10 bg-[#fffdf7] p-4 transition hover:border-[#234331]/35 hover:bg-[#f7f3ea]"
+                      >
+                        <span className="block text-[11px] font-black uppercase tracking-[0.12em] text-[#c76b2f]">
+                          {itemCategory?.name ?? "Guide"}
+                        </span>
+                        <span className="mt-2 block text-base font-black leading-6 text-stone-950">
+                          {item.title}
+                        </span>
+                        <span className="mt-2 block text-sm leading-6 text-stone-600">
+                          {item.excerpt}
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </section>
+            ) : null}
 
             <section className="mt-8 rounded-lg border border-[#234331]/10 bg-[#fffdf7] p-5 shadow-[0_18px_48px_rgba(25,35,29,0.07)] sm:p-7">
               <p className="text-xs font-black uppercase tracking-[0.16em] text-[#c76b2f]">
@@ -255,7 +344,7 @@ export default async function GuidePostPage({ params }: { params: Params }) {
                       {item.question}
                     </h3>
                     <p className="mt-2 text-sm leading-7 text-stone-600">
-                      {item.answer}
+                      {renderGuideInlineText(item.answer)}
                     </p>
                   </div>
                 ))}
@@ -288,7 +377,7 @@ export default async function GuidePostPage({ params }: { params: Params }) {
                 Related guides
               </p>
               <div className="mt-4 grid gap-3">
-                {related.map((item) => {
+                {related.slice(0, 3).map((item) => {
                   const itemCategory = getGuideCategory(item.category);
                   return (
                     <Link
